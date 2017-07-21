@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebExperiment
+namespace Dotnettency.Container
 {
     public class SomeTenantService
     {

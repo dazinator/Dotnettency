@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace WebExperiment
+namespace Dotnettency.Container
 {
     public class TenantStartup : ITenantStartup
     {

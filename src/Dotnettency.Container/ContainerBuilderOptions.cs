@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace WebExperiment
+namespace Dotnettency.Container
 {
     //public class TenantServicesConfigurationProvider<TTenantStartup>
     //{

@@ -1,13 +1,12 @@
-﻿using StructureMap;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace WebExperiment
+namespace Dotnettency.Container
 {
     public interface ITenantContainerFactory<TTenant>
        where TTenant : class
     {
         // Task<TTenant> Resolve(TenantIdentifier identifier);
-        Task<ITenantContainerAdaptor> Get(TenantIdentifier identifier);
+        Task<ITenantContainerAdaptor> Get(TTenant currentTenant);
     }
 
 

@@ -2,40 +2,11 @@
 using System;
 using System.Threading.Tasks;
 
-namespace WebExperiment
+namespace Dotnettency.Container
 {
+     
 
-    //public class StartupClassTenantContainerFactory<TTenant, TTenantStartup> : CachingTenantContainerFactory<TTenant>
-    //    where TTenant : class
-    //    where TTenantStartup : ITenantStartup
-    //{
-
-    //    //  private readonly List<TTenantStartup> _startups;
-    //    private readonly IServiceProvider _serviceProvider;
-
-    //    public StartupClassTenantContainerFactory(IServiceProvider servicePrvider)
-    //        : base(servicePrvider)
-    //    {
-    //        _serviceProvider = servicePrvider;
-    //        //_startups = startups.ToList();
-    //    }
-
-    //    protected override Task<IServiceProvider> BuildContainer(TTenant currentTenant)
-    //    {
-    //        return Task.Run(() =>
-    //        {
-    //            var startups = _serviceProvider.GetServices<TTenantStartup>();
-    //            var tenantServices = new ServiceCollection();
-    //            foreach (var item in startups)
-    //            {
-    //                item.ConfigureServices(tenantServices);
-    //            }
-    //            return tenantServices.BuildServiceProvider();
-    //        });
-    //    }
-    //}
-
-    public class TenantContainerBuilderFactory<TTenant> : CachingTenantContainerFactory<TTenant>
+    public class TenantContainerBuilderFactory<TTenant> : TenantContainerFactory<TTenant>
      where TTenant : class    
     {
 

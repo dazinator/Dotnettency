@@ -1,8 +1,10 @@
-﻿using StructureMap;
+﻿using Dotnettency.Container;
+using StructureMap;
 using System;
 
-namespace WebExperiment
-{
+
+namespace Dotnettency
+{   
 
     public static class StructureMapContainerBuilderOptionsExtensions
     //  where TTenant : class
@@ -13,7 +15,7 @@ namespace WebExperiment
           Action<TTenant, ConfigurationExpression> configureTenant)
           where TTenant : class
         {
-            var container = new Container();
+            var container = new StructureMap.Container();
             container.Populate(options.Services);
 
             // var tenantContainer = container.CreateChildContainer();
@@ -33,7 +35,7 @@ namespace WebExperiment
             Action<ConfigurationExpression> configureTenant)
             where TTenant : class
         {
-            var container = new Container();
+            var container = new StructureMap.Container();
             container.Populate(options.Services);
 
             // var tenantContainer = container.CreateChildContainer();

@@ -19,7 +19,7 @@ namespace Sample
                 options
                     .DistinguishTenantsWithHostname()
                     .OnInitialiseTenant((distinguisher) => // invoked when tenant needs to be initialised.
-                     {                         
+                     {
                          // The distinguisher for the current request - we are using hostname.
                          if (distinguisher.Key == "localhost")
                          {
@@ -37,7 +37,7 @@ namespace Sample
                          // returning null will cause dotnettency to try to intialsie this tenant again on future requests for the same hostname.
 
                          // if you would like to prevent this, return a new TenantShell<Tenant>(null) which will initialise a null tenant.                   
-                
+
                          return null;
                      })
                     .ConfigureTenantPipeline((pipelineOptions) =>
@@ -47,6 +47,8 @@ namespace Sample
                             appBuilder.UseWelcomePage("/welcome");
                         });
                     });
+                    
+                    
 
             });
         }

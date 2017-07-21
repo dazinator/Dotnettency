@@ -1,8 +1,9 @@
-﻿using StructureMap;
+﻿using Dotnettency.Container;
+using StructureMap;
 using System;
 using System.Threading.Tasks;
 
-namespace WebExperiment
+namespace Dotnettency.Container
 {
     public class StructureMapTenantContainerBuilder<TTenant> : ITenantContainerBuilder<TTenant>
     {
