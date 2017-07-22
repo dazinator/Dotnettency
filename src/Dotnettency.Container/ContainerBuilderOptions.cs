@@ -2,24 +2,21 @@
 
 namespace Dotnettency.Container
 {
-    //public class TenantServicesConfigurationProvider<TTenantStartup>
-    //{
-    //    public TenantServicesConfigurationProvider()
-    //    {
-
-    //    }
-    //}
-
-
 
     public class ContainerBuilderOptions<TTenant>
+        where TTenant : class
     {
-        public ContainerBuilderOptions(IServiceCollection services)
+
+        public ContainerBuilderOptions(MultitenancyOptionsBuilder<TTenant> builder)
         {
-            Services = services;
+            Builder = builder;
+            builder.Services.AddSingleton<ITenantContainerFactory<TTenant>, TenantContainerBuilderFactory<TTenant>>();
         }
 
-        public IServiceCollection Services { get; set; }
+        public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
+
+
+        // public IServiceCollection Services { get; set; }
 
     }
 

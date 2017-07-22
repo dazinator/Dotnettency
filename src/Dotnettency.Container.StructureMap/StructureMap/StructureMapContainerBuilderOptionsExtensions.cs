@@ -1,22 +1,23 @@
 ﻿using Dotnettency.Container;
+using Microsoft.Extensions.DependencyInjection;
 using StructureMap;
 using System;
 
 
 namespace Dotnettency
-{   
+{
 
     public static class StructureMapContainerBuilderOptionsExtensions
     //  where TTenant : class
     {
 
 
-        public static IServiceProvider ConfigureStructureMapContainer<TTenant>(this ContainerBuilderOptions<TTenant> options,
+        public static ContainerBuilderOptions<TTenant> ConfigureStructureMapContainer<TTenant>(this ContainerBuilderOptions<TTenant> options,
           Action<TTenant, ConfigurationExpression> configureTenant)
           where TTenant : class
         {
             var container = new StructureMap.Container();
-            container.Populate(options.Services);
+            container.Populate(options.Builder.Services);
 
             // var tenantContainer = container.CreateChildContainer();
 
@@ -26,17 +27,18 @@ namespace Dotnettency
             );
 
             // now configure nested container per tenant.
-            return container.GetInstance<IServiceProvider>();
+            options.Builder.ServiceProvider = container.GetInstance<IServiceProvider>();
+            return options;
             // var containerBuilderOptions = new ContainerBuilderOptions<TTenant>();
             // return options(containerBuilderOptions);
         }
 
-        public static IServiceProvider ConfigureStructureMapContainer<TTenant>(this ContainerBuilderOptions<TTenant> options,
+        public static ContainerBuilderOptions<TTenant> ConfigureStructureMapContainer<TTenant>(this ContainerBuilderOptions<TTenant> options,
             Action<ConfigurationExpression> configureTenant)
             where TTenant : class
         {
             var container = new StructureMap.Container();
-            container.Populate(options.Services);
+            container.Populate(options.Builder.Services);
 
             // var tenantContainer = container.CreateChildContainer();
 
@@ -46,7 +48,9 @@ namespace Dotnettency
           );
 
             // now configure nested container per tenant.
-            return container.GetInstance<IServiceProvider>();
+            options.Builder.ServiceProvider = container.GetInstance<IServiceProvider>();
+            return options;
+
             // var containerBuilderOptions = new ContainerBuilderOptions<TTenant>();
             // return options(containerBuilderOptions);
         }

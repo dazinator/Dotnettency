@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Dotnettency.Container

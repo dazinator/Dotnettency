@@ -14,8 +14,8 @@ namespace Dotnettency.Container
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var tenantService = new SomeTenantService() { Id = Guid.NewGuid() };
-            services.AddSingleton<SomeTenantService>(tenantService);
+          //  var tenantService = new SomeTenantService() { Id = Guid.NewGuid() };
+          //  services.AddSingleton<SomeTenantService>(tenantService);
 
            
         }
