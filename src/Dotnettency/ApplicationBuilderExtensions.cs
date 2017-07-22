@@ -2,11 +2,9 @@
 using System;
 
 namespace Dotnettency
-{   
-
+{
     public static class ApplicationBuilderExtensions
     {
-
         public static IApplicationBuilder UseMultitenancy<TTenant>(this IApplicationBuilder app, Action<MultitenancyMiddlewareOptionsBuilder<TTenant>> configure)
             where TTenant : class
         {
@@ -14,8 +12,5 @@ namespace Dotnettency
             configure(builder);
             return app;
         }
-
     }
-
 }
-

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Dotnettency.Container;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Dotnettency
 {
@@ -15,10 +13,6 @@ namespace Dotnettency
             {
                 configure(containerOptionsBuilder);
             }
-
-            //  containerOptionsBuilder.Builder.ServiceProvider = containerOptionsBuilder.Buil
-
-            //   var serviceProvider = optionsBuilder.Build();
             return optionsBuilder;
         }
     }

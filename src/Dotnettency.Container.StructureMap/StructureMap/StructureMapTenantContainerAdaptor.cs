@@ -1,10 +1,8 @@
-﻿using Dotnettency.Container;
-using StructureMap;
+﻿using StructureMap;
 using System;
 
 namespace Dotnettency.Container
 {
-
     public class StructureMapTenantContainerAdaptor : ITenantContainerAdaptor
     {
         private readonly IContainer _container;
@@ -29,6 +27,4 @@ namespace Dotnettency.Container
             _container.Dispose();
         }
     }
-    
-
 }

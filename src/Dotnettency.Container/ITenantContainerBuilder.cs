@@ -6,6 +6,4 @@ namespace Dotnettency.Container
     {
         Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant);
     }
-
-
 }

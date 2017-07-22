@@ -56,7 +56,6 @@ namespace Dotnettency.Container
                 var lazy = tenantShell.GetOrAddContainer<TTenant>(_containerFactory);
                 var currentTenantContainer = await lazy.Value;
 
-
                 using (var scope = currentTenantContainer.CreateNestedContainer())
                 {
                     var oldRequestServices = context.RequestServices;
@@ -65,17 +64,6 @@ namespace Dotnettency.Container
                     context.RequestServices = oldRequestServices;
                 }
             };
-
-
-
-
-
-
-
-
         }
-
     }
-
-
 }

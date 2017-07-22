@@ -15,10 +15,5 @@ namespace Dotnettency.Container
 
         public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
 
-
-        // public IServiceCollection Services { get; set; }
-
     }
-
-
 }
