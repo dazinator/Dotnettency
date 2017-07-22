@@ -23,6 +23,4 @@ namespace Dotnettency.MiddlewarePipeline
             return _builder;
         }
     }
-
-
 }

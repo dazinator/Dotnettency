@@ -38,23 +38,6 @@ namespace Dotnettency.MiddlewarePipeline
                 }));
                 await tenantPipeline.Value(context);
             };
-        }
-
-        //private RequestDelegate BuildTenantPipeline(TTenant tenant)
-        //{
-        //    //var branchBuilder = _rootApp.New();
-        //    //var builderContext = new TenantPipelineBuilderContext<TTenant>
-        //    //{
-
-        //    //    //   TenantContext = tenantContext,
-        //    //    Tenant = tenant
-        //    //};
-
-        //    return
-
-        //    // register root pipeline at the end of the tenant branch
-        //    branchBuilder.Run(_next);
-        //    return branchBuilder.Build();
-        //}
+        }        
     }
 }

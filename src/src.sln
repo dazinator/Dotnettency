@@ -11,7 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Dotnettency.Sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Container", "Dotnettency.Container\Dotnettency.Container.csproj", "{9D449854-6932-436B-B9F6-FC298273C6F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Container.StructureMap", "Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj", "{5FDA86A9-0751-409D-9C3E-0BF344FA4CE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Container.StructureMap", "Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj", "{5FDA86A9-0751-409D-9C3E-0BF344FA4CE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4FB5543E-ED1F-4B32-A770-2675A16E508F}"
+	ProjectSection(SolutionItems) = preProject
+		..\appveyor.yml = ..\appveyor.yml
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
