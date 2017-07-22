@@ -34,24 +34,26 @@ namespace Sample
                              var result = new TenantShell<Tenant>(tenant, "bar.com", "baz.com");  // optional other identifies we want to associate this same tenant shell with.                          
                              return result;
                          }
-                         // returning null will cause dotnettency to try to intialsie this tenant again on future requests for the same hostname.
-
-                         // if you would like to prevent this, return a new TenantShell<Tenant>(null) which will initialise a null tenant.                   
+                         // returning null will cause this method to keep being called on future requests with same distinguisher.                  
+                         // if you would like to prevent this, return a new TenantShell<Tenant>(null) which will cause a null tenant to be cached.                 
 
                          return null;
                      })
-                    .ConfigureTenantPipeline((pipelineOptions) =>
+                    .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
-                        pipelineOptions.FromDelegate((context, appBuilder) =>
+                        middlewareOptions.OnConfigureTenant((context, appBuilder) =>
                         {
-                            appBuilder.UseWelcomePage("/welcome");
+                            if (context.Tenant.Id == 1)
+                            {
+                                appBuilder.UseWelcomePage("/welcome");
+                            }
                         });
                     })
-                    .ConfigureTenantContainers((containerOptions) =>
+                    .ConfigureTenantContainers((containerBuilder) =>
                     {
-                        containerOptions.ConfigureStructureMapContainer((tenant, builder) =>
+                        containerBuilder.ConfigureStructureMapContainer((tenant, configuration) =>
                         {
-                            builder.ForSingletonOf<SomeTenantService>();
+                            configuration.ForSingletonOf<SomeTenantService>();
                             // could register services based on the tenant.
                             //switch (tenant.Id)
                             //{
@@ -67,6 +69,7 @@ namespace Sample
                     });
             });
 
+            // When using tenant containers, must return IServiceProvider.
             return serviceProvider;
         }
 
@@ -79,6 +82,7 @@ namespace Sample
                 app.UseDeveloperExceptionPage();
             }
 
+            // Add the multitenancy middleware.
             app.UseMultitenancy<Tenant>((options) =>
             {
                 options.UsePerTenantMiddlewarePipeline()
