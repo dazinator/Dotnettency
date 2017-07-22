@@ -50,7 +50,7 @@ namespace Dotnettency
 
         }
 
-        public MultitenancyOptionsBuilder<TTenant> OnInitialiseTenant(Func<TenantDistinguisher, TenantShell<TTenant>> factoryMethod)
+        public MultitenancyOptionsBuilder<TTenant> OnResolveTenant(Func<TenantDistinguisher, TenantShell<TTenant>> factoryMethod)
         {
             var factory = new DelegateTenantShellFactory<TTenant>(factoryMethod);
             Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);

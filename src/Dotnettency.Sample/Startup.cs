@@ -18,7 +18,7 @@ namespace Sample
             {
                 options
                     .DistinguishTenantsWithHostname()
-                    .OnInitialiseTenant((distinguisher) => // invoked when tenant needs to be initialised.
+                    .OnResolveTenant((distinguisher) => // invoked when tenant needs to be resolved, result is cached.
                      {
                          // The distinguisher used for this request - we are using hostname - return tenant accordingly.
                          if (distinguisher.Key == "localhost")
