@@ -41,7 +41,7 @@ namespace Sample
                      })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
-                        middlewareOptions.OnConfigureTenant((context, appBuilder) =>
+                        middlewareOptions.OnBuildPipeline((context, appBuilder) =>
                         {
                             if (context.Tenant.Id == 1)
                             {

@@ -16,7 +16,7 @@ namespace Dotnettency.MiddlewarePipeline
         }
 
 
-        public MultitenancyOptionsBuilder<TTenant> OnConfigureTenant(Action<TenantPipelineBuilderContext<TTenant>, IApplicationBuilder> configuration)
+        public MultitenancyOptionsBuilder<TTenant> OnBuildPipeline(Action<TenantPipelineBuilderContext<TTenant>, IApplicationBuilder> configuration)
         {
             var factory = new DelegateTenantMiddlewarePipelineFactory<TTenant>(configuration);
             _builder.Services.AddSingleton<ITenantMiddlewarePipelineFactory<TTenant>>(factory);
