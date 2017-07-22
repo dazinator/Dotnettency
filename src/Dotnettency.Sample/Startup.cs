@@ -70,7 +70,6 @@ namespace Sample
             return serviceProvider;
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
@@ -88,15 +87,15 @@ namespace Sample
 
 
             //  app.
-
             app.Run(async (context) =>
             {
+                // Use ITenantAccessor to access the current tenant.
                 var tenantAccessor = context.RequestServices.GetRequiredService<ITenantAccessor<Tenant>>();
                 var tenant = await tenantAccessor.CurrentTenant.Value;
 
+                // This service was registered as singleton in tenant container.
                 var someTenantService = context.RequestServices.GetService<SomeTenantService>();
-
-                await context.Response.WriteAsync("Hello tenant: " + tenant?.Name + " Service: " + someTenantService?.Id);
+                await context.Response.WriteAsync("Hello tenant: " + tenant?.Name + ", Service Id: " + someTenantService?.Id);
             });
         }
     }
