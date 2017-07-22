@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+    <!--Nuspec Metadata-->
+    <Description>Allows per tenant middleware pipelines to be configured, using the dotnettency Mutlitenancy library for dotnet standard compatible applications.</Description>
+    <Authors>Darrell Tunnell</Authors>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/dazinator/Dotnettency</PackageProjectUrl>
+    <PackageTags>Multitenancy,tenant,middleware,pipeline</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
