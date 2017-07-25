@@ -1,19 +1,22 @@
-version: 1.0.{build}
-skip_tags: true
-image: Visual Studio 2017
+  # environment variables
 environment:
-  NuGetOrgApiKey: 
-    secure: 
-  PUBLIC_NUGET_FEED_NAME: nuget.org
-  PUBLIC_NUGET_FEED_SOURCE: https://www.nuget.org/
+  path_to_sln: src/src.sln 
+skip_tags: true
+install:
+  - choco install gitversion.portable -pre -y
+  - cinst gitlink -y
+image: Visual Studio 2017 
+assembly_info:
+  patch: false
 before_build:
-- cmd: msbuild src/src.sln /t:restore /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
+- ps: gitversion /l console /output buildserver
+- cmd: msbuild %path_to_sln% /t:restore /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
 build:
-  project: src/src.sln
-  publish_nuget: true
+  project: %path_to_sln%
   verbosity: minimal
 after_build:
-- cmd: msbuild src/src.sln /t:Pack /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
+- cmd: gitlink . -u https://github.com/%APPVEYOR_REPO_NAME% -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f %path_to_sln%
+- cmd: msbuild %path_to_sln% /t:Pack /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
 artifacts:
 - path: /src/**/*.nupkg
 deploy:
@@ -21,4 +24,4 @@ deploy:
   api_key:
     secure: u8JpW5kkti8pMi+ra2QcXTJPhkHCA8pkKSiiZOJbcS/vFVHNvF3W8qw1Fy2If6a7
   skip_symbols: false
-  artifact: /.*\.nupkg/
+  artifact: '**\Dotnettency*.nupkg'
