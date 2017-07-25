@@ -1,10 +1,12 @@
 # Dotnettency
 Mutlitenancy library for dotnet applications.
 
-| Branch  | Build Status | NuGet |
-| ------------- | ------------- | ----- |
-| Master  |[![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | [![NuGet](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) |
-| Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop)  | [![NuGet](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) |
+| Branch  | Build Status | Dotnettency Core Library | Middleware | Container | StructureMap |
+| ------------- | ------------- | ----- | ----- | ----- | ----- |
+| Master  |[![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![Middleware](https://img.shields.io/nuget/v/Dotnettency.Middleware.svg)](https://www.nuget.org/packages/Dotnettency.Middleware/) | [![Container](https://img.shields.io/nuget/v/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) | [![StructureMap](https://img.shields.io/nuget/v/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) |
+| Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop)  | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![Middleware](https://img.shields.io/nuget/vpre/Dotnettency.Middleware.svg)](https://www.nuget.org/packages/Dotnettency.Middleware/) [![Container](https://img.shields.io/nuget/vpre/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) |  [![StructureMap](https://img.shields.io/nuget/vpre/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) |
+
+
 
 Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 
