@@ -17,33 +17,48 @@ namespace Sample
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .DistinguishTenantsByHostname()
-                    .OnResolveTenant((distinguisher) => // invoked when tenant needs to be resolved, result is cached.
+                    .DistinguishTenantsBySchemeHostnameAndPort()  // The distinguisher used to identify one tenant from another. Other methods available.
+                    .OnResolveTenant((distinguisher) => // method used to resolve the tenant using the distinguisher above.
                      {
-                         // The distinguisher used for this request - we are using hostname - return tenant accordingly.
-                         if (distinguisher.Key == "localhost")
+                         if (distinguisher.Key == "http://localhost:63291")
                          {
-                             var tenant = new Tenant() { Name = "Test", Id = 1 };
+                             var tenant = new Tenant() { Name = "Foo", Id = 1 };
                              var result = new TenantShell<Tenant>(tenant);
                              return result;
                          }
 
-                         if (distinguisher.Key == "foo.com")
+                         if (distinguisher.Key.Contains(":5000") || distinguisher.Key.Contains(":5001"))
                          {
-                             var tenant = new Tenant() { Name = "Foo and Bar and Baz", Id = 2 };
-                             var result = new TenantShell<Tenant>(tenant, "bar.com", "baz.com");  // optional other identifies we want to associate this same tenant shell with.                          
+                             var tenant = new Tenant() { Name = "Bar", Id = 2 };
+                             var result = new TenantShell<Tenant>(tenant, "http://localhost:5000", "http://localhost:5001"); // additional distinguishers to map this same tenant shell instance too.
                              return result;
                          }
-                         // returning null will cause this method to keep being called on future requests with same distinguisher.                  
-                         // if you would like to prevent this, return a new TenantShell<Tenant>(null) which will cause a null tenant to be cached.                 
 
-                         return null;
+                         // for an unknown tenant, we can either create the tenant shell as a NULL tenant by returning a TenantShell<TTenant>(null),
+                         // which results in the TenantShell being created, and will explicitly have to be reloaded() in order for this method to be called again.                        
+                         if (distinguisher.Key.Contains("5002"))
+                         {
+                             var result = new TenantShell<Tenant>(null);
+                             return result;
+                         }
+
+                         if (distinguisher.Key.Contains("5003"))
+                         {
+
+                             // or we can return null - which means we wil keep attempting to resolve the tenant on every subsequent request until a result is returned in future.
+                             // (i.e allows tenant to be created in backend in a few moments time). 
+                             return null;
+                         }
+
+                         throw new NotImplementedException("Please make request on ports 5000 - 5003 to see various behaviour. Can also use 63291 when launching under IISExpress");
+
+
                      })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
                         middlewareOptions.OnBuildPipeline((context, appBuilder) =>
                         {
-                            if (context.Tenant.Id == 1)
+                            if (context.Tenant?.Id == 1)
                             {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
@@ -99,7 +114,18 @@ namespace Sample
 
                 // This service was registered as singleton in tenant container.
                 var someTenantService = context.RequestServices.GetService<SomeTenantService>();
-                await context.Response.WriteAsync("Hello tenant: " + tenant?.Name + ", Service Id: " + someTenantService?.Id);
+
+                // The tenant shell to access context for the tenant - even if the tenant is null
+                var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
+                var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
+
+                string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
+                string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
+
+                var message = $"Tenant Shell Id: {tenantShellId} {Environment.NewLine} Tenant Name: {tenantName} {Environment.NewLine}Tenant Scoped Singleton Service Id: {someTenantService?.Id}";
+                await context.Response.WriteAsync(message);
+
+                // for null tenants we could optionally redirect somewhere?
             });
         }
     }

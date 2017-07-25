@@ -11,7 +11,7 @@ namespace Dotnettency
 
         protected override TenantDistinguisher GetTenantDistinguisher(HttpContext context)
         {
-            var host = context.Request.Host.Host;
+            var host = context.Request.Host.Host.ToLowerInvariant();
             var identity = new TenantDistinguisher(host);
             return identity;
         }
