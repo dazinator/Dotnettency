@@ -46,9 +46,16 @@ namespace Dotnettency
             return this;
         }
 
+        public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsBySchemeHostnameAndPort()
+        {
+            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, SchemeHostnameAndPortTenantDistinguisherFactory<TTenant>>();
+            return this;
+
+        }
+
         public IServiceCollection Services { get; set; }
 
-        public MultitenancyOptionsBuilder<TTenant> GetTenantWith<T>()
+        public MultitenancyOptionsBuilder<TTenant> ResolveTenantWithFactory<T>()
        where T : class, ITenantShellFactory<TTenant>
         {
             Services.AddSingleton<ITenantShellFactory<TTenant>, T>();

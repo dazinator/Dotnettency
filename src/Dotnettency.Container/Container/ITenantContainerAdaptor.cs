@@ -6,6 +6,10 @@ namespace Dotnettency.Container
     {
         Lazy<IServiceProvider> ServiceProvider { get; }
         ITenantContainerAdaptor CreateNestedContainer();
+
+        string ContainerName { get; }
+        Guid ContainerId { get; }
+
     }
 
 
