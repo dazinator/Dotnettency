@@ -17,7 +17,7 @@ namespace Sample
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .DistinguishTenantsWithHostname()
+                    .DistinguishTenantsByHostname()
                     .OnResolveTenant((distinguisher) => // invoked when tenant needs to be resolved, result is cached.
                      {
                          // The distinguisher used for this request - we are using hostname - return tenant accordingly.

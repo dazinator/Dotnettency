@@ -16,13 +16,5 @@ namespace Dotnettency
             return identity;
         }
 
-       
-
     }
-
-
-
-
-
-
 }

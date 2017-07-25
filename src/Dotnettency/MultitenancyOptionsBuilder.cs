@@ -33,11 +33,17 @@ namespace Dotnettency
 
         }
 
-        public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsWithHostname()
+        public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsByHostname()
         {
             Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, HostnameTenantDistinguisherFactory<TTenant>>();
             return this;
 
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsByHostnameWithPort()
+        {
+            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, HostnameAndPortTenantDistinguisherFactory<TTenant>>();
+            return this;
         }
 
         public IServiceCollection Services { get; set; }
