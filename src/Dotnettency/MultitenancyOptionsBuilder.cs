@@ -21,6 +21,14 @@ namespace Dotnettency
             Services.AddScoped<TenantDistinguisherAccessor<TTenant>>();
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
 
+            Services.AddScoped<TTenant>((sp =>
+            {
+                var accessor = sp.GetRequiredService<ITenantAccessor<TTenant>>();
+                var tenant = accessor.CurrentTenant.Value.Result;
+                return tenant;
+            }));
+
+
         }
 
         public IServiceProvider ServiceProvider { get; set; }

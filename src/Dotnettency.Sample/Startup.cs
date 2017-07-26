@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Dotnettency;
 using System;
+using System.Text;
+using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Sample
 {
@@ -119,14 +122,27 @@ namespace Sample
                 var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
                 var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
 
+
+                var messageBuilder = new StringBuilder();
+
                 string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
                 string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
+                string injectedTenantName = someTenantService?.TenantName == null ? "{NULL TENANT}" : someTenantService?.TenantName;
 
-                var message = $"Tenant Shell Id: {tenantShellId} {Environment.NewLine} Tenant Name: {tenantName} {Environment.NewLine}Tenant Scoped Singleton Service Id: {someTenantService?.Id}";
-                await context.Response.WriteAsync(message);
+                context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
+                var result = new { TenantShellId = tenantShellId,
+                    TenantName = tenantName,
+                    TenantScopedServiceId = someTenantService?.Id,
+                    InjectedTenantName = injectedTenantName };
 
-                // for null tenants we could optionally redirect somewhere?
-            });
+                var jsonResult = JsonConvert.SerializeObject(result);
+                await context.Response.WriteAsync(jsonResult, Encoding.UTF8);
+
+
+            //    context.Response.
+
+            // for null tenants we could optionally redirect somewhere?
+        });
         }
-    }
+}
 }
