@@ -39,7 +39,7 @@ namespace Dotnettency.MiddlewarePipeline
                 var tenant = tenantShell?.Tenant;
                 var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline<TTenant>(new Lazy<RequestDelegate>(() =>
                 {
-                    return _factory.Get(_rootApp, tenant, _next);
+                    return _factory.Get(_rootApp, tenant, context.RequestServices, _next);
                 }));
                 await tenantPipeline.Value(context);
             }

@@ -5,15 +5,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\**" />
+    <Content Remove="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\**" />
+    <EmbeddedResource Remove="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\**" />
+    <None Remove="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot/Page.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
+    <ProjectReference Include="..\Dotnettency.HostingEnvironment\Dotnettency.HostingEnvironment.csproj" />
     <ProjectReference Include="..\Dotnettency.MiddlewarePipeline\Dotnettency.MiddlewarePipeline.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>

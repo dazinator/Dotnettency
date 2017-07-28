@@ -1,0 +1,1 @@
+This static file only accessible for default tenants!
