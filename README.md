@@ -10,7 +10,7 @@ Mutlitenancy library for dotnet applications.
 
 Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 
-See the sample app for a full display of all the current features which include:
+See the [sample app for a full display of all the current features](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample) which include:
 
 - Tenant resolution
 - Per Tenant Middleware Pipeline
@@ -28,4 +28,4 @@ Once configured in `startup.cs` you can:
   - Tenant Admin screens - if you need to "Restart" a tenant, then the idea is, you can resolve the `ITenantShellAccessor<TTenant>` and then use extension methods (provided by the dotnettency extensions such as Middleware pipeline, or Container) to allow you to control the state of the running tenant - for example to trigger rebuild of the tenant's container, or pipeline on the next request.
 
 
-Notes: For details on what Per Tenant Hosting Environment does see the README on the sample.
+Notes: For details on what Per Tenant Hosting Environment does see the [README on the sample](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample).
