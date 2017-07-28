@@ -113,14 +113,13 @@ namespace Sample
                 // The tenant shell to access context for the tenant - even if the tenant is null
                 var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
                 var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
-
-
-                var messageBuilder = new StringBuilder();
+                               
 
                 string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
                 string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
                 string injectedTenantName = someTenantService?.TenantName == null ? "{NULL TENANT}" : someTenantService?.TenantName;
 
+                // Accessing a content file.
                 string fileContent = someTenantService?.GetContentFile("/Info.txt");
                 context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
                 var result = new
