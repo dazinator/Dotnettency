@@ -1,4 +1,23 @@
-﻿Start this sample running, then browse to:
+This sample demonstrates resolving 2 different tenants, and also a Null tenant:
+
+Tenant Bar --> on http://localhost:5000/ and http://localhost:5001/
+Tenant Foo --> on http://localhost:5002/
+Tenant NULL --> on http://localhost:5003/
+
+It also demonstrates configuring:
+
+1. Per Tenant Middleware
+2. Per Tenant Containers
+3. Per Tenant Hosting Environment (Provides a virtual directory as each tenant's webroot and content root that isolates each tenant)
+
+## Per Tenant Middleware
+
+In this sample, only the `Bar` tenant has the "Welcome Page" middleware. Browse "/welcome" on the Bar tenant to see that.
+Each tenant also has `StaticFiles` middleware added. Middleware added in the tenant middleware pipeline get's advantage of the `PerTenantHostingEnvironment` feature which is also configured in the sample. This means tenant middleware only sees a `Tenant View Of the World` when its looking at the WebRoot and ContentRoot file provides. This causes `StaticFiles` middleware at the tenant level to only be able to resolve files accessible for the current tenant. In our confiugration of `PerTenantHostingEnvironment` you will see that we allow each tenant to access files in its own isloated directory, in composite with files in the hosts / common directory. In terms of how you set this up and where the files can actually live is open to configuration.
+
+## Per Tenant Files / HostingEnvironment
+
+Start this sample running, then browse to:
 
 - http://localhost:5001/Index.html
 - http://localhost:5002/Index.html
@@ -12,7 +31,7 @@ On 5002 (Tenant Foo) you get this:
 
 ![image](https://user-images.githubusercontent.com/3176632/28713886-e702d45c-7388-11e7-85c4-d8d052667a3a.png)
 
-The project structure looks like this - but focus on where Index.html is which demonstrates that the file can be overridden on a per tenant basis (The GUID's are tenant's id's)
+The project structure looks like the following - but focus on where Index.html is which demonstrates that the file can be overridden on a per tenant basis (The GUID's are tenant's id's)
 
 ![image](https://user-images.githubusercontent.com/3176632/28713742-4b6ef37c-7388-11e7-9214-41988fafdbba.png)
 
