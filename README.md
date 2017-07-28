@@ -1,4 +1,4 @@
-# Dotnettency
+c# Dotnettency
 Mutlitenancy library for dotnet applications.
 
 | Branch  | Build Status | Dotnettency Core Library | Middleware | Container | StructureMap |
@@ -19,7 +19,7 @@ See the sample app for a full display of all the current features which include:
 
 Tenant Resolution
 
-One configured in `startup.cs` you can:
+Once configured in `startup.cs` you can:
 
 - Inject `TTenant` directly.
 - Inject `ITenantAccessor<TTenant>` in order to lazily access the current tenant (which could be null).
