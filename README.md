@@ -10,15 +10,22 @@ Mutlitenancy library for dotnet applications.
 
 Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 
-See the sample app for usage.
+See the sample app for a full display of all the current features which include:
 
-Let's you inject `ITenantAccessor<TTenant>` in order to lazily access the current tenant (which could be null).
+- Tenant resolution
+- Per Tenant Middleware Pipeline
+- Per Tenant Containers
+- Per Tenant HostingEnvironment
 
-Let's you inject `ITenantShellAccessor<TTenant>` in order to access context for the tenant, which is primarily used by:
+Tenant Resolution
 
-- Extensions (such as Middleware, or Container) - which store things for the tenant in the `ITenantShellAccessor<TTenant>`'s concurrent property bag.
-- Tenant Admin screens - if you need to "Restart" a tenant, then the idea is, you can resolve the `ITenantShellAccessor<TTenant>` and then use extension methods (provided by the dotnettency extensions such as Middleware pipeline, or Container) to allow you to control the state of the running tenant - for example to trigger rebuild of the tenant's container, or pipeline on the next request.
+One configured in `startup.cs` you can:
 
-TODO:
+- Inject `TTenant` directly.
+- Inject `ITenantAccessor<TTenant>` in order to lazily access the current tenant (which could be null).
+- Inject `ITenantShellAccessor<TTenant>` in order to access context for the tenant, which is primarily used by:
+  - Extensions (such as Middleware, or Container) - which store things for the tenant in the `ITenantShellAccessor<TTenant>`'s concurrent property bag.
+  - Tenant Admin screens - if you need to "Restart" a tenant, then the idea is, you can resolve the `ITenantShellAccessor<TTenant>` and then use extension methods (provided by the dotnettency extensions such as Middleware pipeline, or Container) to allow you to control the state of the running tenant - for example to trigger rebuild of the tenant's container, or pipeline on the next request.
 
-See issues.
+
+Notes: For details on what Per Tenant Hosting Environment does see the README on the sample.
