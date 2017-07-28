@@ -1,8 +1,10 @@
 This sample demonstrates resolving 2 different tenants, and also a Null tenant:
 
+```
 Tenant Bar --> on http://localhost:5000/ and http://localhost:5001/
 Tenant Foo --> on http://localhost:5002/
 Tenant NULL --> on http://localhost:5003/
+```
 
 It also demonstrates configuring:
 
