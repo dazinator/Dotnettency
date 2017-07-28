@@ -8,7 +8,6 @@ using System;
 using System.Text;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using Dotnettency.HostingEnvironment;
 
 namespace Sample
 {
@@ -28,14 +27,13 @@ namespace Sample
             {
                 options
                     .DistinguishTenantsBySchemeHostnameAndPort() // The distinguisher used to identify one tenant from another.
-                    .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when needed. Can use overload to provide a delegate instead.                    
+                    .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
-                        // Bellow method is called when pipeline needs to be initialised for tenant (i.e0 on first request for the tenant
+                        // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
                         middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
                         {
-
-                            appBuilder.UseStaticFiles(); // So that each instance of this middleware gets an IHostingEnvironment injected for the current tenant.
+                            appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
                             if (context.Tenant?.Name == "Foo")
                             {
@@ -50,18 +48,6 @@ namespace Sample
                         containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
                         {
                             tenantServices.AddSingleton<SomeTenantService>();
-                            // Register IHostingEnvironment into tenant container as singleton.
-                            // Any middleware created that has IHostingEnvironment injected into constructor will resolve this value.
-                            // However application level middleware is only created once per application, and so the value resolved
-                            // will be held onto for all subsequent requests - even when the tenant changes and we would rather inject a different
-                            // IHostingEnvironment. Middleware the resolves IHostingEnvironment from RequestServices won't suffer from this issue.
-                            // For middleware that does suffer from this issue, we have to register the middleware in the PerTenant pipeline insead.
-
-                            //services.AddSingleton<IHostingEnvironment>((sp) =>
-                            //{
-                            //    return new TenantHostingEnvironment<Tenant>(_environment);
-                            //});
-
                         });
                     })
                 // configure per tenant hosting environment.
@@ -113,7 +99,7 @@ namespace Sample
                        .UsePerTenantMiddlewarePipeline();
             });
 
-          //  app.UseMiddleware<SampleMiddleware<Tenant>>();
+            //  app.UseMiddleware<SampleMiddleware<Tenant>>();
             //  app.
             app.Run(async (context) =>
             {

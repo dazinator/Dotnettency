@@ -1,1 +1,1 @@
-Changed
+Bar tenant content file. Not accessible to other tenants.
