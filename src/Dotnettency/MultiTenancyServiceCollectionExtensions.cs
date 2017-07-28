@@ -15,7 +15,16 @@ namespace Dotnettency
                 configure(optionsBuilder);
             }
             //   var serviceProvider = optionsBuilder.Build();
-            return optionsBuilder.ServiceProvider;
+
+            Func<IServiceProvider> serviceProviderBuilder = optionsBuilder.BuildServiceProvider;
+            if (serviceProviderBuilder != null)
+            {
+                IServiceProvider sp = serviceProviderBuilder();
+                return sp;
+            }
+
+            return null;
+            //return optionsBuilder.ServiceProvider;
         }
     }
 }

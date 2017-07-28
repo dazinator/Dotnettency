@@ -13,6 +13,12 @@ namespace Sample
 {
     public class Startup
     {
+        private readonly IHostingEnvironment _environment;
+        public Startup(IHostingEnvironment environment)
+        {
+            _environment = environment;
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -20,71 +26,50 @@ namespace Sample
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .DistinguishTenantsBySchemeHostnameAndPort()  // The distinguisher used to identify one tenant from another. Other methods available.
-                    .OnResolveTenant((distinguisher) => // method used to resolve the tenant using the distinguisher above.
-                     {
-                         if (distinguisher.Key == "http://localhost:63291")
-                         {
-                             var tenant = new Tenant() { Name = "Foo", Id = 1 };
-                             var result = new TenantShell<Tenant>(tenant);
-                             return result;
-                         }
-
-                         if (distinguisher.Key.Contains(":5000") || distinguisher.Key.Contains(":5001"))
-                         {
-                             var tenant = new Tenant() { Name = "Bar", Id = 2 };
-                             var result = new TenantShell<Tenant>(tenant, "http://localhost:5000", "http://localhost:5001"); // additional distinguishers to map this same tenant shell instance too.
-                             return result;
-                         }
-
-                         // for an unknown tenant, we can either create the tenant shell as a NULL tenant by returning a TenantShell<TTenant>(null),
-                         // which results in the TenantShell being created, and will explicitly have to be reloaded() in order for this method to be called again.                        
-                         if (distinguisher.Key.Contains("5002"))
-                         {
-                             var result = new TenantShell<Tenant>(null);
-                             return result;
-                         }
-
-                         if (distinguisher.Key.Contains("5003"))
-                         {
-
-                             // or we can return null - which means we wil keep attempting to resolve the tenant on every subsequent request until a result is returned in future.
-                             // (i.e allows tenant to be created in backend in a few moments time). 
-                             return null;
-                         }
-
-                         throw new NotImplementedException("Please make request on ports 5000 - 5003 to see various behaviour. Can also use 63291 when launching under IISExpress");
-
-
-                     })
+                    .DistinguishTenantsBySchemeHostnameAndPort() // The distinguisher used to identify one tenant from another.
+                    .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
-                        middlewareOptions.OnBuildPipeline((context, appBuilder) =>
+                        // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
+                        middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
                         {
-                            if (context.Tenant?.Id == 1)
+                            appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
+
+                            if (context.Tenant?.Name == "Foo")
                             {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
                         });
-                    })
+                    }) // Configure per tenant containers.
                     .ConfigureTenantContainers((containerBuilder) =>
                     {
-                        containerBuilder.ConfigureStructureMapContainer((tenant, configuration) =>
+                        // Extension methods available here for supported containers. We are using structuremap..
+                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
+                        containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
                         {
-                            configuration.ForSingletonOf<SomeTenantService>();
-                            // could register services based on the tenant.
-                            //switch (tenant.Id)
-                            //{
-                            //    case 1:                                   
-
-                            //        break;
-                            //    case 2:
-
-                            //        break;
-                            //}
-
+                            tenantServices.AddSingleton<SomeTenantService>();
                         });
+                    })
+                // configure per tenant hosting environment.
+                .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
+                {
+                    tenantHostingEnvironmentOptions.OnInitialiseTenantContentRoot((contentRootOptions) =>
+                    {
+                        // WE use a tenant's guid id to partition one tenants files from another on disk.
+                        // NOTE: We use an empty guid for NULL tenants, so that all NULL tenants share the same location.
+                        var tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                        contentRootOptions.TenantPartitionId(tenantGuid)
+                                           .AllowAccessTo(_environment.ContentRootFileProvider); // We allow the tenant content root file provider to access to the environments content root.
                     });
+
+                    tenantHostingEnvironmentOptions.OnInitialiseTenantWebRoot((webRootOptions) =>
+                    {
+                        // WE use the tenant's guid id to partition one tenants files from another on disk.
+                        var tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                        webRootOptions.TenantPartitionId(tenantGuid)
+                                           .AllowAccessTo(_environment.WebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
+                    });
+                });
             });
 
             // When using tenant containers, must return IServiceProvider.
@@ -103,11 +88,18 @@ namespace Sample
             // Add the multitenancy middleware.
             app.UseMultitenancy<Tenant>((options) =>
             {
-                options.UsePerTenantMiddlewarePipeline()
-                       .UsePerTenantContainers();
+                options
+                       .UsePerTenantContainers()
+                       .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
+                        {
+                            // using tenant content root and web root.
+                            hostingEnvironmentOptions.UseTenantContentRootFileProvider();
+                            hostingEnvironmentOptions.UseTenantWebRootFileProvider();
+                        })
+                       .UsePerTenantMiddlewarePipeline();
             });
 
-
+            //  app.UseMiddleware<SampleMiddleware<Tenant>>();
             //  app.
             app.Run(async (context) =>
             {
@@ -129,20 +121,25 @@ namespace Sample
                 string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
                 string injectedTenantName = someTenantService?.TenantName == null ? "{NULL TENANT}" : someTenantService?.TenantName;
 
+                string fileContent = someTenantService?.GetContentFile("/Info.txt");
                 context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                var result = new { TenantShellId = tenantShellId,
+                var result = new
+                {
+                    TenantShellId = tenantShellId,
                     TenantName = tenantName,
                     TenantScopedServiceId = someTenantService?.Id,
-                    InjectedTenantName = injectedTenantName };
+                    InjectedTenantName = injectedTenantName,
+                    TenantContentFile = fileContent
+                };
 
                 var jsonResult = JsonConvert.SerializeObject(result);
                 await context.Response.WriteAsync(jsonResult, Encoding.UTF8);
 
 
-            //    context.Response.
+                //    context.Response.
 
-            // for null tenants we could optionally redirect somewhere?
-        });
+                // for null tenants we could optionally redirect somewhere?
+            });
         }
-}
+    }
 }

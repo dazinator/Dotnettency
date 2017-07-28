@@ -31,7 +31,11 @@ namespace Dotnettency
 
         }
 
-        public IServiceProvider ServiceProvider { get; set; }
+        public Func<IServiceProvider> BuildServiceProvider { get; set; }
+
+       
+
+        //public IServiceProvider ServiceProvider { get; set; }
 
         public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsWith<T>()
             where T : class, ITenantDistinguisherFactory<TTenant>
@@ -63,7 +67,7 @@ namespace Dotnettency
 
         public IServiceCollection Services { get; set; }
 
-        public MultitenancyOptionsBuilder<TTenant> ResolveTenantWithFactory<T>()
+        public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>()
        where T : class, ITenantShellFactory<TTenant>
         {
             Services.AddSingleton<ITenantShellFactory<TTenant>, T>();
@@ -71,7 +75,7 @@ namespace Dotnettency
 
         }
 
-        public MultitenancyOptionsBuilder<TTenant> OnResolveTenant(Func<TenantDistinguisher, TenantShell<TTenant>> factoryMethod)
+        public MultitenancyOptionsBuilder<TTenant> InitialiseTenant(Func<TenantDistinguisher, TenantShell<TTenant>> factoryMethod)
         {
             var factory = new DelegateTenantShellFactory<TTenant>(factoryMethod);
             Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);

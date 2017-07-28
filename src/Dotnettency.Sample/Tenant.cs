@@ -4,11 +4,14 @@ namespace Sample
 {
     public class Tenant
     {
-        public Tenant()
+        public Tenant(Guid tenantGuid)
         {
-           // Id = Guid.NewGuid();
+
+            TenantGuid = tenantGuid;
+            // Id = Guid.NewGuid();           
         }
-        public int Id { get; set; }
+       // public int Id { get; set; }
+        public Guid TenantGuid { get; set; }
         public string Name { get; set; }
     }
 }
