@@ -18,21 +18,21 @@ namespace Dotnettency
             _configuration = configuration;
         }
 
-        public RequestDelegate Get(IApplicationBuilder appBuilder, TTenant tenant, RequestDelegate next)
+        public RequestDelegate Get(IApplicationBuilder appBuilder, TTenant tenant, IServiceProvider requestServices, RequestDelegate next)
         {
             //return Task.Run(() =>
             //{
-            return BuildTenantPipeline(appBuilder, tenant, next);
+            return BuildTenantPipeline(appBuilder, tenant, requestServices, next);
             //  });
         }
 
-        protected virtual RequestDelegate BuildTenantPipeline(IApplicationBuilder rootApp, TTenant tenant, RequestDelegate next)
+        protected virtual RequestDelegate BuildTenantPipeline(IApplicationBuilder rootApp, TTenant tenant, IServiceProvider requestServices, RequestDelegate next)
         {
 
             var branchBuilder = rootApp.New();
+            rootApp.ApplicationServices = requestServices;
             var builderContext = new TenantPipelineBuilderContext<TTenant>
             {
-
                 //   TenantContext = tenantContext,
                 Tenant = tenant
             };
