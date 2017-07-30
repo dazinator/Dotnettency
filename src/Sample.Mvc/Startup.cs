@@ -1,53 +1,106 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Dotnettency;
+using System;
+using System.Text;
+using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Sample.Mvc
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        private readonly IHostingEnvironment _environment;
+        public Startup(IHostingEnvironment environment)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+            _environment = environment;
         }
-
-        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
+
             services.AddMvc();
+
+            var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
+            {
+                options
+                    .DistinguishTenantsBySchemeHostnameAndPort() // The distinguisher used to identify one tenant from another.
+                    .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
+                    .ConfigureTenantMiddleware((middlewareOptions) =>
+                    {
+                        // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
+                        middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
+                        {
+                            appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
+
+                            if (context.Tenant?.Name == "Foo")
+                            {
+                                appBuilder.UseWelcomePage("/welcome");
+                            }
+                        });
+                    }) // Configure per tenant containers.
+                    .ConfigureTenantContainers((containerBuilder) =>
+                    {
+                        // Extension methods available here for supported containers. We are using structuremap..
+                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
+                        containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
+                        {
+                            // tenantServices.AddSingleton<SomeTenantService>();
+                        });
+                    })
+                // configure per tenant hosting environment.
+                .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
+                {
+                    tenantHostingEnvironmentOptions.OnInitialiseTenantContentRoot((contentRootOptions) =>
+                    {
+                        // WE use a tenant's guid id to partition one tenants files from another on disk.
+                        // NOTE: We use an empty guid for NULL tenants, so that all NULL tenants share the same location.
+                        var tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                        contentRootOptions.TenantPartitionId(tenantGuid)
+                                           .AllowAccessTo(_environment.ContentRootFileProvider); // We allow the tenant content root file provider to access to the environments content root.
+                    });
+
+                    tenantHostingEnvironmentOptions.OnInitialiseTenantWebRoot((webRootOptions) =>
+                    {
+                        // WE use the tenant's guid id to partition one tenants files from another on disk.
+                        var tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                        webRootOptions.TenantPartitionId(tenantGuid)
+                                           .AllowAccessTo(_environment.WebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
+                    });
+                });
+            });
+
+            // When using tenant containers, must return IServiceProvider.
+            return serviceProvider;
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            loggerFactory.AddConsole();
 
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStaticFiles();
+            // Add the multitenancy middleware.
+            app.UseMultitenancy<Tenant>((options) =>
+            {
+                options
+                       .UsePerTenantContainers()
+                       .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
+                       {
+                           // using tenant content root and web root.
+                           hostingEnvironmentOptions.UseTenantContentRootFileProvider();
+                           hostingEnvironmentOptions.UseTenantWebRootFileProvider();
+                       })
+                       .UsePerTenantMiddlewarePipeline();
+            });
 
             app.UseMvc(routes =>
             {
@@ -55,6 +108,8 @@ namespace Sample.Mvc
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+         //   app.UseMvc();
         }
     }
 }

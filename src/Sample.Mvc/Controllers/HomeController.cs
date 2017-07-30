@@ -13,10 +13,10 @@ namespace Sample.Mvc.Controllers
             return View();
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> About([FromServices] Task<Tenant> tenantTask)
         {
-            ViewData["Message"] = "Your application description page.";
-
+            var tenant = await tenantTask;
+            ViewData["Message"] = tenant?.Name;
             return View();
         }
 

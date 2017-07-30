@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Dotnettency
 {
@@ -16,11 +17,15 @@ namespace Dotnettency
             // add default services
             Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             Services.AddScoped<ITenantAccessor<TTenant>, TenantAccessor<TTenant>>();
+            // Tenant shell cache is special in that it houses the tenant shell for each tenant, and each 
+            // tenant shell has state that needs to be kept local to the applicatioin (i.e the tenants container or middleware pipeline.)
+            // Therefore it should always be a local / in-memory based cache as will have will have fundamentally non-serialisable state.
             Services.AddSingleton<ITenantShellCache<TTenant>, ConcurrentDictionaryTenantShellCache<TTenant>>();
             Services.AddSingleton<ITenantShellResolver<TTenant>, TenantShellResolver<TTenant>>();
             Services.AddScoped<TenantDistinguisherAccessor<TTenant>>();
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
 
+            // Support injection of TTenant (has side effect that may block during injection)
             Services.AddScoped<TTenant>((sp =>
             {
                 var accessor = sp.GetRequiredService<ITenantAccessor<TTenant>>();
@@ -28,12 +33,19 @@ namespace Dotnettency
                 return tenant;
             }));
 
+            // Support injection of Task<TTenant> - a convenience that allows non blocking access to tenant when required 
+            // minor contention on Lazy<>
+            Services.AddScoped<Task<TTenant>>((sp =>
+            {
+                return sp.GetRequiredService<ITenantAccessor<TTenant>>().CurrentTenant.Value;             
+            }));
+
 
         }
 
         public Func<IServiceProvider> BuildServiceProvider { get; set; }
 
-       
+
 
         //public IServiceProvider ServiceProvider { get; set; }
 

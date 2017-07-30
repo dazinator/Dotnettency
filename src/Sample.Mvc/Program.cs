@@ -16,6 +16,7 @@ namespace Sample.Mvc
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
+                 .UseUrls("http://*:5000", "http://*:5001", "http://*:5002", "http://*:5003", "http://*:5004")
                 .UseApplicationInsights()
                 .Build();
 
