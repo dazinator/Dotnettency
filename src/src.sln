@@ -24,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Mvc", "Sample.Mvc\Sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.HostingEnvironment", "Dotnettency.HostingEnvironment\Dotnettency.HostingEnvironment.csproj", "{E2CAD9E5-6843-4A9B-9A0B-1F4E1F42A6A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Modules", "Dotnettency.Modules\Dotnettency.Modules.csproj", "{720AC644-94A4-4AA9-AD12-543AB87BC2FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,18 @@ Global
 		{E2CAD9E5-6843-4A9B-9A0B-1F4E1F42A6A4}.Release|x64.Build.0 = Release|Any CPU
 		{E2CAD9E5-6843-4A9B-9A0B-1F4E1F42A6A4}.Release|x86.ActiveCfg = Release|Any CPU
 		{E2CAD9E5-6843-4A9B-9A0B-1F4E1F42A6A4}.Release|x86.Build.0 = Release|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Debug|x64.Build.0 = Debug|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Debug|x86.Build.0 = Debug|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|x64.ActiveCfg = Release|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|x64.Build.0 = Release|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|x86.ActiveCfg = Release|Any CPU
+		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
