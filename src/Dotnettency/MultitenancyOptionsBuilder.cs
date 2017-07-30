@@ -25,6 +25,9 @@ namespace Dotnettency
             Services.AddScoped<TenantDistinguisherAccessor<TTenant>>();
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
 
+            // By default, we use a URI from the request to identify tenants.
+            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestUriTenantDistinguisherFactory<TTenant>>();
+
             // Support injection of TTenant (has side effect that may block during injection)
             Services.AddScoped<TTenant>((sp =>
             {
@@ -37,7 +40,7 @@ namespace Dotnettency
             // minor contention on Lazy<>
             Services.AddScoped<Task<TTenant>>((sp =>
             {
-                return sp.GetRequiredService<ITenantAccessor<TTenant>>().CurrentTenant.Value;             
+                return sp.GetRequiredService<ITenantAccessor<TTenant>>().CurrentTenant.Value;
             }));
 
 
@@ -49,34 +52,20 @@ namespace Dotnettency
 
         //public IServiceProvider ServiceProvider { get; set; }
 
+        /// <summary>
+        /// Call this to override the service used to provide a URI for the current request. The URI is used as an identifier
+        /// for a tenant to be loaded.    
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsWith<T>()
             where T : class, ITenantDistinguisherFactory<TTenant>
         {
             Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, T>();
             return this;
+        }     
 
-        }
-
-        public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsByHostname()
-        {
-            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, HostnameTenantDistinguisherFactory<TTenant>>();
-            return this;
-
-        }
-
-        public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsByHostnameWithPort()
-        {
-            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, HostnameAndPortTenantDistinguisherFactory<TTenant>>();
-            return this;
-        }
-
-        public MultitenancyOptionsBuilder<TTenant> DistinguishTenantsBySchemeHostnameAndPort()
-        {
-            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, SchemeHostnameAndPortTenantDistinguisherFactory<TTenant>>();
-            return this;
-
-        }
-
+      
         public IServiceCollection Services { get; set; }
 
         public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>()

@@ -28,8 +28,7 @@ namespace Sample.Mvc
 
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
-                options
-                    .DistinguishTenantsBySchemeHostnameAndPort() // The distinguisher used to identify one tenant from another.
+                options                   
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {

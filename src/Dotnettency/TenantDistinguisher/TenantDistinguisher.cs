@@ -4,14 +4,14 @@ namespace Dotnettency
 {
     public class TenantDistinguisher : IEquatable<TenantDistinguisher>
     {
-        public TenantDistinguisher(string key)
+        public TenantDistinguisher(Uri key)
         {
-            Key = key;
+            Uri = key;
         }
 
-        public string Key { get; set; }
+        public Uri Uri { get; set; }
 
-        public static implicit operator TenantDistinguisher(string key)
+        public static implicit operator TenantDistinguisher(Uri key)
         {
             TenantDistinguisher value = new TenantDistinguisher(key);
             return value;
@@ -20,11 +20,11 @@ namespace Dotnettency
 
         public override int GetHashCode()
         {
-            if (Key == null)
+            if (Uri == null)
             {
                 return 0;
             }
-            return Key.GetHashCode();
+            return Uri.GetHashCode();
         }
 
         public override bool Equals(object other)
@@ -34,7 +34,7 @@ namespace Dotnettency
 
         public bool Equals(TenantDistinguisher other)
         {
-            return other != null && other.Key == Key;
+            return other != null && other.Uri == Uri;
         }
     }
 

@@ -25,8 +25,7 @@ namespace Sample
         {
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
-                options
-                    .DistinguishTenantsBySchemeHostnameAndPort() // The distinguisher used to identify one tenant from another.
+                options                   
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
@@ -113,7 +112,7 @@ namespace Sample
                 // The tenant shell to access context for the tenant - even if the tenant is null
                 var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
                 var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
-                               
+
 
                 string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
                 string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
