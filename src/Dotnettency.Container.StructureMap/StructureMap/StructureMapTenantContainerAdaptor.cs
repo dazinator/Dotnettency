@@ -1,5 +1,6 @@
 ﻿using StructureMap;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dotnettency.Container
 {
@@ -23,9 +24,24 @@ namespace Dotnettency.Container
 
         public Guid ContainerId => _id;
 
+        public void Configure(Action<IServiceCollection> configure)
+        {
+            _container.Configure(_ =>
+            {
+                var services = new ServiceCollection();
+                configure(services);
+                _.Populate(services);
+            });
+        }
+
         public ITenantContainerAdaptor CreateNestedContainer()
         {
             return new StructureMapTenantContainerAdaptor(_container.GetNestedContainer());
+        }
+
+        public ITenantContainerAdaptor CreateChildContainer()
+        {
+            return new StructureMapTenantContainerAdaptor(_container.CreateChildContainer());
         }
 
         public void Dispose()

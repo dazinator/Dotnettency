@@ -25,8 +25,18 @@ namespace Sample
         {
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
-                options                   
+                options
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
+                    .ConfigureTenantContainers((containerBuilder) =>
+                   {
+                       // Extension methods available here for supported containers. We are using structuremap..
+                       // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
+                       containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
+                       {
+                           tenantServices.AddSingleton<SomeTenantService>();
+                       })
+                       .WithModuleContainers(); // Creates a child container per IModule.
+                   })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
                         // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
@@ -38,17 +48,11 @@ namespace Sample
                             {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
+
+                            //
                         });
                     }) // Configure per tenant containers.
-                    .ConfigureTenantContainers((containerBuilder) =>
-                    {
-                        // Extension methods available here for supported containers. We are using structuremap..
-                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
-                        {
-                            tenantServices.AddSingleton<SomeTenantService>();
-                        });
-                    })
+
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
                 {

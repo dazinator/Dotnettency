@@ -32,6 +32,7 @@
     <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
     <ProjectReference Include="..\Dotnettency.HostingEnvironment\Dotnettency.HostingEnvironment.csproj" />
     <ProjectReference Include="..\Dotnettency.MiddlewarePipeline\Dotnettency.MiddlewarePipeline.csproj" />
+    <ProjectReference Include="..\Dotnettency.Modules\Dotnettency.Modules.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 

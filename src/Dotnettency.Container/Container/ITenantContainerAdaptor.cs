@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Dotnettency.Container
 {
@@ -6,9 +7,16 @@ namespace Dotnettency.Container
     {
         Lazy<IServiceProvider> ServiceProvider { get; }
         ITenantContainerAdaptor CreateNestedContainer();
+        ITenantContainerAdaptor CreateChildContainer();
 
         string ContainerName { get; }
         Guid ContainerId { get; }
+
+        /// <summary>
+        /// Used to add services to a container AFTER its initialised.
+        /// </summary>
+        /// <param name="configure"></param>
+        void Configure(Action<IServiceCollection> configure);
 
     }
 

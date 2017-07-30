@@ -16,7 +16,7 @@ namespace Dotnettency
             }
             //   var serviceProvider = optionsBuilder.Build();
 
-            Func<IServiceProvider> serviceProviderBuilder = optionsBuilder.BuildServiceProvider;
+            Func<IServiceProvider> serviceProviderBuilder = optionsBuilder.ServiceProviderFactory;
             if (serviceProviderBuilder != null)
             {
                 IServiceProvider sp = serviceProviderBuilder();
