@@ -11,6 +11,7 @@ namespace Dotnettency.Container
         {
             Builder = builder;
             builder.Services.AddSingleton<ITenantContainerFactory<TTenant>, TenantContainerBuilderFactory<TTenant>>();
+            builder.Services.AddScoped<ITenantContainerAccessor<TTenant>, TenantContainerAccessor<TTenant>>();
         }
 
         public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }

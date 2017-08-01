@@ -8,6 +8,7 @@ using System;
 using System.Text;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
+using Dotnettency.Modules;
 
 namespace Sample
 {
@@ -34,8 +35,32 @@ namespace Sample
                        containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
                        {
                            tenantServices.AddSingleton<SomeTenantService>();
-                       })
-                       .WithModuleContainers(); // Creates a child container per IModule.
+
+                           tenantServices.AddModules<BaseModule>((modules) =>
+                           {
+                               // Only load these modules for tenant Bar.
+                               if (tenant.Name == "Bar")
+                               {
+                                   modules.AddModule<SystemModule>()
+                                          .AddModule<IsolatedModule>();
+                               }
+
+                               modules.OnSetupModule((moduleOptions) =>
+                               {
+
+                                   if (!moduleOptions.Module.IsSystemModule)
+                                   {
+                                       // We will load this modules services into isolated container for the module
+                                       // This means the modules services won't pollute the tenants container.
+                                       moduleOptions.UseIsolatedContainer();
+                                   }
+                               });
+
+
+                           });
+                       });
+
+                       // .WithModuleContainers(); // Creates a child container per IModule.
                    })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
@@ -44,11 +69,12 @@ namespace Sample
                         {
                             appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
+                            appBuilder.UseModules<Tenant, BaseModule>();                          
+
                             if (context.Tenant?.Name == "Foo")
                             {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
-
                             //
                         });
                     }) // Configure per tenant containers.
@@ -100,6 +126,7 @@ namespace Sample
                             hostingEnvironmentOptions.UseTenantWebRootFileProvider();
                         })
                        .UsePerTenantMiddlewarePipeline();
+                      // .UseModules<Tenant, BaseModule>();
             });
 
             //  app.UseMiddleware<SampleMiddleware<Tenant>>();

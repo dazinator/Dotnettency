@@ -5,7 +5,7 @@ namespace Dotnettency.Container
 {
     public interface ITenantContainerAdaptor : IDisposable
     {
-        Lazy<IServiceProvider> ServiceProvider { get; }
+        IServiceProvider GetServiceProvider();
         ITenantContainerAdaptor CreateNestedContainer();
         ITenantContainerAdaptor CreateChildContainer();
 

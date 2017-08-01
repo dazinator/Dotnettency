@@ -1,6 +1,7 @@
 ﻿using StructureMap;
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Dotnettency.Container.StructureMap;
 
 namespace Dotnettency.Container
 {
@@ -13,12 +14,16 @@ namespace Dotnettency.Container
         {
             _container = container;
             _id = Guid.NewGuid();
-            ServiceProvider = new Lazy<IServiceProvider>(() =>
-            {
-                return _container.GetInstance<IServiceProvider>();
-            });
+            //ServiceProvider = new Lazy<IServiceProvider>(() =>
+            //{
+            //    return 
+            //});
         }
-        public Lazy<IServiceProvider> ServiceProvider { get; }
+        public IServiceProvider GetServiceProvider()
+        {
+            return _container.GetInstance<IServiceProvider>();
+        }
+      
 
         public string ContainerName => _container.Name;
 

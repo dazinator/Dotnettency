@@ -1,8 +1,7 @@
 ﻿using Dotnettency.Container;
 using Microsoft.Extensions.DependencyInjection;
-using StructureMap;
 using System;
-
+using Dotnettency.Container.StructureMap;
 
 namespace Dotnettency
 {
@@ -63,9 +62,12 @@ namespace Dotnettency
 
             var adaptorFactory = new Func<ITenantContainerAdaptor>(() =>
             {
+                // host level container.
                 var container = new StructureMap.Container();
                 container.Populate(options.Builder.Services);
 
+                // add ITenantContainerBuilder<TTenant> service to the host container
+                // This service can be used to build a child container (adaptor) for a particular tenant, when required.
                 container.Configure(_ =>
                     _.For<ITenantContainerBuilder<TTenant>>()
                         .Use(new StructureMapTenantContainerBuilder<TTenant>(container, (tenant, configurationExpression) =>
@@ -93,7 +95,7 @@ namespace Dotnettency
             //    // now configure nested container per tenant.
             //    return container.GetInstance<IServiceProvider>();
             //});
-
+           
             return adapted;
         }
 
