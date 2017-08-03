@@ -19,22 +19,4 @@ namespace Dotnettency.Modules
         public RouteContext ParentRouteContext { get; set; }
     }
 
-    public class ModulesRouteContext<TModule> : RouteContext
-        where TModule : IModule
-        // where TTenant : class
-    {
-      //  private readonly RouteContext _parentRouteContext;
-
-        public ModulesRouteContext(HttpContext httpContext) : base(httpContext)
-        {
-            //  NotMatched = false;
-        }
-
-        public ModuleShell<TModule> ModuleShell { get; set; }
-
-        //public bool NotMatched { get; set; }
-
-       // public RouteContext ParentRouteContext { get; set; }
-    }
-
 }

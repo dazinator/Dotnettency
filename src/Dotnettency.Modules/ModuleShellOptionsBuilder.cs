@@ -7,7 +7,7 @@ namespace Dotnettency
          where TModule : IModule
     {
 
-        private ModuleShellOptions<TModule> _moduleShellOptions = new ModuleShellOptions<TModule>();
+        private ModuleShellOptions _moduleShellOptions = new ModuleShellOptions();
 
         public ModuleShellOptionsBuilder(TModule module)
         {
@@ -15,19 +15,17 @@ namespace Dotnettency
             //   Tenant = tenant;
         }
 
-
-
-        public ModuleShellOptionsBuilder<TModule> UseIsolatedContainer()
-        {
-            _moduleShellOptions.IsIsolated = true;
-            return this;
-        }
+        //public ModuleShellOptionsBuilder<TModule> UseIsolatedContainer()
+        //{
+        //    _moduleShellOptions.IsRoutedModule = true;
+        //    return this;
+        //}
 
         public TModule Module { get; set; }
 
         ////  public TTenant Tenant { get; set; }
 
-        internal ModuleShellOptions<TModule> Build()
+        internal ModuleShellOptions Build()
         {
             return _moduleShellOptions;
 

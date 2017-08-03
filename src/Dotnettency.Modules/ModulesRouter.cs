@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
 namespace Dotnettency.Modules
 {
 
+
     public class ModulesRouter<TModule> : IRouter
         where TModule : IModule
     {
 
-        private IApplicationBuilder _appBuilder;
+        // private IApplicationBuilder _appBuilder;
 
         //public List<IModule> RoutedModules { get; set; }
 
-        public ModulesRouter(IApplicationBuilder appBuilder, RouteHandler defaultRouteHandler)
+        public ModulesRouter(RouteHandler defaultRouteHandler)
         {
             DefaultRouteHandler = defaultRouteHandler;
-            _appBuilder = appBuilder;
-            RoutedModules = new LinkedList<ModuleShell<TModule>>();
+            //  _appBuilder = appBuilder;
+            RoutedModules = new LinkedList<RoutedModuleShell<TModule>>();
 
             // if adding a new module, we want the first modules default route handler to be chained to the last, so that we can evaluate a null match.
             NullMatchRouteHandler = new RouteHandler(context =>
@@ -35,29 +34,32 @@ namespace Dotnettency.Modules
 
         }
 
-        public LinkedList<ModuleShell<TModule>> RoutedModules { get; set; }
+        public LinkedList<RoutedModuleShell<TModule>> RoutedModules { get; set; }
 
-
-        public void AddModuleRouter(Func<RouteBuilder, ModuleShell<TModule>> configureModuleRoutes, IServiceProvider moduleServicesProvider)
+        public void AddModuleRouter(RoutedModuleShell<TModule> routedModuleShell)
         {
-
-            var appBuilder = _appBuilder.New();
-            appBuilder.ApplicationServices = moduleServicesProvider;
-
-
-            var routeBuilder = new RouteBuilder(appBuilder, NullMatchRouteHandler);
-            var moduleShell = configureModuleRoutes(routeBuilder);
-
-            var newNode = new LinkedListNode<ModuleShell<TModule>>(moduleShell);
-            RoutedModules.AddLast(newNode);
-            //// swap out the previous nodes defualt handler to a null handler.
-            //var previous = newNode.Previous;
-            //if (previous != null)
-            //{
-            //    newNode.Value.Router.de
-            //}
-
+            var newNode = new LinkedListNode<RoutedModuleShell<TModule>>(routedModuleShell);
+            RoutedModules.AddLast(routedModuleShell);
         }
+
+        //public void AddModuleRouter(Func<RouteBuilder, ModuleShell<TModule>> configureModuleRoutes, IServiceProvider moduleServicesProvider, IApplicationBuilder defaultAppBuilder)
+        //{
+
+        //    var moduleAppBuilder = defaultAppBuilder.New();
+        //    moduleAppBuilder.ApplicationServices = moduleServicesProvider;
+
+        //    var routeBuilder = new RouteBuilder(moduleAppBuilder, NullMatchRouteHandler);
+        //    var moduleShell = configureModuleRoutes(routeBuilder);
+
+
+        //    //// swap out the previous nodes defualt handler to a null handler.
+        //    //var previous = newNode.Previous;
+        //    //if (previous != null)
+        //    //{
+        //    //    newNode.Value.Router.de
+        //    //}
+
+        //}
 
         public VirtualPathData GetVirtualPath(VirtualPathContext context)
         {
@@ -77,19 +79,28 @@ namespace Dotnettency.Modules
         }
 
         public async Task RouteAsync(RouteContext context)
-        {          
+        {
 
             var moduleRouteContext = new ModuleRouteContext(context.HttpContext, context);
-            var currentNode = RoutedModules.First;
+            
+             var currentNode = RoutedModules.First;
             while ((currentNode != null))
             {
                 var module = currentNode.Value;
+
+               // context.HttpContext.GetRouteData().Routers.Add(router);
                 await module.Router.RouteAsync(moduleRouteContext);
                 if (moduleRouteContext.Handler != null)
                 {
                     var modulesRouteContext = context as ModulesRouteContext<TModule>;
-                    modulesRouteContext.ModuleShell = currentNode.Value;
+                    var cast = currentNode.Value as IModuleShell<TModule>;
+                    modulesRouteContext.ModuleShell = cast;
+
+                    var existingRouteData = context.HttpContext.GetRouteData();
                     context.Handler = moduleRouteContext.Handler;
+                    context.RouteData = moduleRouteContext.RouteData;
+
+                  //  existingRouteData.PushState(module.Router, context.RouteData.Values, context.RouteData.DataTokens);
                     return;
                 }
                 else

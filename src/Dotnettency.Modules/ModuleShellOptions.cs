@@ -1,8 +1,8 @@
 ﻿namespace Dotnettency
 {
-    public class ModuleShellOptions<TModule>
+    public class ModuleShellOptions
     {
-        public bool IsIsolated { get; set; }
+        public bool IsolatedServices { get; set; }
 
     }
 

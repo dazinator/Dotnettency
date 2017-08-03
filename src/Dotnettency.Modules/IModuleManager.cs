@@ -8,7 +8,7 @@ namespace Dotnettency.Modules
     public interface IModuleManager<TModule>
         where TModule : IModule
     {
-        Task EnsureModulesStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder);
+        Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder);
 
         ModulesRouter<TModule> GetModulesRouter();
     }

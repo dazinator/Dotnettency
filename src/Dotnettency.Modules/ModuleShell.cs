@@ -8,19 +8,24 @@ using Microsoft.AspNetCore.Http;
 
 namespace Dotnettency.Modules
 {
-    public class ModuleShell<TModule>
-        where TModule : IModule
+
+    public class RoutedModuleShell<TModule> : IModuleShell<TModule>
+       where TModule : IModule
     {
+        //private IRoutedModule routedModule;
 
-        public ModuleShellOptions<TModule> Options { get; }
+        private ModulesRouter<TModule> _modulesRouter;
 
-        public ModuleShell(TModule module, ModuleShellOptions<TModule> options)
+        public ModuleShellOptions Options { get; }
+
+        public RoutedModuleShell(TModule module, ModuleShellOptions options, ModulesRouter<TModule> modulesRouter)
         {
             Options = options;
             Module = module;
+            _modulesRouter = modulesRouter;
         }
 
-        public TModule Module { get; set; }
+        public IModule Module { get; set; }
 
         public bool IsStarted { get; private set; }
 
@@ -30,7 +35,7 @@ namespace Dotnettency.Modules
 
         public RequestDelegate MiddlewarePipeline { get; set; }
 
-        internal async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, ModulesRouter<TModule> modulesRouter)
+        public async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, IServiceCollection sharedServices)
         {
             if (IsStarted)
             {
@@ -38,62 +43,139 @@ namespace Dotnettency.Modules
             }
 
             var container = await containerFactory();
-            if (Options.IsIsolated) // means module is routable and isolated. Services are registered into container per module, and module can configure its own middleware.
-            {
-                container = container.CreateChildContainer();
-            }
+            var routedModule = Module as IRoutedModule;
+            container = container.CreateChildContainer();
 
             container.Configure((services) =>
             {
-                if (Options.IsIsolated)
-                {
-                    services.AddRouting();
-                }
-                Module.ConfigureServices(services);
+                services.AddRouting(); //it's assumed routing is required for a routed module!
+                routedModule.ConfigureServices(services);
             });
 
             Container = container;
 
+            var routedModuleShell = this as ModuleShell<IRoutedModule>;
 
-            // Configure routes.
-            // only isolated modules can have routing.
-            if (Options.IsIsolated)
-            {
-                modulesRouter.AddModuleRouter((moduleRouteBuilder) =>
-                {
-                    //  var appBuilder = rootAppBuilder.New();
-                    //appBuilder.ApplicationServices = Container.GetServiceProvider();
-                    //  var routeBuilder = new RouteBuilder(appBuilder, modulesRouter);
-                    Module.ConfigureRoutes(moduleRouteBuilder);
+            var moduleAppBuilder = rootAppBuilder.New();
 
-                    var moduleRouter = moduleRouteBuilder.Build();
-                    moduleRouteBuilder.ApplicationBuilder.UseRouter(moduleRouter);
-                    this.Router = moduleRouter;
+            var moduleServicesProvider = Container.GetServiceProvider();
+            moduleAppBuilder.ApplicationServices = moduleServicesProvider;
 
-                    //TODO: Not sure it makes sense for an isolated module to have its own middleware pipeline.
-                    // As means evauating routes twice - i.e we evaluate the routes to route to the correct module,
-                    // then because the router is in the middleware pipeline if we invoke the middleware pipeline
-                    // we will evaulate the routes again.
-                    // perhaps we don't add the routing to the modules middleware pipeline, but then
-                   
+            var moduleRouteBuilder = new RouteBuilder(moduleAppBuilder, _modulesRouter.NullMatchRouteHandler);
+            routedModule.ConfigureRoutes(moduleRouteBuilder);
+            var moduleRouter = moduleRouteBuilder.Build();
+            moduleRouteBuilder.ApplicationBuilder.UseRouter(moduleRouter);
+            AppBuilder = moduleRouteBuilder.ApplicationBuilder;
+            MiddlewarePipeline = AppBuilder.Build();
 
-                    AppBuilder = moduleRouteBuilder.ApplicationBuilder;
-                    MiddlewarePipeline = AppBuilder.Build();
+            this.Router = moduleRouter;
 
-                    return this;
-                }, Container.GetServiceProvider());
-
-            }
-            else
-            {
-                // non isolated modules can directly configure middleware in the tenants pipeline.
-                Module.ConfigureMiddleware(rootAppBuilder);
-            }
+            // Must register this module with the module router.         
+            _modulesRouter.AddModuleRouter(this);
 
             IsStarted = true;
 
 
         }
+    }
+
+
+    public class ModuleShell<TModule> : IModuleShell<TModule>
+    where TModule : IModule
+    {
+
+        public ModuleShellOptions Options { get; }
+
+       // public Func<IServiceCollection> ServicesFactory { get; }
+
+        public ModuleShell(TModule module, ModuleShellOptions options)
+        {
+            Options = options;
+            Module = module;
+          //  ServicesFactory = servicesFactory;
+            //Services = services;
+        }
+
+        public IModule Module { get; set; }
+
+        public bool IsStarted { get; private set; }
+
+        public ITenantContainerAdaptor Container { get; set; }
+        public IApplicationBuilder AppBuilder { get; private set; }
+        public IRouter Router { get; private set; }
+
+        public RequestDelegate MiddlewarePipeline { get; set; }
+
+        //internal async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, ModulesRouter<IRoutedModule> modulesRouter)
+        //{
+        //    if (IsStarted)
+        //    {
+        //        return;
+        //    }
+
+        //    var container = await containerFactory();
+        //    var routedModule = Module as IRoutedModule;
+        //    container = container.CreateChildContainer();
+
+        //    container.Configure((services) =>
+        //    {
+        //        services.AddRouting(); //it's assumed routing is required for a routed module!
+        //        routedModule.ConfigureServices(services);
+        //    });
+
+        //    Container = container;
+
+        //    var routedModuleShell = this as ModuleShell<IRoutedModule>;
+        //    // Must register this module with the module router.
+        //    modulesRouter.AddModuleRouter((moduleRouteBuilder) =>
+        //    {
+        //        routedModule.ConfigureRoutes(moduleRouteBuilder);
+        //        var moduleRouter = moduleRouteBuilder.Build();
+        //        moduleRouteBuilder.ApplicationBuilder.UseRouter(moduleRouter);
+        //        this.Router = moduleRouter;
+
+        //        AppBuilder = moduleRouteBuilder.ApplicationBuilder;
+        //        MiddlewarePipeline = AppBuilder.Build();
+
+        //        return routedModuleShell;
+        //    }, Container.GetServiceProvider());
+
+
+        //    IsStarted = true;
+
+
+        //}
+
+        public async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, IServiceCollection sharedServices)
+        {
+            if (IsStarted)
+            {
+                return;
+            }
+
+            var container = await containerFactory();
+
+            // configure container.           
+            var sharedModule = Module as ISharedModule;
+            if (sharedModule != null)
+            {
+               // var services = ServicesFactory();
+                sharedModule.ConfigureServices(sharedServices);
+                //container.Configure((services) =>
+                //{
+
+                //});
+            }
+
+            Container = container;
+
+            // configure middleware.
+            sharedModule.ConfigureMiddleware(rootAppBuilder);
+
+            IsStarted = true;
+        }
+
+
     }
 
 }

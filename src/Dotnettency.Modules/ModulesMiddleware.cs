@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Dotnettency.Container;
+using Microsoft.AspNetCore.Routing;
 
 namespace Dotnettency.Modules
 {
@@ -21,7 +22,7 @@ namespace Dotnettency.Modules
             RequestDelegate next,
             IApplicationBuilder rootApp,
             ILogger<ModulesMiddleware<TTenant, TModule>> logger,
-             IModuleManager<TModule> moduleManager
+            IModuleManager<TModule> moduleManager
            )
         {
             _next = next;
@@ -35,15 +36,15 @@ namespace Dotnettency.Modules
         {
 
             // need to ensure all modules are initialised.
-            await _moduleManager.EnsureModulesStarted(() =>
+            await _moduleManager.EnsureStarted(() =>
             {
                 return tenantContainerAccessor.TenantContainer.Value;
             }, _rootApp);
 
             var router = _moduleManager.GetModulesRouter();
-            var routeContext = new Modules.ModulesRouteContext<TModule>(context);
-
-            // context.GetRouteData().Routers.Add(router);
+            var routeContext = new ModulesRouteContext<TModule>(context);
+            routeContext.RouteData.Routers.Add(router);
+           // context.GetRouteData().Routers.Add(router);
             await router.RouteAsync(routeContext);
 
             if (routeContext.Handler == null)
@@ -56,6 +57,12 @@ namespace Dotnettency.Modules
                 // we can also store the modules container.
                 //  context.Features[typeof(IRoutingFeature)] = new RoutingFeature()
                 var routedModule = routeContext.ModuleShell;
+
+                routeContext.HttpContext.Features[typeof(IRoutingFeature)] = new RoutingFeature()
+                {
+                    RouteData = routeContext.RouteData,
+                };
+                // context.GetRouteData().PushState(routeContext., routeContext.RouteData,)
                 _logger.LogInformation("Request matched module {0}", routedModule.Module.GetType().Name);
 
 
@@ -73,4 +80,5 @@ namespace Dotnettency.Modules
             }
         }
     }
+
 }

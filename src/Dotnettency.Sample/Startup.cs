@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Dotnettency.Modules;
+using Microsoft.AspNetCore.Routing;
 
 namespace Sample
 {
@@ -36,27 +37,35 @@ namespace Sample
                        {
                            tenantServices.AddSingleton<SomeTenantService>();
 
-                           tenantServices.AddModules<BaseModule>((modules) =>
+                           tenantServices.AddModules<ModuleBase>((modules) =>
                            {
                                // Only load these modules for tenant Bar.
-                               if (tenant.Name == "Bar")
+                               if (tenant?.Name == "Bar")
                                {
-                                   modules.AddModule<SystemModule>()
-                                          .AddModule<IsolatedModule>();
+                                   // Enable a routed module (i.e a module that handles requests.
+                                   modules.AddModule<SampleRoutedModule>()
+                                   // Enable a shared module, this is a module that provides dependencies that all modules can consume.
+                                          .AddModule<SampleSharedModule>();
                                }
 
                                modules.OnSetupModule((moduleOptions) =>
                                {
+                                   // Here you have access to the common base for all of your modules so you can configure any
+                                   // additional properties on them.
+                                   //if (!moduleOptions.Module.)
+                                   //{
+                                   //   
+                                   //}
+                               }, (new RouteHandler(context =>
+                               {
+                                   // context.Items["NUL"]
+                                   return null;
 
-                                   if (!moduleOptions.Module.IsSystemModule)
-                                   {
-                                       // We will load this modules services into isolated container for the module
-                                       // This means the modules services won't pollute the tenants container.
-                                       moduleOptions.UseIsolatedContainer();
-                                   }
-                               });
-
-
+                                   //context.GetRouteData().
+                                   //var routeValues = context.GetRouteData().Values;
+                                   //return context.Response.WriteAsync(
+                                   //    $"Hello! Route values: {string.Join(", ", routeValues)}");
+                               })));
                            });
                        });
 
@@ -69,7 +78,7 @@ namespace Sample
                         {
                             appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
-                            appBuilder.UseModules<Tenant, BaseModule>();                          
+                            appBuilder.UseModules<Tenant, ModuleBase>();
 
                             if (context.Tenant?.Name == "Foo")
                             {
@@ -126,7 +135,7 @@ namespace Sample
                             hostingEnvironmentOptions.UseTenantWebRootFileProvider();
                         })
                        .UsePerTenantMiddlewarePipeline();
-                      // .UseModules<Tenant, BaseModule>();
+                // .UseModules<Tenant, BaseModule>();
             });
 
             //  app.UseMiddleware<SampleMiddleware<Tenant>>();

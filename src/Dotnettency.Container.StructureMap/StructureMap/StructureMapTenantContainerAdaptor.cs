@@ -2,6 +2,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Dotnettency.Container.StructureMap;
+using System.Threading.Tasks;
 
 namespace Dotnettency.Container
 {
@@ -23,7 +24,7 @@ namespace Dotnettency.Container
         {
             return _container.GetInstance<IServiceProvider>();
         }
-      
+
 
         public string ContainerName => _container.Name;
 
@@ -31,12 +32,15 @@ namespace Dotnettency.Container
 
         public void Configure(Action<IServiceCollection> configure)
         {
-            _container.Configure(_ =>
-            {
-                var services = new ServiceCollection();
-                configure(services);
-                _.Populate(services);
-            });
+            //return Task.Run(() =>
+            //{
+                _container.Configure(_ =>
+                {
+                    var services = new ServiceCollection();
+                    configure(services);
+                    _.Populate(services);
+                });
+           // });
         }
 
         public ITenantContainerAdaptor CreateNestedContainer()
