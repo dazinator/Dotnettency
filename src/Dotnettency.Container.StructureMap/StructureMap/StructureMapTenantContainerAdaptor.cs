@@ -1,5 +1,8 @@
 ﻿using StructureMap;
 using System;
+using Microsoft.Extensions.DependencyInjection;
+using Dotnettency.Container.StructureMap;
+using System.Threading.Tasks;
 
 namespace Dotnettency.Container
 {
@@ -12,20 +15,42 @@ namespace Dotnettency.Container
         {
             _container = container;
             _id = Guid.NewGuid();
-            ServiceProvider = new Lazy<IServiceProvider>(() =>
-            {
-                return _container.GetInstance<IServiceProvider>();
-            });
+            //ServiceProvider = new Lazy<IServiceProvider>(() =>
+            //{
+            //    return 
+            //});
         }
-        public Lazy<IServiceProvider> ServiceProvider { get; }
+        public IServiceProvider GetServiceProvider()
+        {
+            return _container.GetInstance<IServiceProvider>();
+        }
+
 
         public string ContainerName => _container.Name;
 
         public Guid ContainerId => _id;
 
+        public void Configure(Action<IServiceCollection> configure)
+        {
+            //return Task.Run(() =>
+            //{
+                _container.Configure(_ =>
+                {
+                    var services = new ServiceCollection();
+                    configure(services);
+                    _.Populate(services);
+                });
+           // });
+        }
+
         public ITenantContainerAdaptor CreateNestedContainer()
         {
             return new StructureMapTenantContainerAdaptor(_container.GetNestedContainer());
+        }
+
+        public ITenantContainerAdaptor CreateChildContainer()
+        {
+            return new StructureMapTenantContainerAdaptor(_container.CreateChildContainer());
         }
 
         public void Dispose()

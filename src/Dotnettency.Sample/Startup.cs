@@ -8,6 +8,8 @@ using System;
 using System.Text;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
+using Dotnettency.Modules;
+using Microsoft.AspNetCore.Routing;
 
 namespace Sample
 {
@@ -25,8 +27,50 @@ namespace Sample
         {
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
-                options                   
+                options
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
+                    .ConfigureTenantContainers((containerBuilder) =>
+                   {
+                       // Extension methods available here for supported containers. We are using structuremap..
+                       // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
+                       containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
+                       {
+                           tenantServices.AddSingleton<SomeTenantService>();
+
+                           tenantServices.AddModules<ModuleBase>((modules) =>
+                           {
+                               // Only load these modules for tenant Bar.
+                               if (tenant?.Name == "Bar")
+                               {
+                                   // Enable a routed module (i.e a module that handles requests.
+                                   modules.AddModule<SampleRoutedModule>()
+                                   // Enable a shared module, this is a module that provides dependencies that all modules can consume.
+                                          .AddModule<SampleSharedModule>();
+                               }
+
+                               modules.OnSetupModule((moduleOptions) =>
+                               {
+                                   // Here you have access to the common base for all of your modules so you can configure any
+                                   // additional properties on them.
+                                   //if (!moduleOptions.Module.)
+                                   //{
+                                   //   
+                                   //}
+                               }, (new RouteHandler(context =>
+                               {
+                                   // context.Items["NUL"]
+                                   return null;
+
+                                   //context.GetRouteData().
+                                   //var routeValues = context.GetRouteData().Values;
+                                   //return context.Response.WriteAsync(
+                                   //    $"Hello! Route values: {string.Join(", ", routeValues)}");
+                               })));
+                           });
+                       });
+
+                       // .WithModuleContainers(); // Creates a child container per IModule.
+                   })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
                         // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
@@ -34,21 +78,16 @@ namespace Sample
                         {
                             appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
+                            appBuilder.UseModules<Tenant, ModuleBase>();
+
                             if (context.Tenant?.Name == "Foo")
                             {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
+                            //
                         });
                     }) // Configure per tenant containers.
-                    .ConfigureTenantContainers((containerBuilder) =>
-                    {
-                        // Extension methods available here for supported containers. We are using structuremap..
-                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
-                        {
-                            tenantServices.AddSingleton<SomeTenantService>();
-                        });
-                    })
+
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
                 {
@@ -96,6 +135,7 @@ namespace Sample
                             hostingEnvironmentOptions.UseTenantWebRootFileProvider();
                         })
                        .UsePerTenantMiddlewarePipeline();
+                // .UseModules<Tenant, BaseModule>();
             });
 
             //  app.UseMiddleware<SampleMiddleware<Tenant>>();

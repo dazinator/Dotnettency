@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DelegateModuleFactory.cs" />
+    <Compile Remove="DelegateModuleShellFactory.cs" />
+    <Compile Remove="IModuleFactory.cs" />
+    <Compile Remove="IModuleShellFactory.cs" />
+    <Compile Remove="ModuleContainerBuilderOptionsExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dotnettency.Container\Dotnettency.Container.csproj" />
+    <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
+  </ItemGroup>
+
+</Project>

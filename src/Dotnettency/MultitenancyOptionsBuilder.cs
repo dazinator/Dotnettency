@@ -46,7 +46,7 @@ namespace Dotnettency
 
         }
 
-        public Func<IServiceProvider> BuildServiceProvider { get; set; }
+      public Func<IServiceProvider> ServiceProviderFactory { get; set; }
 
 
 
