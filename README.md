@@ -10,6 +10,8 @@ Mutlitenancy library for dotnet applications.
 
 Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 
+Read me blog / tutorial series here: http://darrelltunnell.net/tags/dotnettency/
+
 See the [sample app for a full display of all the current features](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample) or if you want to see MVC in action, checkout the [MVC sample](https://github.com/dazinator/Dotnettency/tree/develop/src/Sample.Mvc) which include:
 
 - Tenant resolution
