@@ -10,20 +10,28 @@ Mutlitenancy library for dotnet applications.
 
 Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 
-Read the tutorial series here: http://darrelltunnell.net/tags/dotnettency/
-See the [sample app for a full display of all the current features](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample) or if you want to see MVC in action, checkout the [MVC sample](https://github.com/dazinator/Dotnettency/tree/develop/src/Sample.Mvc) which include:
+## Resources
+
+ - Tutorial series here: http://darrelltunnell.net/tags/dotnettency/
+ - See the [sample app for a full display of all the current features](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample) or if you want to see MVC in action, checkout the [MVC sample](https://github.com/dazinator/Dotnettency/tree/develop/src/Sample.Mvc)
+ 
+## Features
 
 - Tenant resolution
 - Per Tenant Middleware Pipeline
 - Per Tenant Containers
 - Per Tenant HostingEnvironment
+- Modules (Shared and Routed)
 
-Tenant Resolution
+## Tenant Injection
 
 Once configured in `startup.cs` you can:
 
 - Inject `TTenant` directly. (Has potential to be blocking)
 - Inject `ITenantAccessor<TTenant>` in order to lazily access the current tenant in a non blocking way.
+
+## Tenant Shell Injection
+
 - Inject `ITenantShellAccessor<TTenant>` in order to access context for the currnet tenant, which is primarily used by:
   - Extensions (such as Middleware, or Container) - which store things for the tenant in the `ITenantShellAccessor<TTenant>`'s concurrent property bag.
   - Tenant Admin screens - if you need to "Restart" a tenant, then the idea is, you can resolve the `ITenantShellAccessor<TTenant>` and then use extension methods (provided by the dotnettency extensions such as Middleware pipeline, or Container) to allow you to control the state of the running tenant - for example to trigger rebuild of the tenant's container, or pipeline on the next request.
