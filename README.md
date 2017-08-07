@@ -13,7 +13,8 @@ Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 ## Resources
 
  - Tutorial series here: http://darrelltunnell.net/tags/dotnettency/
- - See the [sample app for a full display of all the current features](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample) or if you want to see MVC in action, checkout the [MVC sample](https://github.com/dazinator/Dotnettency/tree/develop/src/Sample.Mvc)
+ - Various samples here: https://github.com/dazinator/Dotnettency.Samples
+ - More extensive [sample app for a full display of all the current features](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample) or if you want to see MVC in action, checkout the [MVC sample](https://github.com/dazinator/Dotnettency/tree/develop/src/Sample.Mvc)
  
 ## Features
 
