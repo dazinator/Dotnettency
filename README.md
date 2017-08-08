@@ -28,8 +28,9 @@ Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 
 Once configured in `startup.cs` you can:
 
-- Inject `TTenant` directly. (Has potential to be blocking)
-- Inject `ITenantAccessor<TTenant>` in order to lazily access the current tenant in a non blocking way.
+- Inject `TTenant` directly (may block whilst resolving current tenant).
+- Inject `Task<TTenant>` - Allows you to `await` the current `Tenant` (so non blocking). `Task<TTenant>` is convenient.
+- Inject `ITenantAccessor<TTenant>`. This is similar to injecting `Task<Tenant>` in that it provides lazy access the current tenant in a non blocking way. For convenience it's now easier to just inject `Task<Tenant>` instead, unless you want a more descriptive API.
 
 ## Tenant Shell Injection
 
