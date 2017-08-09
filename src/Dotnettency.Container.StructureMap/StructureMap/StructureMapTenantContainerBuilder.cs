@@ -1,5 +1,4 @@
-﻿using Dotnettency.Container;
-using StructureMap;
+﻿using StructureMap;
 using System;
 using System.Threading.Tasks;
 
@@ -25,7 +24,7 @@ namespace Dotnettency.Container
 
             var tenantContainer = Container.CreateChildContainer();
             tenantContainer.Configure(config => Configure(tenant, config));
-            ITenantContainerAdaptor adaptor = new StructureMapTenantContainerAdaptor(tenantContainer);
+            ITenantContainerAdaptor adaptor = new StructureMapTenantContainerAdaptor(tenantContainer, ContainerRole.Child);
             return Task.FromResult(adaptor);
         }
     }

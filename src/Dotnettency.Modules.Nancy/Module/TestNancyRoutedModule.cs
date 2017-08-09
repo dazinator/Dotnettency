@@ -3,24 +3,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Sample
+namespace Dotnettency.Modules.Nancy
 {
-
-    public class SampleRoutedModule : RoutedModuleBase
+    public class TestNancyRoutedModule : RoutedModuleBase
     {
-        public SampleRoutedModule()
+        public TestNancyRoutedModule()
         {
             // IsSystemModule = false;
         }
 
         public override void ConfigureRoutes(IRouteBuilder routes)
         {
+
             RequestDelegate handler = (c) =>
             {
                 var name = c.GetRouteValue("name");
                 return c.Response.WriteAsync($"Hi {name}, from module: {this.GetType().Name}");
             };
 
+            // routes.MapMiddlewareRoute
+
+            //   routes.MapMiddlewareRoute
             routes.MapGet("hello/{name}", handler);
 
         }

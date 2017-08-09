@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency", "Dotnettency\Dotnettency.csproj", "{27306262-FF3C-4B52-A2CD-ED49F613B200}"
 EndProject
@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		..\appveyor.yml = ..\appveyor.yml
 		..\LICENSE = ..\LICENSE
+		NuGet.config = NuGet.config
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
@@ -24,7 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Mvc", "Sample.Mvc\Sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.HostingEnvironment", "Dotnettency.HostingEnvironment\Dotnettency.HostingEnvironment.csproj", "{E2CAD9E5-6843-4A9B-9A0B-1F4E1F42A6A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Modules", "Dotnettency.Modules\Dotnettency.Modules.csproj", "{720AC644-94A4-4AA9-AD12-543AB87BC2FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Modules", "Dotnettency.Modules\Dotnettency.Modules.csproj", "{720AC644-94A4-4AA9-AD12-543AB87BC2FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Modules.Nancy", "Dotnettency.Modules.Nancy\Dotnettency.Modules.Nancy.csproj", "{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,8 +135,23 @@ Global
 		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|x64.Build.0 = Release|Any CPU
 		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|x86.ActiveCfg = Release|Any CPU
 		{720AC644-94A4-4AA9-AD12-543AB87BC2FC}.Release|x86.Build.0 = Release|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Debug|x64.Build.0 = Debug|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Debug|x86.Build.0 = Debug|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|x64.ActiveCfg = Release|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|x64.Build.0 = Release|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|x86.ActiveCfg = Release|Any CPU
+		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CDE5153E-0835-41A9-A40E-3E930F41F681}
 	EndGlobalSection
 EndGlobal

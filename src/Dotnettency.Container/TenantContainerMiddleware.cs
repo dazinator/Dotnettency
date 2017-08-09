@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnettency.Container
 {
-
     public class TenantContainerMiddleware<TTenant>
          where TTenant : class
     {
@@ -19,35 +18,29 @@ namespace Dotnettency.Container
         public TenantContainerMiddleware(
             RequestDelegate next,
             ILoggerFactory loggerFactory,
-             ITenantContainerFactory<TTenant> factory)
+            ITenantContainerFactory<TTenant> factory)
         {
             _next = next;
             _log = loggerFactory.CreateLogger<TenantContainerMiddleware<TTenant>>();
             _factory = factory;
         }
 
-        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor)
+        public async Task Invoke(HttpContext context, ITenantRequestContainerAccessor<TTenant> tenantRequestContainerAccessor)
         {
             //  log.LogDebug("Using multitenancy provider {multitenancyProvidertype}.", tenantAccessor.GetType().Name);
 
-
-            var tenantContainer = await tenantContainerAccessor.TenantContainer.Value;
-            if (tenantContainer == null)
+            var requestContainer = await tenantRequestContainerAccessor.TenantRequestContainer.Value;
+            if (requestContainer == null)
             {
                 await _next.Invoke(context);
                 return;
             }
 
             // Replace request services with a nested version (for lifetime management - used to encpasulate a request).
-            using (var scope = tenantContainer.CreateNestedContainer())
+            using (requestContainer)
             {
-
-                _log.LogDebug("Setting Request: {containerId} - {containerName}", scope.ContainerId, scope.ContainerName);
-                var oldRequestServices = context.RequestServices;
-                context.RequestServices = scope.GetServiceProvider();
-                await _next.Invoke(context); // module middleware should be next - which will replace again with module specific container (nested).
-                _log.LogDebug("Restoring Request Container");
-                context.RequestServices = oldRequestServices;
+                _log.LogDebug("Setting Request Container: {containerId} - {containerName}", requestContainer.RequestContainer.ContainerId, requestContainer.RequestContainer.ContainerName);
+                await requestContainer.ExecuteWithinSwappedRequestContainer(_next.Invoke(context));
             }
 
         }

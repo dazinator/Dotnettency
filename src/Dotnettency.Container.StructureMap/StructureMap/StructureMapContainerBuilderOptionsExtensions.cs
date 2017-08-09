@@ -78,7 +78,7 @@ namespace Dotnettency
                         }))
                     );
 
-                var adaptor = new StructureMapTenantContainerAdaptor(container);
+                var adaptor = new StructureMapTenantContainerAdaptor(container, ContainerRole.Root);
                 return adaptor;
             });
 

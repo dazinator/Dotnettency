@@ -138,6 +138,13 @@ namespace Sample
                 // .UseModules<Tenant, BaseModule>();
             });
 
+            //app.UseOwin(x =>
+            //{
+            //    x.UseMyMiddleware(new MyMiddlewareOptions());
+            //    x.UseNancy();
+            //});
+
+
             //  app.UseMiddleware<SampleMiddleware<Tenant>>();
             //  app.
             app.Run(async (context) =>

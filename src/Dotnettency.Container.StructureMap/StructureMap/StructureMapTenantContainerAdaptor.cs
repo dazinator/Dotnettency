@@ -11,10 +11,11 @@ namespace Dotnettency.Container
         private readonly IContainer _container;
         private readonly Guid _id;
 
-        public StructureMapTenantContainerAdaptor(IContainer container)
+        public StructureMapTenantContainerAdaptor(IContainer container, ContainerRole role)
         {
             _container = container;
             _id = Guid.NewGuid();
+            Role = role;
             //ServiceProvider = new Lazy<IServiceProvider>(() =>
             //{
             //    return 
@@ -26,6 +27,8 @@ namespace Dotnettency.Container
         }
 
 
+        public ContainerRole Role { get; set; }
+
         public string ContainerName => _container.Name;
 
         public Guid ContainerId => _id;
@@ -34,23 +37,23 @@ namespace Dotnettency.Container
         {
             //return Task.Run(() =>
             //{
-                _container.Configure(_ =>
-                {
-                    var services = new ServiceCollection();
-                    configure(services);
-                    _.Populate(services);
-                });
-           // });
+            _container.Configure(_ =>
+            {
+                var services = new ServiceCollection();
+                configure(services);
+                _.Populate(services);
+            });
+            // });
         }
 
         public ITenantContainerAdaptor CreateNestedContainer()
         {
-            return new StructureMapTenantContainerAdaptor(_container.GetNestedContainer());
+            return new StructureMapTenantContainerAdaptor(_container.GetNestedContainer(), ContainerRole.Scoped);
         }
 
         public ITenantContainerAdaptor CreateChildContainer()
         {
-            return new StructureMapTenantContainerAdaptor(_container.CreateChildContainer());
+            return new StructureMapTenantContainerAdaptor(_container.CreateChildContainer(), ContainerRole.Child);
         }
 
         public void Dispose()

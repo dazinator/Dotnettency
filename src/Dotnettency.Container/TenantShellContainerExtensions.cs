@@ -17,5 +17,6 @@ namespace Dotnettency
                 }) as Lazy<Task<ITenantContainerAdaptor>>;
             return result;
         }
+
     }
 }
