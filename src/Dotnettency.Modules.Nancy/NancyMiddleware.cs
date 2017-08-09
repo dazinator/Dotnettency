@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Dotnettency.Container;
-using Microsoft.AspNetCore.Routing;
 using Dotnettency.Modules.Nancy;
-using System;
 
 namespace Dotnettency.Modules
 {
@@ -55,10 +53,9 @@ namespace Dotnettency.Modules
             try
             {
                 nancyBootstrapper.RequestContainerAdaptor = tenantRequestContainer.RequestContainer;
-
-                // proceed with nancy request.
-                throw new NotImplementedException();
-                await _next.Invoke(context);
+                var engine = nancyBootstrapper.GetEngine();
+                var nancyHandler = new NancyHandler(engine);
+                await nancyHandler.ProcessRequest(context, NancyPassThroughOptions.PassThroughWhenStatusCodesAre(global::Nancy.HttpStatusCode.NotFound), _next);
             }
             finally
             {
