@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 namespace Dotnettency.Modules
 {
 
-    public class RoutedModuleShell<TModule> : IModuleShell<TModule>
+    public class RoutedModuleShell<TModule> : IRoutedModuleShell<TModule>
        where TModule : IModule
     {
         //private IRoutedModule routedModule;
@@ -102,9 +102,8 @@ namespace Dotnettency.Modules
 
         public ITenantContainerAdaptor Container { get; set; }
         public IApplicationBuilder AppBuilder { get; private set; }
-        public IRouter Router { get; private set; }
 
-        public RequestDelegate MiddlewarePipeline { get; set; }
+      
 
         //internal async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, ModulesRouter<IRoutedModule> modulesRouter)
         //{

@@ -13,16 +13,17 @@ namespace Dotnettency.Container
         private readonly ILogger _log;
         private readonly ITenantContainerFactory<TTenant> _factory;
 
-        private Lazy<Task<ITenantContainerAdaptor>> _containerFactory;
+        //  private Lazy<Task<ITenantContainerAdaptor>> _containerFactory;
 
         public TenantContainerMiddleware(
             RequestDelegate next,
-            ILoggerFactory loggerFactory,
-            ITenantContainerFactory<TTenant> factory)
+            ILoggerFactory loggerFactory
+            //  ITenantContainerFactory<TTenant> factory
+            )
         {
             _next = next;
             _log = loggerFactory.CreateLogger<TenantContainerMiddleware<TTenant>>();
-            _factory = factory;
+            //  _factory = factory;
         }
 
         public async Task Invoke(HttpContext context, ITenantRequestContainerAccessor<TTenant> tenantRequestContainerAccessor)
