@@ -1,24 +1,39 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
+using Nancy;
 
 namespace Dotnettency.Modules
 {
-    public class ModulesRouter<TModule> : IRouter
+    public class NancyModulesRouter<TModule> : IRouter
+        where TModule : INancyModule
     {
-        public ModulesRouter(IRouteHandler defaultRouteHandler)
+
+        public NancyModulesRouter(RouteHandler defaultRouteHandler)
         {
             DefaultRouteHandler = defaultRouteHandler;
             //  _appBuilder = appBuilder;
-            RoutedModules = new LinkedList<IModuleShell<TModule>>();
-            // NullMatchRouteHandler = nullMatchRouteHandler;
+            RoutedModules = new LinkedList<IRoutedNancyModuleShell<TModule>>();
+
+            // if adding a new module, we want the first modules default route handler to be chained to the last, so that we can evaluate a null match.
+            NullMatchRouteHandler = new RouteHandler(context =>
+            {
+                // context.Items["NUL"]
+                return null;
+
+                //context.GetRouteData().
+                //var routeValues = context.GetRouteData().Values;
+                //return context.Response.WriteAsync(
+                //    $"Hello! Route values: {string.Join(", ", routeValues)}");
+            });
+
         }
 
-        public LinkedList<IModuleShell<TModule>> RoutedModules { get; set; }
+        public LinkedList<IRoutedNancyModuleShell<TModule>> RoutedModules { get; set; }
 
-        public void AddModuleRouter(IModuleShell<TModule> routedModuleShell)
+        public void AddModuleRouter(IRoutedNancyModuleShell<TModule> routedModuleShell)
         {
-            var newNode = new LinkedListNode<IModuleShell<TModule>>(routedModuleShell);
+            var newNode = new LinkedListNode<IRoutedNancyModuleShell<TModule>>(routedModuleShell);
             RoutedModules.AddLast(routedModuleShell);
         }
 
@@ -41,6 +56,7 @@ namespace Dotnettency.Modules
 
         public async Task RouteAsync(RouteContext context)
         {
+
             var moduleRouteContext = new ModuleRouteContext(context.HttpContext, context);
 
             var currentNode = RoutedModules.First;
@@ -52,8 +68,8 @@ namespace Dotnettency.Modules
                 await module.Router.RouteAsync(moduleRouteContext);
                 if (moduleRouteContext.Handler != null)
                 {
-                    var modulesRouteContext = context as ModulesRouteContext<TModule>;
-                    var cast = currentNode.Value as IModuleShell<TModule>;
+                    var modulesRouteContext = context as NancyModulesRouteContext<TModule>;
+                    var cast = currentNode.Value as INancyModuleShell<TModule>;
                     modulesRouteContext.ModuleShell = cast;
 
                     var existingRouteData = context.HttpContext.GetRouteData();
@@ -77,8 +93,11 @@ namespace Dotnettency.Modules
             }
         }
 
-        public IRouteHandler DefaultRouteHandler { get; set; }
+        public RouteHandler DefaultRouteHandler { get; set; }
 
-        //  public IRouteHandler NullMatchRouteHandler { get; set; }
+        public RouteHandler NullMatchRouteHandler { get; set; }
+
+
     }
+
 }

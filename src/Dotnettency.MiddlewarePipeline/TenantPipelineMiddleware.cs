@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Dotnettency.Container;
 
 namespace Dotnettency.MiddlewarePipeline
 {
@@ -31,17 +32,19 @@ namespace Dotnettency.MiddlewarePipeline
         }
 
 
-        public async Task Invoke(HttpContext context, ITenantShellAccessor<TTenant> tenantShellAccessor)
+        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor, ITenantShellAccessor<TTenant> tenantShellAccessor)
         {
             var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
             if (tenantShell != null)
             {
                 var tenant = tenantShell?.Tenant;
-                var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline<TTenant>(new Lazy<RequestDelegate>(() =>
+                var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline<TTenant>(new Lazy<Task<RequestDelegate>>(() =>
                 {
-                    return _factory.Get(_rootApp, tenant, context.RequestServices, _next);
+                    //await tenantContainerAccessor.
+                    return _factory.Get(_rootApp, tenant, tenantContainerAccessor, _next);
                 }));
-                await tenantPipeline.Value(context);
+                var requestDelegate = await tenantPipeline.Value;
+                await requestDelegate(context);
             }
             else
             {

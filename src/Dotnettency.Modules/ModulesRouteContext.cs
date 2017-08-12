@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Dotnettency.Modules
 {
-    public class ModulesRouteContext<TModule> : RouteContext
-       where TModule : IModule
+    public class ModulesRouteContext<TModule> : RouteContext     
         // where TTenant : class
     {
       //  private readonly RouteContext _parentRouteContext;

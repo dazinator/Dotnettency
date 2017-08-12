@@ -10,9 +10,12 @@ namespace Dotnettency.Modules
         where TModule : class, IModule
     {
         private IServiceCollection _services;
-        public ModuleRegisterBuilder(IServiceCollection servicies)
+        private IRouteHandler _defaultRouteHandler;
+
+        public ModuleRegisterBuilder(IServiceCollection servicies, IRouteHandler defaultRouteHandler)
         {
             _services = servicies;
+            _defaultRouteHandler = defaultRouteHandler;
             _services.AddRouting(); // needed for modular routing.
         }
 
@@ -23,10 +26,12 @@ namespace Dotnettency.Modules
             return this;
         }
 
-        public void OnSetupModule(Action<ModuleShellOptionsBuilder<TModule>> configureModuleOptionsBuilder, RouteHandler defaultRouteHandler)
+        public void OnSetupModule(Action<ModuleShellOptionsBuilder<TModule>> configureModuleOptionsBuilder)
         {
             //  var moduleShell = new
-            var modulesRouter = new ModulesRouter<TModule>(defaultRouteHandler);
+           
+
+            var modulesRouter = new ModulesRouter<TModule>(_defaultRouteHandler);
             //  _services.AddSingleton(modulesRouter);
 
             _services.AddSingleton<IModuleManager<TModule>, ModuleManager<TModule>>((sp) =>
@@ -43,24 +48,8 @@ namespace Dotnettency.Modules
                 var moduleOptionsBuilder = new ModuleShellOptionsBuilder<TModule>(item);
                 configureModuleOptionsBuilder(moduleOptionsBuilder);
                 var moduleShellOptions = moduleOptionsBuilder.Build();
-
-                var routedModule = item as IRoutedModule;
-                if (routedModule != null) // these need to be routed.
-                {
-                    // modulesRouter.
-                    // var routedModuleOptions = moduleShellOptions as ModuleShellOptions<IRoutedModule>;
-                    var routedModuleShell = new RoutedModuleShell<TModule>(item, moduleShellOptions, modulesRouter);
-                    // var moduleShell = routedModuleShell as IModuleShell<TModule>;
-                    moduleManager.AddModule(routedModuleShell);
-                }
-                else
-                {
-
-                    var nonRoutedModuleShell = new ModuleShell<TModule>(item, moduleShellOptions);
-                    //  var moduleShell = routedModuleShell as IModuleShell<TModule>;
-                    moduleManager.AddModule(nonRoutedModuleShell);
-                }
-
+                var moduleShell = new ModuleShell<TModule>(item, moduleShellOptions);
+                moduleManager.AddModule(moduleShell);
             }
             return moduleManager;
         });

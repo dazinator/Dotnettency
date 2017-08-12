@@ -8,10 +8,8 @@ using System;
 using System.Text;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using Dotnettency.Modules;
-using Microsoft.AspNetCore.Routing;
 
-namespace Sample
+namespace Sample.PerTenantHostingEnvironment
 {
     public class Startup
     {
@@ -28,78 +26,8 @@ namespace Sample
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
+                    .DistinguishTenantsBySchemeHostnameAndPort() // The distinguisher used to identify one tenant from another.
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
-                    .ConfigureTenantContainers((containerBuilder) =>
-                   {
-                       // Extension methods available here for supported containers. We are using structuremap..
-                       // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                       containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
-                       {
-                           tenantServices.AddSingleton<SomeTenantService>();
-
-                           var defaultRouteHandler = new RouteHandler(context =>
-                            {
-                                // default route handler when no routed modules match.
-                                // could return default mvc route handler, or something else.
-                                // Return null to not handle the request so it can flow through to next middleware.
-                                return null;
-                            });
-
-                           var moMatchRouteHandler = new RouteHandler(context =>
-                           {
-                               // default route handler when a single module router fails to match.
-                               // Return null so it can flow through to the next module
-                               return null;
-                           });
-
-                           tenantServices.AddModules<ModuleBase>(defaultRouteHandler, (modules) =>
-                           {
-                               // Only load these two modules for tenant Bar.
-                               if (tenant?.Name == "Bar")
-                               {
-                                   modules.AddModule<SampleRoutedModule>()
-                                          .AddModule<SampleSharedModule>();
-                               }
-
-                               // Configure each modules shell. This allows the module to participate in:
-                               // 1. Configuring tenant / application level services
-                               // 2. Optionally providing an IRouter so that the services can be isolated and restored only when the router handles the request.
-                               modules.OnSetupModule((moduleOptions) =>
-                               {
-                                   // we allow ISharedModules to configure services at tenant level, and middleware at tenant level.
-                                   var sharedModule = moduleOptions.Module as ISharedModule;
-                                   if (sharedModule != null)
-                                   {
-                                       moduleOptions.SetOnConfigureSharedServices((moduleServices) =>
-                                       {
-                                           sharedModule.ConfigureServices(moduleServices);
-                                       });
-                                       moduleOptions.SetOnConfigureMiddleware((appBuilder) =>
-                                       {
-                                           sharedModule.ConfigureMiddleware(appBuilder);
-                                       });
-                                   }
-
-                                   // We allow IRoutedModules to partipate in configuring their own isolated services, associated with their router 
-                                   var routedModule = moduleOptions.Module as IRoutedModule;
-                                   if (routedModule != null)
-                                   {
-
-                                       moduleOptions.UseRouterFactory((moduleAppBuilder) =>
-                                       {
-                                           var moduleRouteBuilder = new RouteBuilder(moduleAppBuilder, moMatchRouteHandler);
-                                           routedModule.ConfigureRoutes(moduleRouteBuilder);
-                                           var moduleRouter = moduleRouteBuilder.Build();
-                                           return moduleRouter;
-                                       }, moduleServices => routedModule.ConfigureServices(moduleServices));
-                                   }
-
-                               });
-                           });
-                       });
-
-                       // .WithModuleContainers(); // Creates a child container per IModule.
-                   })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
                         // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
@@ -107,16 +35,21 @@ namespace Sample
                         {
                             appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
-                            appBuilder.UseModules<Tenant, ModuleBase>();
-
                             if (context.Tenant?.Name == "Foo")
                             {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
-                            //
                         });
                     }) // Configure per tenant containers.
-
+                    .ConfigureTenantContainers((containerBuilder) =>
+                    {
+                        // Extension methods available here for supported containers. We are using structuremap..
+                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
+                        containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
+                        {
+                            tenantServices.AddSingleton<SomeTenantService>();
+                        });
+                    })
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
                 {
@@ -164,15 +97,7 @@ namespace Sample
                             hostingEnvironmentOptions.UseTenantWebRootFileProvider();
                         })
                        .UsePerTenantMiddlewarePipeline();
-                //.UseModules<BaseModule>();
             });
-
-            //app.UseOwin(x =>
-            //{
-            //    x.UseMyMiddleware(new MyMiddlewareOptions());
-            //    x.UseNancy();
-            //});
-
 
             //  app.UseMiddleware<SampleMiddleware<Tenant>>();
             //  app.
@@ -190,11 +115,12 @@ namespace Sample
                 var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
 
 
+                var messageBuilder = new StringBuilder();
+
                 string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
                 string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
-                string injectedTenantName = someTenantService?.TenantName == null ? "{NULL SERVICE}" : someTenantService?.TenantName;
+                string injectedTenantName = someTenantService?.TenantName == null ? "{NULL TENANT}" : someTenantService?.TenantName;
 
-                // Accessing a content file.
                 string fileContent = someTenantService?.GetContentFile("/Info.txt");
                 context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
                 var result = new

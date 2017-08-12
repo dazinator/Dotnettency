@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Dotnettency.Modules
@@ -8,12 +9,15 @@ namespace Dotnettency.Modules
     {
 
         public static IServiceCollection AddModules<TModule>(this IServiceCollection servicies,
+            IRouteHandler defaultRouteHandler,
             Action<ModuleRegisterBuilder<TModule>> registerModules)
         where TModule : class, IModule
         {
-            var registerModulesBuilder = new ModuleRegisterBuilder<TModule>(servicies);
+            var registerModulesBuilder = new ModuleRegisterBuilder<TModule>(servicies, defaultRouteHandler);
             registerModules(registerModulesBuilder);
             return servicies;
         }
+
+      
     }
 }

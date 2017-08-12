@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Nancy;
 using Sample;
+using System;
 
 namespace Dotnettency.Modules.Nancy
 {
@@ -13,6 +15,15 @@ namespace Dotnettency.Modules.Nancy
             services.AddScoped<ITenantNancyBootstrapperFactory<TTenant>, TenantNancyBootstrapperFactory<TTenant>>();
             services.AddScoped<ITenantNancyBootstrapperAccessor<TTenant>, TenantNancyBootstrapperAccessor<TTenant>>();
             return services;
+        }
+
+        public static IServiceCollection AddNancyModules<TModule>(this IServiceCollection servicies,
+           Action<NancyModuleRegisterBuilder<TModule>> registerModules)
+       where TModule : class, INancyModule
+        {
+            var registerModulesBuilder = new NancyModuleRegisterBuilder<TModule>(servicies);
+            registerModules(registerModulesBuilder);
+            return servicies;
         }
     }
 }

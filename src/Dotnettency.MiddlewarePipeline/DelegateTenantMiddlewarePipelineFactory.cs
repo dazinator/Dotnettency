@@ -3,6 +3,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Dotnettency.MiddlewarePipeline;
 using Microsoft.AspNetCore.Builder;
+using Dotnettency.Container;
 
 namespace Dotnettency
 {
@@ -18,19 +19,20 @@ namespace Dotnettency
             _configuration = configuration;
         }
 
-        public RequestDelegate Get(IApplicationBuilder appBuilder, TTenant tenant, IServiceProvider requestServices, RequestDelegate next)
+        public async Task<RequestDelegate> Get(IApplicationBuilder appBuilder, TTenant tenant, ITenantContainerAccessor<TTenant> tenantContainerAccessor, RequestDelegate next)
         {
             //return Task.Run(() =>
             //{
-            return BuildTenantPipeline(appBuilder, tenant, requestServices, next);
+            return await BuildTenantPipeline(appBuilder, tenant, tenantContainerAccessor, next);
             //  });
         }
 
-        protected virtual RequestDelegate BuildTenantPipeline(IApplicationBuilder rootApp, TTenant tenant, IServiceProvider requestServices, RequestDelegate next)
+        protected virtual async Task<RequestDelegate> BuildTenantPipeline(IApplicationBuilder rootApp, TTenant tenant, ITenantContainerAccessor<TTenant> tenantContainer, RequestDelegate next)
         {
 
             var branchBuilder = rootApp.New();
-            rootApp.ApplicationServices = requestServices;
+            var appServices = await tenantContainer.TenantContainer.Value;
+            branchBuilder.ApplicationServices = appServices.GetServiceProvider();
             var builderContext = new TenantPipelineBuilderContext<TTenant>
             {
                 //   TenantContext = tenantContext,

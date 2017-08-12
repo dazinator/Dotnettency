@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Dotnettency.Container;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency
 {
     public interface ITenantMiddlewarePipelineFactory<TTenant>
      where TTenant : class
     {
-        RequestDelegate Get(IApplicationBuilder appBuilder, TTenant tenant, IServiceProvider requestServices, RequestDelegate next);
+        Task<RequestDelegate> Get(IApplicationBuilder appBuilder, TTenant tenant, ITenantContainerAccessor<TTenant> tenantContainerAccessor, RequestDelegate next);
     }
 }
