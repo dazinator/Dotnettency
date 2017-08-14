@@ -1,15 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Dotnettency.Modules
 {
     public static class ModuleRegisterBuilderExtensions
     {
-        public static MvcModulesBuilder<TModule> AddMvcModules<TModule>(this ModuleRegisterBuilder builder, Action<MvcOptions> mvcOptionsSetup = null)
+
+        public static IServiceCollection AddMvcModules<TModule>(this IServiceCollection servicies,
+           Action<ModuleRegisterBuilder<TModule>> registerModules)
+       where TModule : class, IModule
+        {
+            var routeHandler = DefaultRouteHandler ?? sp.GetRequiredService<MvcRouteHandler>();
+            var registerModulesBuilder = new ModuleRegisterBuilder<TModule>(servicies, defaultRouteHandler);
+            registerModules(registerModulesBuilder);
+            return servicies;
+        }
+
+        public static ModuleRegisterBuilder<TModule> ConfigureMvc<TModule>(this ModuleRegisterBuilder<TModule> builder, Action<MvcOptions> mvcOptionsSetup = null)
             where TModule : class, IRoutedModule
         {
-            var mvcModulesBuilder = new MvcModulesBuilder<TModule>(builder, mvcOptionsSetup);
-            return mvcModulesBuilder;
+            if (mvcOptionsSetup != null)
+            {
+                builder.Services.AddMvc(mvcOptionsSetup);
+            }
+            else
+            {
+                builder.Services.AddMvc();
+            }
+
+            var routeHandler = sp.GetRequiredService<MvcRouteHandler>();
+
+            return builder;
+
+         
         }
     }
 

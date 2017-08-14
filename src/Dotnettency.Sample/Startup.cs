@@ -50,16 +50,6 @@ namespace Sample
                                return new SomeTenantService(tenant, sp.GetRequiredService<IHostingEnvironment>());
                            });
 
-                           // tenantServices.AddSingleton<SomeTenantService>();
-
-                           var defaultRouteHandler = new RouteHandler(context =>
-                            {
-                                // default route handler when no routed modules match.
-                                // could return default mvc route handler, or something else.
-                                // Return null to not handle the request so it can flow through to next middleware.
-                                return null;
-                            });
-
                            var moMatchRouteHandler = new RouteHandler(context =>
                            {
                                // default route handler when a single module router fails to match.
@@ -67,7 +57,7 @@ namespace Sample
                                return null;
                            });
 
-                           tenantServices.AddModules<ModuleBase>(defaultRouteHandler, (modules) =>
+                           tenantServices.AddModules<ModuleBase>((modules) =>
                            {
                                // Only load these two modules for tenant Bar.
                                if (tenant?.Name == "Bar")
@@ -109,7 +99,7 @@ namespace Sample
                                            routedModule.ConfigureRoutes(moduleRouteBuilder);
                                            var moduleRouter = moduleRouteBuilder.Build();
                                            return moduleRouter;
-                                       }, 
+                                       },
                                        moduleServices => routedModule.ConfigureServices(moduleServices));
                                    }
 
@@ -205,7 +195,7 @@ namespace Sample
 
                 var container = context.RequestServices as ITenantContainerAdaptor;
                 logger.LogDebug("App Run Container Is: {id}, {containerNAme}, {role}", container.ContainerId, container.ContainerName, container.Role);
-                               
+
 
                 // Use ITenantAccessor to access the current tenant.
                 var tenantAccessor = container.GetRequiredService<ITenantAccessor<Tenant>>();

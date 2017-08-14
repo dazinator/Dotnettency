@@ -8,7 +8,7 @@ namespace Dotnettency.Modules
     public class MvcModulesBuilder<TModule>
          where TModule : class, IRoutedModule
     {
-        public MvcModulesBuilder(ModuleRegisterBuilder parentBuilder, Action<Microsoft.AspNetCore.Mvc.MvcOptions> mvcOptionsSetup = null)
+        public MvcModulesBuilder(ModuleRegisterBuilder<TModule> parentBuilder, Action<Microsoft.AspNetCore.Mvc.MvcOptions> mvcOptionsSetup = null)
         {
             ParentBuilder = parentBuilder;
             if (mvcOptionsSetup != null)
@@ -19,12 +19,8 @@ namespace Dotnettency.Modules
             {
                 parentBuilder.Services.AddMvc();
             }
-          //  DefaultRouteHandler = new MvcRouteHandler
-
+            //  DefaultRouteHandler = new MvcRouteHandler
         }
-
-      
-
 
         /// <summary>
         /// 
@@ -33,8 +29,6 @@ namespace Dotnettency.Modules
         /// <returns></returns>
         public ModuleRegisterBuilder<TModule> Build(Action<ModuleShellOptionsBuilder<TModule>> configureModuleOptionsBuilder, IRouteHandler defaultRouteHandler)
         {
-           
-
             var services = ParentBuilder.Services;
             services.AddSingleton<IModuleManager<TModule>, ModuleManager<TModule>>((sp) =>
             {
@@ -76,8 +70,6 @@ namespace Dotnettency.Modules
 
             return ParentBuilder;
         }
-
-     
 
         public ModuleRegisterBuilder<TModule> ParentBuilder { get; set; }
 

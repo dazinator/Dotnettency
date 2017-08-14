@@ -17,13 +17,6 @@ namespace Dotnettency.Modules.Nancy
             return services;
         }
 
-        public static IServiceCollection AddNancyModules<TModule>(this IServiceCollection servicies,
-           Action<NancyModuleRegisterBuilder<TModule>> registerModules)
-       where TModule : class, INancyModule
-        {
-            var registerModulesBuilder = new NancyModuleRegisterBuilder<TModule>(servicies);
-            registerModules(registerModulesBuilder);
-            return servicies;
-        }
+       
     }
 }

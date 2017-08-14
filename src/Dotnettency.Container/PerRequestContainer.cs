@@ -69,13 +69,17 @@ namespace Dotnettency.Container
                     // throw;
                 }
             }
+            else
+            {
+                await request.Invoke(context);
+            }
 
         }
         // public IServiceScope Scope { get; }
 
         public void Dispose()
         {
-            OnDispose();
+            OnDispose?.Invoke();
             // Scope.Dispose();
         }
     }

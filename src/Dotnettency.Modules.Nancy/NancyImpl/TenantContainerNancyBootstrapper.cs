@@ -50,43 +50,43 @@ namespace Dotnettency.Modules.Nancy
 
         protected override IEnumerable<INancyModule> GetAllModules(ITenantContainerAdaptor container)
         {
-            var sp = this.ApplicationContainer.GetServiceProvider();
+            var sp = this.ApplicationContainer;
             return sp.GetServices<INancyModule>();
         }
 
         public override INancyEnvironment GetEnvironment()
         {
-            var sp = this.ApplicationContainer.GetServiceProvider();
+            var sp = this.ApplicationContainer;
             return sp.GetService<INancyEnvironment>();
         }
 
         protected override IEnumerable<IApplicationStartup> GetApplicationStartupTasks()
         {
-            var sp = this.ApplicationContainer.GetServiceProvider();
+            var sp = this.ApplicationContainer;
             return sp.GetServices<IApplicationStartup>();
         }
 
         protected override IDiagnostics GetDiagnostics()
         {
-            var sp = ApplicationContainer.GetServiceProvider();
+            var sp = ApplicationContainer;
             return sp.GetService<IDiagnostics>();
         }
 
         protected override INancyEngine GetEngineInternal()
         {
-            var sp = ApplicationContainer.GetServiceProvider();
+            var sp = ApplicationContainer;
             return sp.GetService<INancyEngine>();
         }
 
         protected override INancyEnvironmentConfigurator GetEnvironmentConfigurator()
         {
-            var sp = ApplicationContainer.GetServiceProvider();
+            var sp = ApplicationContainer;
             return sp.GetService<INancyEnvironmentConfigurator>();
         }
 
         protected override IEnumerable<IRegistrations> GetRegistrationTasks()
         {
-            var sp = ApplicationContainer.GetServiceProvider();
+            var sp = ApplicationContainer;
             return sp.GetServices<IRegistrations>();
         }
 
@@ -95,13 +95,13 @@ namespace Dotnettency.Modules.Nancy
 
         protected override INancyModule GetModule(ITenantContainerAdaptor container, Type moduleType)
         {
-            var sp = container.GetServiceProvider();
+            var sp = container;
             return (INancyModule)sp.GetService(moduleType);
         }
 
         protected override IEnumerable<IRequestStartup> RegisterAndGetRequestStartupTasks(ITenantContainerAdaptor container, Type[] requestStartupTypes)
         {
-            var sp = container.GetServiceProvider();
+            var sp = container;
             return requestStartupTypes.Select(sp.GetService).Cast<IRequestStartup>().ToArray();
         }
 

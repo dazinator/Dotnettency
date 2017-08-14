@@ -24,7 +24,7 @@ namespace Dotnettency.Container
             _appBuilder = appBuilder;            
         }
 
-        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor)
+        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor, ITenantRequestContainerAccessor<TTenant> requestContainerAccessor)
         {
             //  log.LogDebug("Using multitenancy provider {multitenancyProvidertype}.", tenantAccessor.GetType().Name);
             _logger.LogDebug("Tenant Container Middleware - Start.");
@@ -41,8 +41,10 @@ namespace Dotnettency.Container
             {
                 _logger.LogDebug("Setting AppBuilder Services to Tenant Container: {containerId} - {containerName}", tenantContainer.ContainerId, tenantContainer.ContainerName);
                 _appBuilder.ApplicationServices = tenantContainer;
+                var perRequestContainer = await requestContainerAccessor.TenantRequestContainer.Value;
+
                 // Replace request services with a nested version (for lifetime management - used to encpasulate a request).                
-                using (var perRequestContainer = new PerRequestContainer(tenantContainer.CreateNestedContainer()))
+                using (perRequestContainer)
                 {
                     _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
                     await perRequestContainer.ExecuteWithinSwappedRequestContainer(_next, context);

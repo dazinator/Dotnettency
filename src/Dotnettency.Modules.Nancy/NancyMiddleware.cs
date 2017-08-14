@@ -38,11 +38,11 @@ namespace Dotnettency.Modules
             // adjust its request container - give it the current request container to return.
             // get the nancy engine
 
-            var tenantContainer = await tenantContainerAccessor.TenantContainer.Value;
+            //  var tenantContainer = await tenantContainerAccessor.TenantContainer.Value;
             var tenantRequestContainer = await tenantRequestContainerAccessor.TenantRequestContainer.Value;
             var nancyBootstrapper = await tenantNancyBootstrapper.Bootstrapper.Value;
 
-            if (tenantContainer == null || tenantRequestContainer == null || nancyBootstrapper == null)
+            if (tenantRequestContainer == null || nancyBootstrapper == null)
             {
                 await _next.Invoke(context);
                 return;

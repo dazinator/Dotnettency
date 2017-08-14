@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.0
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency", "Dotnettency\Dotnettency.csproj", "{27306262-FF3C-4B52-A2CD-ED49F613B200}"
 EndProject
@@ -28,8 +28,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Modules", "Dotnettency.Modules\Dotnettency.Modules.csproj", "{720AC644-94A4-4AA9-AD12-543AB87BC2FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Modules.Nancy", "Dotnettency.Modules.Nancy\Dotnettency.Modules.Nancy.csproj", "{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Modules.Mvc", "Dotnettency.Modules.Mvc\Dotnettency.Modules.Mvc.csproj", "{E614BEB1-198A-4965-A4E9-52C19403A847}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,18 +147,6 @@ Global
 		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|x64.Build.0 = Release|Any CPU
 		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|x86.ActiveCfg = Release|Any CPU
 		{6CFD80AD-DC8C-4228-B467-EE070CEE11AC}.Release|x86.Build.0 = Release|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Debug|x64.Build.0 = Debug|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Debug|x86.Build.0 = Debug|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Release|x64.ActiveCfg = Release|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Release|x64.Build.0 = Release|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Release|x86.ActiveCfg = Release|Any CPU
-		{E614BEB1-198A-4965-A4E9-52C19403A847}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
