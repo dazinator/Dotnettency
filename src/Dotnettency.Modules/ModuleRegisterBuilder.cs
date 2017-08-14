@@ -9,65 +9,51 @@ namespace Dotnettency.Modules
     public class ModuleRegisterBuilder<TModule>
         where TModule : class, IModule
     {
-        private IServiceCollection _services;
+        public Func<IRouteHandler> DefaultRouteHandlerFactory { get; set; }
+
         public ModuleRegisterBuilder(IServiceCollection servicies)
         {
-            _services = servicies;
-            _services.AddRouting(); // needed for modular routing.
+            Services = servicies;
+            DefaultRouteHandlerFactory = () =>
+            {
+                return new RouteHandler(context =>
+                {
+                    return null;
+                });
+            };            
+            Services.AddRouting(); // needed for modular routing.
         }
 
         public ModuleRegisterBuilder<TModule> AddModule<TImplementation>()
             where TImplementation : class, TModule
         {
-            _services.AddTransient<TModule, TImplementation>();
+            Services.AddTransient<TModule, TImplementation>();
             return this;
         }
 
-        public void OnSetupModule(Action<ModuleShellOptionsBuilder<TModule>> configureModuleOptionsBuilder, RouteHandler defaultRouteHandler)
-        {
-            //  var moduleShell = new
-            var modulesRouter = new ModulesRouter<TModule>(defaultRouteHandler);
-            //  _services.AddSingleton(modulesRouter);
-
-            _services.AddSingleton<IModuleManager<TModule>, ModuleManager<TModule>>((sp) =>
-        {
-            var allModules = sp.GetServices<TModule>();
-
-            var moduleManager = new ModuleManager<TModule>(modulesRouter);
-
-            // shared modules all popualte the same service collection
-            //   var services = new ServiceCollection();
-
-            foreach (var item in allModules)
+        public void OnSetupModule(Action<ModuleShellOptionsBuilder<TModule>> configureModuleOptionsBuilder)
+        {          
+            Services.AddSingleton<IModuleManager<TModule>, ModuleManager<TModule>>((sp) =>
             {
-                var moduleOptionsBuilder = new ModuleShellOptionsBuilder<TModule>(item);
-                configureModuleOptionsBuilder(moduleOptionsBuilder);
-                var moduleShellOptions = moduleOptionsBuilder.Build();
+                var routeHandler = DefaultRouteHandlerFactory();
+                var modulesRouter = new ModulesRouter<TModule>(routeHandler);
 
-                var routedModule = item as IRoutedModule;
-                if (routedModule != null) // these need to be routed.
+                var allModules = sp.GetServices<TModule>();
+
+                var moduleManager = new ModuleManager<TModule>(modulesRouter);
+
+                foreach (var item in allModules)
                 {
-                    // modulesRouter.
-                    // var routedModuleOptions = moduleShellOptions as ModuleShellOptions<IRoutedModule>;
-                    var routedModuleShell = new RoutedModuleShell<TModule>(item, moduleShellOptions, modulesRouter);
-                    // var moduleShell = routedModuleShell as IModuleShell<TModule>;
-                    moduleManager.AddModule(routedModuleShell);
+                    var moduleOptionsBuilder = new ModuleShellOptionsBuilder<TModule>(item);
+                    configureModuleOptionsBuilder(moduleOptionsBuilder);
+                    var moduleShellOptions = moduleOptionsBuilder.Build();
+                    var moduleShell = new ModuleShell<TModule>(item, moduleShellOptions);
+                    moduleManager.AddModule(moduleShell);
                 }
-                else
-                {
-
-                    var nonRoutedModuleShell = new ModuleShell<TModule>(item, moduleShellOptions);
-                    //  var moduleShell = routedModuleShell as IModuleShell<TModule>;
-                    moduleManager.AddModule(nonRoutedModuleShell);
-                }
-
-            }
-            return moduleManager;
-        });
-
+                return moduleManager;
+            });
         }
+
+        public IServiceCollection Services { get; set; }
     }
-
-
-
 }

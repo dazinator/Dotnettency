@@ -9,7 +9,7 @@ using System;
 
 namespace Dotnettency.Container.StructureMap
 {
-    public sealed class StructureMapServiceProvider : IServiceProvider, ISupportRequiredService
+    public class StructureMapServiceProvider : IServiceProvider, ISupportRequiredService
     {
         public StructureMapServiceProvider(IContainer container)
         {

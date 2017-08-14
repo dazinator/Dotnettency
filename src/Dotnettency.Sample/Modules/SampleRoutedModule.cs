@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Sample
 {
+
     public class SampleRoutedModule : RoutedModuleBase
     {
         public SampleRoutedModule()

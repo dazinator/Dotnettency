@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include=".tenants\049c8cc4-3660-41c7-92f0-85430452be22\Info.txt" />
+    <Content Include="wwwroot\.tenants\00000000-0000-0000-0000-000000000000\DefaultTenant.html" />
+    <Content Include="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\BarTenant.html" />
+    <Content Include="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\Index.html" />
+    <Content Include="wwwroot\Index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include=".tenants\00000000-0000-0000-0000-000000000000\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
+    <ProjectReference Include="..\Dotnettency.Container\Dotnettency.Container.csproj" />
+    <ProjectReference Include="..\Dotnettency.HostingEnvironment\Dotnettency.HostingEnvironment.csproj" />
+    <ProjectReference Include="..\Dotnettency.MiddlewarePipeline\Dotnettency.MiddlewarePipeline.csproj" />
+    <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
+  </ItemGroup>
+
+</Project>

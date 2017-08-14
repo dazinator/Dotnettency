@@ -6,6 +6,40 @@ namespace Dotnettency.Container.StructureMap
 {
     public static partial class ContainerExtensions
     {
+        internal sealed class TenantContainerServiceScopeFactory : IServiceScopeFactory
+        {
+            public TenantContainerServiceScopeFactory(ITenantContainerAdaptor container)
+            {
+                Container = container; // new StructureMapTenantContainerAdaptor(container, ContainerRole.Root);
+            }
+
+            private ITenantContainerAdaptor Container { get; }
+
+            public IServiceScope CreateScope()
+            {
+                return new TenantContainerServiceScope(Container.CreateNestedContainer());
+            }
+
+
+            private class TenantContainerServiceScope : IServiceScope
+            {
+
+                public TenantContainerServiceScope(ITenantContainerAdaptor container)
+                {
+                    Container = container;
+                    ServiceProvider = Container;
+                }
+
+                private ITenantContainerAdaptor Container { get; }
+
+                public IServiceProvider ServiceProvider { get; }
+
+                public void Dispose() => Container.Dispose();
+
+            }
+
+        }
+
         internal sealed class StructureMapServiceScopeFactory : IServiceScopeFactory
         {
             public StructureMapServiceScopeFactory(IContainer container)

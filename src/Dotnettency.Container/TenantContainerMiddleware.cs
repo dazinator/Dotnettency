@@ -2,53 +2,61 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Builder;
 
 namespace Dotnettency.Container
 {
-
     public class TenantContainerMiddleware<TTenant>
          where TTenant : class
     {
 
         private readonly RequestDelegate _next;
-        private readonly ILogger _log;
-        private readonly ITenantContainerFactory<TTenant> _factory;
-
-        private Lazy<Task<ITenantContainerAdaptor>> _containerFactory;
+        private readonly ILogger<TenantContainerMiddleware<TTenant>> _logger;
+        private readonly IApplicationBuilder _appBuilder;
 
         public TenantContainerMiddleware(
             RequestDelegate next,
-            ILoggerFactory loggerFactory,
-             ITenantContainerFactory<TTenant> factory)
+            ILogger<TenantContainerMiddleware<TTenant>> logger,
+            IApplicationBuilder appBuilder)
         {
             _next = next;
-            _log = loggerFactory.CreateLogger<TenantContainerMiddleware<TTenant>>();
-            _factory = factory;
+            _logger = logger;
+            _appBuilder = appBuilder;            
         }
 
-        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor)
+        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor, ITenantRequestContainerAccessor<TTenant> requestContainerAccessor)
         {
             //  log.LogDebug("Using multitenancy provider {multitenancyProvidertype}.", tenantAccessor.GetType().Name);
-
-
+            _logger.LogDebug("Tenant Container Middleware - Start.");
             var tenantContainer = await tenantContainerAccessor.TenantContainer.Value;
             if (tenantContainer == null)
             {
+                _logger.LogDebug("Tenant Container Middleware - No tenant container.");
                 await _next.Invoke(context);
                 return;
             }
 
-            // Replace request services with a nested version (for lifetime management - used to encpasulate a request).
-            using (var scope = tenantContainer.CreateNestedContainer())
+            IServiceProvider oldAppBuilderServices = _appBuilder.ApplicationServices;
+            try
             {
+                _logger.LogDebug("Setting AppBuilder Services to Tenant Container: {containerId} - {containerName}", tenantContainer.ContainerId, tenantContainer.ContainerName);
+                _appBuilder.ApplicationServices = tenantContainer;
+                var perRequestContainer = await requestContainerAccessor.TenantRequestContainer.Value;
 
-                _log.LogDebug("Setting Request: {containerId} - {containerName}", scope.ContainerId, scope.ContainerName);
-                var oldRequestServices = context.RequestServices;
-                context.RequestServices = scope.GetServiceProvider();
-                await _next.Invoke(context); // module middleware should be next - which will replace again with module specific container (nested).
-                _log.LogDebug("Restoring Request Container");
-                context.RequestServices = oldRequestServices;
+                // Replace request services with a nested version (for lifetime management - used to encpasulate a request).                
+                using (perRequestContainer)
+                {
+                    _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
+                    await perRequestContainer.ExecuteWithinSwappedRequestContainer(_next, context);
+                    _logger.LogDebug("Restoring Request Container");
+                }
             }
+            finally
+            {
+                _logger.LogDebug("Restoring AppBuilder Services");
+                _appBuilder.ApplicationServices = oldAppBuilderServices;
+            }
+
 
         }
     }

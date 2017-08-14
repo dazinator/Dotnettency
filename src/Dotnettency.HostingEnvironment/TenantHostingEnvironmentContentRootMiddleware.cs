@@ -48,17 +48,19 @@ namespace Dotnettency.HostingEnvironment
                 var oldContentRootFilePrvovider = hosting.ContentRootFileProvider;
                 try
                 {
+                    _logger.LogDebug("Hosting Environment Middleware - Swapping Content Root FileProvider.");
                     hosting.ContentRootFileProvider = tenantContentRootFileSystem.Value.FileProvider;
                     await _next(context);
                 }
                 finally
                 {
+                    _logger.LogDebug("Hosting Environment Middleware - Restoring Content Root FileProvider.");
                     hosting.ContentRootFileProvider = tenantContentRootFileSystem.Value.FileProvider;
                 }              
             }
             else
             {
-                _logger.LogDebug("Null tenant shell - No Tenant ContentRoot File Provider.");
+                _logger.LogDebug("Hosting Environment Middleware - Null tenant shell - No Tenant ContentRoot File Provider.");
                 await _next(context);
             }
 
