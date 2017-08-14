@@ -17,7 +17,6 @@ namespace Dotnettency
             return value;
         }
 
-
         public override int GetHashCode()
         {
             if (Uri == null)

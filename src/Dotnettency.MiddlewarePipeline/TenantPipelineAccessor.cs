@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Dotnettency.Container;
 
 namespace Dotnettency.MiddlewarePipeline
 {

@@ -26,7 +26,7 @@ namespace Dotnettency
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
 
             // By default, we use a URI from the request to identify tenants.
-            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestUriTenantDistinguisherFactory<TTenant>>();
+            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
 
             // Support injection of TTenant (has side effect that may block during injection)
             Services.AddScoped<TTenant>((sp =>

@@ -19,7 +19,7 @@ namespace Dotnettency.MiddlewarePipeline
         {
             var factory = new DelegateTenantMiddlewarePipelineFactory<TTenant>(configuration);
             _builder.Services.AddSingleton<ITenantMiddlewarePipelineFactory<TTenant>>(factory);
-            _builder.Services.AddSingleton<ITenantPipelineAccessor<TTenant>, TenantPipelineAccessor<TTenant>>();
+            _builder.Services.AddScoped<ITenantPipelineAccessor<TTenant>, TenantPipelineAccessor<TTenant>>();
             return _builder;
         }
     }

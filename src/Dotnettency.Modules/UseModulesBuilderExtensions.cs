@@ -18,9 +18,9 @@ namespace Dotnettency
           where TTenant : class
           where TModule : IModule
         {
-            var container = builder.ApplicationServices;
-            var resolved = container.GetRequiredService(typeof(IModuleManager<ModuleBase>));
-            builder.UseMiddleware<ModulesMiddleware<TTenant, TModule>>(builder, resolved);
+          //  var container = builder.ApplicationServices;
+       //     var resolved = container.GetRequiredService(typeof(IModuleManager<ModuleBase>));
+            builder.UseMiddleware<ModulesMiddleware<TTenant, TModule>>(builder);
             return builder;
         }
     }
