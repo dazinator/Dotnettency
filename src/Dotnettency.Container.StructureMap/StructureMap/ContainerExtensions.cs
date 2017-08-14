@@ -63,13 +63,15 @@ namespace Dotnettency.Container.StructureMap
 
             registry.Policies.ConstructorSelector<AspNetConstructorSelector>();
 
-            registry.For<IServiceProvider>()
+            registry.For<ITenantContainerAdaptor>()
                 .LifecycleIs(Lifecycles.Container)
-                .Use<StructureMapServiceProvider>();
+                .Use<StructureMapTenantContainerAdaptor>();
+
+            registry.Forward<ITenantContainerAdaptor, IServiceProvider>();        
 
             registry.For<IServiceScopeFactory>()
                 .LifecycleIs(Lifecycles.Container)
-                .Use<StructureMapServiceScopeFactory>();
+                .Use<TenantContainerServiceScopeFactory>();
 
             registry.Register(descriptors);
 

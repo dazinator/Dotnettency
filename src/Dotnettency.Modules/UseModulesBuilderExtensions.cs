@@ -1,24 +1,28 @@
-﻿using Dotnettency.Modules;
+﻿using Dotnettency.Container.StructureMap;
+using Dotnettency.Modules;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dotnettency
 {
     public static class UseModulesBuilderExtensions
     {
-        public static MultitenancyMiddlewareOptionsBuilder<TTenant> UseModules<TTenant, TModule>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder)
+        public static UseModulesOptionsBuilder<TTenant> UseModules<TTenant>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder)
             where TTenant : class
-            where TModule : IModule
         {
-            builder.ApplicationBuilder.UseMiddleware<ModulesMiddleware<TTenant, TModule>>(builder.ApplicationBuilder);
-            return builder;
+            var optionsBuilder = new UseModulesOptionsBuilder<TTenant>(builder);
+            return optionsBuilder;
         }
 
         public static IApplicationBuilder UseModules<TTenant, TModule>(this IApplicationBuilder builder)
           where TTenant : class
           where TModule : IModule
         {
-            builder.UseMiddleware<ModulesMiddleware<TTenant, TModule>>(builder);
+            var container = builder.ApplicationServices;
+            var resolved = container.GetRequiredService(typeof(IModuleManager<ModuleBase>));
+            builder.UseMiddleware<ModulesMiddleware<TTenant, TModule>>(builder, resolved);
             return builder;
         }
     }
+
 }

@@ -7,7 +7,6 @@ namespace Dotnettency.Modules
 
     public static class ServiceCollectionExtensions
     {
-
         public static IServiceCollection AddModules<TModule>(this IServiceCollection servicies,
             IRouteHandler defaultRouteHandler,
             Action<ModuleRegisterBuilder<TModule>> registerModules)
@@ -17,7 +16,5 @@ namespace Dotnettency.Modules
             registerModules(registerModulesBuilder);
             return servicies;
         }
-
-      
     }
 }

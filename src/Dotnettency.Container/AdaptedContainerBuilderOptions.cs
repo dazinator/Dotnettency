@@ -15,7 +15,7 @@ namespace Dotnettency.Container
 
             ContainerBuilderOptions.Builder.ServiceProviderFactory = new Func<IServiceProvider>(() =>
             {
-                return HostContainerAdaptor().GetServiceProvider();
+                return HostContainerAdaptor();
             });
         }
 

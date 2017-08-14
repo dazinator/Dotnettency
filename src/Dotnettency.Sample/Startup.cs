@@ -10,21 +10,29 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Dotnettency.Modules;
 using Microsoft.AspNetCore.Routing;
+using Dotnettency.Container.StructureMap;
+using Dotnettency.Container;
 
 namespace Sample
 {
     public class Startup
     {
         private readonly IHostingEnvironment _environment;
-        public Startup(IHostingEnvironment environment)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public Startup(IHostingEnvironment environment, ILoggerFactory loggerFactory)
         {
             _environment = environment;
+            _loggerFactory = loggerFactory;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            _loggerFactory.AddConsole();
+            var logger = _loggerFactory.CreateLogger<Startup>();
+
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
@@ -33,9 +41,16 @@ namespace Sample
                    {
                        // Extension methods available here for supported containers. We are using structuremap..
                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                       containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
+                       containerBuilder.WithStructureMap((tenant, tenantServices) =>
                        {
-                           tenantServices.AddSingleton<SomeTenantService>();
+                           tenantServices.AddSingleton<SomeTenantService>((sp) =>
+                           {
+                               //var logger = sp.GetRequiredService<ILogger<SomeTenantService>>();
+                               logger.LogDebug("Resolving SomeTenantService");
+                               return new SomeTenantService(tenant, sp.GetRequiredService<IHostingEnvironment>());
+                           });
+
+                           // tenantServices.AddSingleton<SomeTenantService>();
 
                            var defaultRouteHandler = new RouteHandler(context =>
                             {
@@ -66,16 +81,19 @@ namespace Sample
                                // 2. Optionally providing an IRouter so that the services can be isolated and restored only when the router handles the request.
                                modules.OnSetupModule((moduleOptions) =>
                                {
+                                   logger.LogDebug("Setting up module: " + moduleOptions.Module.GetType().FullName);
                                    // we allow ISharedModules to configure services at tenant level, and middleware at tenant level.
                                    var sharedModule = moduleOptions.Module as ISharedModule;
                                    if (sharedModule != null)
                                    {
-                                       moduleOptions.SetOnConfigureSharedServices((moduleServices) =>
+                                       moduleOptions.HasSharedServices((moduleServices) =>
                                        {
+                                           logger.LogDebug("Module is adding to tenant services");
                                            sharedModule.ConfigureServices(moduleServices);
                                        });
-                                       moduleOptions.SetOnConfigureMiddleware((appBuilder) =>
+                                       moduleOptions.HasMiddlewareConfiguration((appBuilder) =>
                                        {
+                                           logger.LogDebug("Module is adding to tenant middleware pipeline");
                                            sharedModule.ConfigureMiddleware(appBuilder);
                                        });
                                    }
@@ -84,14 +102,15 @@ namespace Sample
                                    var routedModule = moduleOptions.Module as IRoutedModule;
                                    if (routedModule != null)
                                    {
-
-                                       moduleOptions.UseRouterFactory((moduleAppBuilder) =>
+                                       logger.LogDebug("Module is confoguring router");
+                                       moduleOptions.HasRoutedContainer((moduleAppBuilder) =>
                                        {
                                            var moduleRouteBuilder = new RouteBuilder(moduleAppBuilder, moMatchRouteHandler);
                                            routedModule.ConfigureRoutes(moduleRouteBuilder);
                                            var moduleRouter = moduleRouteBuilder.Build();
                                            return moduleRouter;
-                                       }, moduleServices => routedModule.ConfigureServices(moduleServices));
+                                       }, 
+                                       moduleServices => routedModule.ConfigureServices(moduleServices));
                                    }
 
                                });
@@ -102,10 +121,12 @@ namespace Sample
                    })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
+
                         // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
                         middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
                         {
-                            appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
+                            logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name);
+                            // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
                             appBuilder.UseModules<Tenant, ModuleBase>();
 
@@ -145,7 +166,7 @@ namespace Sample
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole();
+            //  loggerFactory.AddConsole();
 
             if (env.IsDevelopment())
             {
@@ -164,7 +185,8 @@ namespace Sample
                             hostingEnvironmentOptions.UseTenantWebRootFileProvider();
                         })
                        .UsePerTenantMiddlewarePipeline();
-                //.UseModules<BaseModule>();
+                //.UseModules<Tenant, ModuleBase>();
+
             });
 
             //app.UseOwin(x =>
@@ -178,12 +200,19 @@ namespace Sample
             //  app.
             app.Run(async (context) =>
             {
+                var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
+                logger.LogDebug("App Run..");
+
+                var container = context.RequestServices as ITenantContainerAdaptor;
+                logger.LogDebug("App Run Container Is: {id}, {containerNAme}, {role}", container.ContainerId, container.ContainerName, container.Role);
+                               
+
                 // Use ITenantAccessor to access the current tenant.
-                var tenantAccessor = context.RequestServices.GetRequiredService<ITenantAccessor<Tenant>>();
+                var tenantAccessor = container.GetRequiredService<ITenantAccessor<Tenant>>();
                 var tenant = await tenantAccessor.CurrentTenant.Value;
 
                 // This service was registered as singleton in tenant container.
-                var someTenantService = context.RequestServices.GetService<SomeTenantService>();
+                var someTenantService = container.GetService<SomeTenantService>();
 
                 // The tenant shell to access context for the tenant - even if the tenant is null
                 var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
@@ -208,7 +237,7 @@ namespace Sample
 
                 var jsonResult = JsonConvert.SerializeObject(result);
                 await context.Response.WriteAsync(jsonResult, Encoding.UTF8);
-
+                logger.LogDebug("App Run Finished..");
 
                 //    context.Response.
 

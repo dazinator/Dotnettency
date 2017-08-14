@@ -55,7 +55,7 @@ namespace Dotnettency
 
         //}
 
-        public static AdaptedContainerBuilderOptions<TTenant> WithStructureMapServiceCollection<TTenant>(this ContainerBuilderOptions<TTenant> options,
+        public static AdaptedContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(this ContainerBuilderOptions<TTenant> options,
         Action<TTenant, IServiceCollection> configureTenant)
         where TTenant : class
         {
@@ -65,20 +65,17 @@ namespace Dotnettency
                 // host level container.
                 var container = new StructureMap.Container();
                 container.Populate(options.Builder.Services);
-
+                var adaptedContainer = container.GetInstance<ITenantContainerAdaptor>();
                 // add ITenantContainerBuilder<TTenant> service to the host container
                 // This service can be used to build a child container (adaptor) for a particular tenant, when required.
                 container.Configure(_ =>
                     _.For<ITenantContainerBuilder<TTenant>>()
-                        .Use(new StructureMapTenantContainerBuilder<TTenant>(container, (tenant, configurationExpression) =>
-                        {
-                            var tenantServices = new ServiceCollection();
-                            configureTenant(tenant, tenantServices);
-                            configurationExpression.Populate(tenantServices);
-                        }))
+                        .Use(new TenantContainerBuilder<TTenant>(adaptedContainer, configureTenant))
                     );
 
-                var adaptor = new StructureMapTenantContainerAdaptor(container, ContainerRole.Root);
+                // new StructureMap.Pipeline.ExplicitArguments("role", ContainerRole.Root)
+                var adaptor = container.GetInstance<ITenantContainerAdaptor>();
+                // new StructureMapTenantContainerAdaptor(container, ContainerRole.Root);
                 return adaptor;
             });
 
@@ -95,7 +92,7 @@ namespace Dotnettency
             //    // now configure nested container per tenant.
             //    return container.GetInstance<IServiceProvider>();
             //});
-           
+
             return adapted;
         }
 

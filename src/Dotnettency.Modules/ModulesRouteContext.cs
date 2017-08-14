@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Dotnettency.Modules
 {
-    public class ModulesRouteContext<TModule> : RouteContext     
-        // where TTenant : class
+    public class ModulesRouteContext<TModule> : RouteContext
     {
-      //  private readonly RouteContext _parentRouteContext;
 
         public ModulesRouteContext(HttpContext httpContext) : base(httpContext)
         {
@@ -15,9 +13,6 @@ namespace Dotnettency.Modules
 
         public IModuleShell<TModule> ModuleShell { get; set; }
 
-        //public bool NotMatched { get; set; }
-
-       // public RouteContext ParentRouteContext { get; set; }
     }
 
 }

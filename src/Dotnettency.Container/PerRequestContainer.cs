@@ -7,13 +7,12 @@ namespace Dotnettency.Container
     public class PerRequestContainer : IDisposable
     {
 
-        private bool _hasSwapped = false;
+        // private bool _hasSwapped = false;
 
-        public PerRequestContainer(ITenantContainerAdaptor requestContainer, HttpContext httpContext)
+        public PerRequestContainer(ITenantContainerAdaptor requestContainer)
         {
             RequestContainer = requestContainer;
-            HttpContext = httpContext;
-            HttpContext.Items[nameof(PerRequestContainer)] = requestContainer;
+
 
             //var sp = requestContainer.GetServiceProvider();
 
@@ -42,35 +41,41 @@ namespace Dotnettency.Container
             // Scope = scopeFactory.CreateScope();
         }
 
-        public HttpContext HttpContext { get; }
+        // public HttpContext HttpContext { get; }
 
         public ITenantContainerAdaptor RequestContainer { get; }
 
-        public async Task ExecuteWithinSwappedRequestContainer(Task task)
+        private Action OnDispose { get; set; }
+
+        public async Task ExecuteWithinSwappedRequestContainer(RequestDelegate request, HttpContext context)
         {
-            if(!_hasSwapped)
-            {              
-                IServiceProvider oldServiceProvider = HttpContext.RequestServices;
+            if (!context.Items.ContainsKey(nameof(PerRequestContainer)))
+            {
+                context.Items[nameof(PerRequestContainer)] = this;
+                IServiceProvider oldServiceProvider = context.RequestServices;
                 try
                 {
-                    HttpContext.RequestServices = RequestContainer.GetServiceProvider();
-                    await task;
+                    OnDispose = () =>
+                    {
+                        context.Items.Remove(nameof(PerRequestContainer));
+                        RequestContainer.Dispose();
+                    };
+                    context.RequestServices = RequestContainer;
+                    await request.Invoke(context);
                 }
                 finally
                 {
-                    HttpContext.RequestServices = oldServiceProvider;
+                    context.RequestServices = oldServiceProvider;
                     // throw;
                 }
-                _hasSwapped = true;
             }
-           
+
         }
         // public IServiceScope Scope { get; }
 
         public void Dispose()
         {
-            HttpContext.Items.Remove(nameof(PerRequestContainer));
-            RequestContainer.Dispose();
+            OnDispose();
             // Scope.Dispose();
         }
     }

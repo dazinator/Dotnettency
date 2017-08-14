@@ -19,31 +19,35 @@ namespace Dotnettency
             _configuration = configuration;
         }
 
-        public async Task<RequestDelegate> Get(IApplicationBuilder appBuilder, TTenant tenant, ITenantContainerAccessor<TTenant> tenantContainerAccessor, RequestDelegate next)
+        public async Task<RequestDelegate> Create(IApplicationBuilder appBuilder, TTenant tenant, RequestDelegate next)
         {
             //return Task.Run(() =>
             //{
-            return await BuildTenantPipeline(appBuilder, tenant, tenantContainerAccessor, next);
+            return await BuildTenantPipeline(appBuilder, tenant, next);
             //  });
         }
 
-        protected virtual async Task<RequestDelegate> BuildTenantPipeline(IApplicationBuilder rootApp, TTenant tenant, ITenantContainerAccessor<TTenant> tenantContainer, RequestDelegate next)
+        protected virtual Task<RequestDelegate> BuildTenantPipeline(IApplicationBuilder rootApp, TTenant tenant, RequestDelegate next)
         {
+            return Task.Run<RequestDelegate>(() =>
+             {
 
-            var branchBuilder = rootApp.New();
-            var appServices = await tenantContainer.TenantContainer.Value;
-            branchBuilder.ApplicationServices = appServices.GetServiceProvider();
-            var builderContext = new TenantPipelineBuilderContext<TTenant>
-            {
-                //   TenantContext = tenantContext,
-                Tenant = tenant
-            };
+                 var branchBuilder = rootApp.New();
+                 // var appServices = await tenantContainer.TenantContainer.Value;
+                 // branchBuilder.ApplicationServices = appServices;
+                 var builderContext = new TenantPipelineBuilderContext<TTenant>
+                 {
+                     //   TenantContext = tenantContext,
+                     Tenant = tenant
+                 };
 
-            _configuration(builderContext, branchBuilder);
+                 _configuration(builderContext, branchBuilder);
 
-            // register root pipeline at the end of the tenant branch
-            branchBuilder.Run(next);
-            return branchBuilder.Build();
+                 // register root pipeline at the end of the tenant branch
+                 branchBuilder.Run(next);
+                 return branchBuilder.Build();
+             });
+
         }
     }
 

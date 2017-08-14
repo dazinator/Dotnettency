@@ -3,9 +3,9 @@ using System;
 
 namespace Dotnettency.Container
 {
-    public interface ITenantContainerAdaptor : IDisposable
+    public interface ITenantContainerAdaptor : IServiceProvider, IDisposable
     {
-        IServiceProvider GetServiceProvider();
+       // IServiceProvider GetServiceProvider();
         ITenantContainerAdaptor CreateNestedContainer();
         ITenantContainerAdaptor CreateChildContainer();
 

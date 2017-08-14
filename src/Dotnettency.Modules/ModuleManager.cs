@@ -57,6 +57,13 @@ namespace Dotnettency.Modules
                 {
                     await Task.WhenAll(allModules.Select(m => m.EnsureStarted(containerFactory, rootAppBuilder, sharedServices)));
                 });
+
+                // collate routers
+                foreach (var module in allModules.Where(m => m.Router != null))
+                {
+                    this.ModulesRouter.AddModuleRouter(module);
+                }
+
                 // ModulesRouter = modulesRouter;
                 Started = true;
 

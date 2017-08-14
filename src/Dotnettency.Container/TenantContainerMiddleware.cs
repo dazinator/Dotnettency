@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Builder;
 
 namespace Dotnettency.Container
 {
@@ -10,39 +11,50 @@ namespace Dotnettency.Container
     {
 
         private readonly RequestDelegate _next;
-        private readonly ILogger _log;
-        private readonly ITenantContainerFactory<TTenant> _factory;
-
-        //  private Lazy<Task<ITenantContainerAdaptor>> _containerFactory;
+        private readonly ILogger<TenantContainerMiddleware<TTenant>> _logger;
+        private readonly IApplicationBuilder _appBuilder;
 
         public TenantContainerMiddleware(
             RequestDelegate next,
-            ILoggerFactory loggerFactory
-            //  ITenantContainerFactory<TTenant> factory
-            )
+            ILogger<TenantContainerMiddleware<TTenant>> logger,
+            IApplicationBuilder appBuilder)
         {
             _next = next;
-            _log = loggerFactory.CreateLogger<TenantContainerMiddleware<TTenant>>();
-            //  _factory = factory;
+            _logger = logger;
+            _appBuilder = appBuilder;            
         }
 
-        public async Task Invoke(HttpContext context, ITenantRequestContainerAccessor<TTenant> tenantRequestContainerAccessor)
+        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor)
         {
             //  log.LogDebug("Using multitenancy provider {multitenancyProvidertype}.", tenantAccessor.GetType().Name);
-
-            var requestContainer = await tenantRequestContainerAccessor.TenantRequestContainer.Value;
-            if (requestContainer == null)
+            _logger.LogDebug("Tenant Container Middleware - Start.");
+            var tenantContainer = await tenantContainerAccessor.TenantContainer.Value;
+            if (tenantContainer == null)
             {
+                _logger.LogDebug("Tenant Container Middleware - No tenant container.");
                 await _next.Invoke(context);
                 return;
             }
 
-            // Replace request services with a nested version (for lifetime management - used to encpasulate a request).
-            using (requestContainer)
+            IServiceProvider oldAppBuilderServices = _appBuilder.ApplicationServices;
+            try
             {
-                _log.LogDebug("Setting Request Container: {containerId} - {containerName}", requestContainer.RequestContainer.ContainerId, requestContainer.RequestContainer.ContainerName);
-                await requestContainer.ExecuteWithinSwappedRequestContainer(_next.Invoke(context));
+                _logger.LogDebug("Setting AppBuilder Services to Tenant Container: {containerId} - {containerName}", tenantContainer.ContainerId, tenantContainer.ContainerName);
+                _appBuilder.ApplicationServices = tenantContainer;
+                // Replace request services with a nested version (for lifetime management - used to encpasulate a request).                
+                using (var perRequestContainer = new PerRequestContainer(tenantContainer.CreateNestedContainer()))
+                {
+                    _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
+                    await perRequestContainer.ExecuteWithinSwappedRequestContainer(_next, context);
+                    _logger.LogDebug("Restoring Request Container");
+                }
             }
+            finally
+            {
+                _logger.LogDebug("Restoring AppBuilder Services");
+                _appBuilder.ApplicationServices = oldAppBuilderServices;
+            }
+
 
         }
     }

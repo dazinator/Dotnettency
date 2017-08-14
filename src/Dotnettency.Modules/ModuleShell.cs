@@ -27,46 +27,6 @@ namespace Dotnettency.Modules
 
         public IRouter Router { get; set; }
 
-        //internal async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, ModulesRouter<IRoutedModule> modulesRouter)
-        //{
-        //    if (IsStarted)
-        //    {
-        //        return;
-        //    }
-
-        //    var container = await containerFactory();
-        //    var routedModule = Module as IRoutedModule;
-        //    container = container.CreateChildContainer();
-
-        //    container.Configure((services) =>
-        //    {
-        //        services.AddRouting(); //it's assumed routing is required for a routed module!
-        //        routedModule.ConfigureServices(services);
-        //    });
-
-        //    Container = container;
-
-        //    var routedModuleShell = this as ModuleShell<IRoutedModule>;
-        //    // Must register this module with the module router.
-        //    modulesRouter.AddModuleRouter((moduleRouteBuilder) =>
-        //    {
-        //        routedModule.ConfigureRoutes(moduleRouteBuilder);
-        //        var moduleRouter = moduleRouteBuilder.Build();
-        //        moduleRouteBuilder.ApplicationBuilder.UseRouter(moduleRouter);
-        //        this.Router = moduleRouter;
-
-        //        AppBuilder = moduleRouteBuilder.ApplicationBuilder;
-        //        MiddlewarePipeline = AppBuilder.Build();
-
-        //        return routedModuleShell;
-        //    }, Container.GetServiceProvider());
-
-
-        //    IsStarted = true;
-
-
-        //}
-
         public async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, IServiceCollection sharedServices)
         {
             if (IsStarted)
@@ -96,14 +56,13 @@ namespace Dotnettency.Modules
             if (Options.GetRouter != null)
             {
                 var moduleAppBuilder = rootAppBuilder.New();
-                var moduleServicesProvider = Container.GetServiceProvider();
+                var moduleServicesProvider = Container;
                 moduleAppBuilder.ApplicationServices = moduleServicesProvider;
                 this.Router = Options.GetRouter(moduleAppBuilder);
             }
 
             IsStarted = true;
         }
-
 
     }
 

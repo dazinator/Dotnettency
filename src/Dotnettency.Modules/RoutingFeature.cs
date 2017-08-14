@@ -6,5 +6,4 @@ namespace Dotnettency.Modules
     {
         public RouteData RouteData { get; set; }
     }
-
 }

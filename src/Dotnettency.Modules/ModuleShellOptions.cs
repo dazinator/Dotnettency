@@ -7,7 +7,7 @@ namespace Dotnettency
 {
     public class ModuleShellOptions<TModule>
     {
-        public bool IsolatedServices { get; set; }
+       // public bool IsolatedServices { get; set; }
 
         public Action<IServiceCollection> OnConfigureSharedServices { get; set; }
 
