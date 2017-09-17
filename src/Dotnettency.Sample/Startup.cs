@@ -77,8 +77,9 @@ namespace Sample
 
                             appBuilder.UseModules<Tenant, ModuleBase>();
 
+                            // welcome page only enabled for tenant FOO.
                             if (context.Tenant?.Name == "Foo")
-                            {
+                            {                               
                                 appBuilder.UseWelcomePage("/welcome");
                             }
                             //
