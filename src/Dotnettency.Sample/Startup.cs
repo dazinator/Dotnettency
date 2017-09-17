@@ -48,14 +48,7 @@ namespace Sample
                                //var logger = sp.GetRequiredService<ILogger<SomeTenantService>>();
                                logger.LogDebug("Resolving SomeTenantService");
                                return new SomeTenantService(tenant, sp.GetRequiredService<IHostingEnvironment>());
-                           });
-
-                           var moMatchRouteHandler = new RouteHandler(context =>
-                           {
-                               // default route handler when a single module router fails to match.
-                               // Return null so it can flow through to the next module
-                               return null;
-                           });
+                           });                         
 
                            tenantServices.AddModules<ModuleBase>((modules) =>
                            {
@@ -63,47 +56,10 @@ namespace Sample
                                if (tenant?.Name == "Bar")
                                {
                                    modules.AddModule<SampleRoutedModule>()
-                                          .AddModule<SampleSharedModule>();
-                               }
-
-                               // Configure each modules shell. This allows the module to participate in:
-                               // 1. Configuring tenant / application level services
-                               // 2. Optionally providing an IRouter so that the services can be isolated and restored only when the router handles the request.
-                               modules.OnSetupModule((moduleOptions) =>
-                               {
-                                   logger.LogDebug("Setting up module: " + moduleOptions.Module.GetType().FullName);
-                                   // we allow ISharedModules to configure services at tenant level, and middleware at tenant level.
-                                   var sharedModule = moduleOptions.Module as ISharedModule;
-                                   if (sharedModule != null)
-                                   {
-                                       moduleOptions.HasSharedServices((moduleServices) =>
-                                       {
-                                           logger.LogDebug("Module is adding to tenant services");
-                                           sharedModule.ConfigureServices(moduleServices);
-                                       });
-                                       moduleOptions.HasMiddlewareConfiguration((appBuilder) =>
-                                       {
-                                           logger.LogDebug("Module is adding to tenant middleware pipeline");
-                                           sharedModule.ConfigureMiddleware(appBuilder);
-                                       });
-                                   }
-
-                                   // We allow IRoutedModules to partipate in configuring their own isolated services, associated with their router 
-                                   var routedModule = moduleOptions.Module as IRoutedModule;
-                                   if (routedModule != null)
-                                   {
-                                       logger.LogDebug("Module is confoguring router");
-                                       moduleOptions.HasRoutedContainer((moduleAppBuilder) =>
-                                       {
-                                           var moduleRouteBuilder = new RouteBuilder(moduleAppBuilder, moMatchRouteHandler);
-                                           routedModule.ConfigureRoutes(moduleRouteBuilder);
-                                           var moduleRouter = moduleRouteBuilder.Build();
-                                           return moduleRouter;
-                                       },
-                                       moduleServices => routedModule.ConfigureServices(moduleServices));
-                                   }
-
-                               });
+                                          .AddModule<SampleSharedModule>()
+                                          .ConfigureModules();
+                               }                               
+                            
                            });
                        });
 
@@ -111,7 +67,6 @@ namespace Sample
                    })
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
-
                         // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
                         middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
                         {

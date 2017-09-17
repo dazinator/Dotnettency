@@ -13,6 +13,10 @@ namespace Dotnettency.Modules
         {
             var registerModulesBuilder = new ModuleRegisterBuilder<TModule>(servicies);
             registerModules(registerModulesBuilder);
+
+
+           
+
             return servicies;
         }
     }

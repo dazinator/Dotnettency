@@ -31,6 +31,56 @@ namespace Dotnettency.Modules
             return this;
         }
 
+        public void ConfigureModules()
+        {
+            var moMatchRouteHandler = new RouteHandler(context =>
+            {
+                return null;
+            });
+
+            ConfigureModules(moMatchRouteHandler);          
+        }
+
+        public void ConfigureModules(IRouter moMatchRouteHandler)
+        {
+            OnSetupModule((moduleOptions) =>
+            {             
+                // TODO: visitor design pattern might be better suite here..
+                var sharedModule = moduleOptions.Module as ISharedModule;
+                if (sharedModule != null)
+                {
+                    // Modules adds services to tenant level container.
+                    moduleOptions.HasSharedServices((moduleServices) =>
+                    {
+                        //  logger.LogDebug("Module is adding to tenant services");
+                        sharedModule.ConfigureServices(moduleServices);
+                    });
+                    // Module adds middleware to tenant level pipeline.
+                    moduleOptions.HasMiddlewareConfiguration((appBuilder) =>
+                    {
+                        // logger.LogDebug("Module is adding to tenant middleware pipeline");
+                        sharedModule.ConfigureMiddleware(appBuilder);
+                    });
+                }
+
+                // We allow IRoutedModules to partipate in configuring their own isolated services, associated with their router 
+                var routedModule = moduleOptions.Module as IRoutedModule;
+                if (routedModule != null)
+                {
+                    // logger.LogDebug("Module is confoguring router");
+                    // module has its own container, that is associated with certain routes.
+                    moduleOptions.HasRoutedContainer((moduleAppBuilder) =>
+                    {
+                        var moduleRouteBuilder = new RouteBuilder(moduleAppBuilder, moMatchRouteHandler);
+                        routedModule.ConfigureRoutes(moduleRouteBuilder);
+                        var moduleRouter = moduleRouteBuilder.Build();
+                        return moduleRouter;
+                    },
+                    moduleServices => routedModule.ConfigureServices(moduleServices));
+                }
+            });
+        }
+
         public void OnSetupModule(Action<ModuleShellOptionsBuilder<TModule>> configureModuleOptionsBuilder)
         {          
             Services.AddSingleton<IModuleManager<TModule>, ModuleManager<TModule>>((sp) =>
@@ -39,7 +89,6 @@ namespace Dotnettency.Modules
                 var modulesRouter = new ModulesRouter<TModule>(routeHandler);
 
                 var allModules = sp.GetServices<TModule>();
-
                 var moduleManager = new ModuleManager<TModule>(modulesRouter);
 
                 foreach (var item in allModules)
