@@ -48,7 +48,7 @@ namespace Sample
                                //var logger = sp.GetRequiredService<ILogger<SomeTenantService>>();
                                logger.LogDebug("Resolving SomeTenantService");
                                return new SomeTenantService(tenant, sp.GetRequiredService<IHostingEnvironment>());
-                           });                         
+                           });
 
                            tenantServices.AddModules<ModuleBase>((modules) =>
                            {
@@ -56,10 +56,12 @@ namespace Sample
                                if (tenant?.Name == "Bar")
                                {
                                    modules.AddModule<SampleRoutedModule>()
-                                          .AddModule<SampleSharedModule>()
-                                          .ConfigureModules();
-                               }                               
-                            
+                                          .AddModule<SampleSharedModule>();
+                               }
+
+                               modules.ConfigureModules();
+
+
                            });
                        });
 
