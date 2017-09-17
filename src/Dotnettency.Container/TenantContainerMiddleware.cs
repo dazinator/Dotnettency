@@ -21,7 +21,7 @@ namespace Dotnettency.Container
         {
             _next = next;
             _logger = logger;
-            _appBuilder = appBuilder;            
+            _appBuilder = appBuilder;
         }
 
         public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor, ITenantRequestContainerAccessor<TTenant> requestContainerAccessor)
@@ -42,14 +42,15 @@ namespace Dotnettency.Container
                 _logger.LogDebug("Setting AppBuilder Services to Tenant Container: {containerId} - {containerName}", tenantContainer.ContainerId, tenantContainer.ContainerName);
                 _appBuilder.ApplicationServices = tenantContainer;
                 var perRequestContainer = await requestContainerAccessor.TenantRequestContainer.Value;
-
+              
+                // Ensure container is disposed at end of request.
+                context.Response.RegisterForDispose(perRequestContainer);
                 // Replace request services with a nested version (for lifetime management - used to encpasulate a request).                
-                using (perRequestContainer)
-                {
-                    _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
-                    await perRequestContainer.ExecuteWithinSwappedRequestContainer(_next, context);
-                    _logger.LogDebug("Restoring Request Container");
-                }
+
+                _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
+                await perRequestContainer.ExecuteWithinSwappedRequestContainer(_next, context);
+                _logger.LogDebug("Restoring Request Container");
+
             }
             finally
             {
