@@ -26,7 +26,7 @@ Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 
 ## Tenant Injection
 
-Once configured in `startup.cs` you can:
+Once configured in `startup.cs` you can resolve the current tenant in any one of the following ways:
 
 - Inject `TTenant` directly (may block whilst resolving current tenant).
 - Inject `Task<TTenant>` - Allows you to `await` the current `Tenant` (so non blocking). `Task<TTenant>` is convenient.
