@@ -4,9 +4,8 @@ using System.Collections.Concurrent;
 namespace Dotnettency
 {
     public class ConcurrentDictionaryTenantShellCache<TTenant> : ITenantShellCache<TTenant>
-     where TTenant : class
+        where TTenant : class
     {
-
         private readonly ConcurrentDictionary<TenantDistinguisher, TenantShell<TTenant>> _mappings;
 
         public ConcurrentDictionaryTenantShellCache()
@@ -29,5 +28,4 @@ namespace Dotnettency
             return _mappings.TryGetValue(key, out value);
         }
     }
-
 }

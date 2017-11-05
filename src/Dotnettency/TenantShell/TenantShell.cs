@@ -7,21 +7,7 @@ namespace Dotnettency
     public class TenantShell<TTenant>
         where TTenant : class
     {
-        public TenantShell(TTenant tenant, params TenantDistinguisher[] distinguishers)
-        {
-            Id = Guid.NewGuid();
-            Tenant = tenant;
-            Properties = new ConcurrentDictionary<string, object>();
-            Distinguishers = new HashSet<TenantDistinguisher>();
-            if (distinguishers != null)
-            {
-                foreach (var item in distinguishers)
-                {
-                    Distinguishers.Add(item);
-                }
-            }
-
-        }
+        public ConcurrentDictionary<string, object> Properties { get; private set; }
 
         /// <summary>
         /// Uniquely identifies this tenant.
@@ -35,8 +21,20 @@ namespace Dotnettency
         /// </summary>
         internal HashSet<TenantDistinguisher> Distinguishers { get; set; }
 
-        public ConcurrentDictionary<string, object> Properties { get; }
+        public TenantShell(TTenant tenant, params TenantDistinguisher[] distinguishers)
+        {
+            Id = Guid.NewGuid();
+            Tenant = tenant;
+            Properties = new ConcurrentDictionary<string, object>();
+            Distinguishers = new HashSet<TenantDistinguisher>();
 
-
+            if (distinguishers != null)
+            {
+                foreach (var item in distinguishers)
+                {
+                    Distinguishers.Add(item);
+                }
+            }
+        }
     }  
 }

@@ -6,6 +6,5 @@ namespace Dotnettency
         where TTenant : class
     {
         Task<TenantDistinguisher> IdentifyContext();
-
     }
 }

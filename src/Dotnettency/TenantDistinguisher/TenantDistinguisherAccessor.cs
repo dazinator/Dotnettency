@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 
 namespace Dotnettency
 {
-    // scoped so that each request has 
     public class TenantDistinguisherAccessor<TTenant>
         where TTenant : class
     {
         private ITenantDistinguisherFactory<TTenant> _factory;
+
+        public Lazy<Task<TenantDistinguisher>> TenantDistinguisher { get; private set; }
 
         public TenantDistinguisherAccessor(ITenantDistinguisherFactory<TTenant> factory)
         {
@@ -17,13 +18,5 @@ namespace Dotnettency
                 return _factory.IdentifyContext();
             });
         }
-
-
-        public Lazy<Task<TenantDistinguisher>> TenantDistinguisher { get; }
     }
-
-
-
-
-
 }

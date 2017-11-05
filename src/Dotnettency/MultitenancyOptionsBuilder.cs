@@ -1,24 +1,25 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+using System;
 
 namespace Dotnettency
 {
-
     public class MultitenancyOptionsBuilder<TTenant>
         where TTenant : class
     {
+        public Func<IServiceProvider> ServiceProviderFactory { get; set; }
+        public IServiceCollection Services { get; set; }
 
         public MultitenancyOptionsBuilder(IServiceCollection serviceCollection)
         {
             Services = serviceCollection;
 
-            // add default services
+            // Add default services
             Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             Services.AddScoped<ITenantAccessor<TTenant>, TenantAccessor<TTenant>>();
+            
             // Tenant shell cache is special in that it houses the tenant shell for each tenant, and each 
-            // tenant shell has state that needs to be kept local to the applicatioin (i.e the tenants container or middleware pipeline.)
+            // tenant shell has state that needs to be kept local to the application (i.e the tenant's container or middleware pipeline.)
             // Therefore it should always be a local / in-memory based cache as will have will have fundamentally non-serialisable state.
             Services.AddSingleton<ITenantShellCache<TTenant>, ConcurrentDictionaryTenantShellCache<TTenant>>();
             Services.AddSingleton<ITenantShellResolver<TTenant>, TenantShellResolver<TTenant>>();
@@ -29,29 +30,18 @@ namespace Dotnettency
             Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
 
             // Support injection of TTenant (has side effect that may block during injection)
-            Services.AddScoped<TTenant>((sp =>
-            {
+            Services.AddScoped(sp => {
                 var accessor = sp.GetRequiredService<ITenantAccessor<TTenant>>();
-                var tenant = accessor.CurrentTenant.Value.Result;
-                return tenant;
-            }));
+                return accessor.CurrentTenant.Value.Result;
+            });
 
             // Support injection of Task<TTenant> - a convenience that allows non blocking access to tenant when required 
             // minor contention on Lazy<>
-            Services.AddScoped<Task<TTenant>>((sp =>
-            {
+            Services.AddScoped(sp => {
                 return sp.GetRequiredService<ITenantAccessor<TTenant>>().CurrentTenant.Value;
-            }));
-
-
+            });
         }
-
-      public Func<IServiceProvider> ServiceProviderFactory { get; set; }
-
-
-
-        //public IServiceProvider ServiceProvider { get; set; }
-
+        
         /// <summary>
         /// Call this to override the service used to provide a URI for the current request. The URI is used as an identifier
         /// for a tenant to be loaded.    
@@ -65,15 +55,11 @@ namespace Dotnettency
             return this;
         }     
 
-      
-        public IServiceCollection Services { get; set; }
-
         public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>()
-       where T : class, ITenantShellFactory<TTenant>
+            where T : class, ITenantShellFactory<TTenant>
         {
             Services.AddSingleton<ITenantShellFactory<TTenant>, T>();
             return this;
-
         }
 
         public MultitenancyOptionsBuilder<TTenant> InitialiseTenant(Func<TenantDistinguisher, TenantShell<TTenant>> factoryMethod)
@@ -83,6 +69,4 @@ namespace Dotnettency
             return this;
         }
     }
-
-
 }
