@@ -6,48 +6,39 @@ using Microsoft.AspNetCore.Http;
 namespace Dotnettency.MiddlewarePipeline
 {
     public class TenantPipelineAccessor<TTenant> : ITenantPipelineAccessor<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
         private readonly ITenantMiddlewarePipelineFactory<TTenant> _tenantPipelineFactory;
 
+        public Func<IApplicationBuilder, RequestDelegate, Lazy<Task<RequestDelegate>>> TenantPipeline { get; private set; }
+
         public TenantPipelineAccessor(
-            ITenantMiddlewarePipelineFactory<TTenant> tenantPipelineFactory,           
+            ITenantMiddlewarePipelineFactory<TTenant> tenantPipelineFactory,
             TenantShellAccessor<TTenant> tenantShellAccessor)
         {
             _tenantShellAccessor = tenantShellAccessor;
             _tenantPipelineFactory = tenantPipelineFactory;
-          
+
             TenantPipeline = new Func<IApplicationBuilder, RequestDelegate, Lazy<Task<RequestDelegate>>>((appBuilder, next) =>
             {
-                var lazy = new Lazy<Task<RequestDelegate>>(async () =>
+                return new Lazy<Task<RequestDelegate>>(async () =>
                 {
-
                     var tenantShell = await _tenantShellAccessor.CurrentTenantShell.Value;
-                    if (tenantShell != null)
-                    {
-                        var tenant = tenantShell?.Tenant;
-                        var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline<TTenant>(new Lazy<Task<RequestDelegate>>(() =>
-                        {
-                            return _tenantPipelineFactory.Create(appBuilder, tenant, next);
-                        }));
-                        var requestDelegate = await tenantPipeline.Value;
-                        return requestDelegate;
-                    }//
-                    else
+                    if (tenantShell == null)
                     {
                         return next;
-                        //  _logger.LogDebug("Null tenant shell - No Tenant Middleware Pipeline to execute.");
-                        // await _next(context);
                     }
+
+                    var tenant = tenantShell?.Tenant;
+                    var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline(new Lazy<Task<RequestDelegate>>(() =>
+                    {
+                        return _tenantPipelineFactory.Create(appBuilder, tenant, next);
+                    }));
+
+                    return await tenantPipeline.Value;
                 });
-                return lazy;
             });
         }
-        
-        public Func<IApplicationBuilder, RequestDelegate, Lazy<Task<RequestDelegate>>> TenantPipeline { get; }
-
     }
-
-
 }
