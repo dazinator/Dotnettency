@@ -1,20 +1,19 @@
-﻿using System;
-using DotNet.Cabinets;
+﻿using DotNet.Cabinets;
 using Microsoft.AspNetCore.Hosting;
+using System;
 using System.IO;
 
 namespace Dotnettency.HostingEnvironment
 {
     public class DelegateTenantWebRootFileSystemProviderFactory<TTenant> : ITenantWebRootFileSystemProviderFatory<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
         private readonly Action<TenantFileSystemBuilderContext<TTenant>> _configureWebRoot;
         private readonly IHostingEnvironment _parentHostingEnvironment;
 
         public DelegateTenantWebRootFileSystemProviderFactory(
             IHostingEnvironment hostingEnv,
-             Action<TenantFileSystemBuilderContext<TTenant>> configureWebRoot
-            )
+            Action<TenantFileSystemBuilderContext<TTenant>> configureWebRoot)
         {
             _parentHostingEnvironment = hostingEnv;
             _configureWebRoot = configureWebRoot;
@@ -25,8 +24,7 @@ namespace Dotnettency.HostingEnvironment
             var defaultTenantsBaseFolderPath = Path.Combine(_parentHostingEnvironment.WebRootPath, ".tenants\\");
             var builder = new TenantFileSystemBuilderContext<TTenant>(tenant, defaultTenantsBaseFolderPath);
             _configureWebRoot(builder);
-            var cab = builder.Build();
-            return cab;
+            return builder.Build();
         }
     }
 }
