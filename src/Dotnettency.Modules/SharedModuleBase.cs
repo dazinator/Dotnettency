@@ -7,12 +7,10 @@ namespace Dotnettency.Modules
     {
         public virtual void ConfigureMiddleware(IApplicationBuilder appBuilder)
         {
-            // throw new NotImplementedException();
         }
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            // throw new NotImplementedException();
         }
     }
 }

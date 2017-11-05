@@ -7,20 +7,14 @@ namespace Dotnettency.Modules
     {
         public RoutedModuleBase()
         {
-            // IsSystemModule = false;
         }
 
         public virtual void ConfigureRoutes(IRouteBuilder routes)
         {
-            //routes.MapGet("special", context =>
-            //{
-            //    return context.Response.WriteAsync("Isolated Module");
-            //});
         }
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            // throw new NotImplementedException();
         }
     }
 }

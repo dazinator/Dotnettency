@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-//using Microsoft.AspNetCore.Routing;
 
 namespace Dotnettency.Modules
 {
@@ -13,6 +12,4 @@ namespace Dotnettency.Modules
         void ConfigureMiddleware(IApplicationBuilder appBuilder);
         void ConfigureServices(IServiceCollection services);
     }
-
-
 }

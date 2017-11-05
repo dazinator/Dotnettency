@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Dotnettency.Container;
+﻿using Dotnettency.Container;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency.Modules
 {
-
     public interface IModuleShell<TModule>
     {
         IApplicationBuilder AppBuilder { get; }

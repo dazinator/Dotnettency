@@ -1,5 +1,4 @@
-﻿using Dotnettency.Modules;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -10,12 +9,12 @@ namespace Dotnettency
     {
         private ModuleShellOptions<TModule> _moduleShellOptions = new ModuleShellOptions<TModule>();
 
+        public TModule Module { get; set; }
+
         public ModuleShellOptionsBuilder(TModule module)
         {
             Module = module;
         }
-
-        public TModule Module { get; set; }
 
         public ModuleShellOptionsBuilder<TModule> HasSharedServices(Action<IServiceCollection> onConfigure)
         {

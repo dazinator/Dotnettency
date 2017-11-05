@@ -7,16 +7,13 @@ namespace Dotnettency.Modules
     {
         private readonly RouteContext _parentRouteContext;
 
+        public bool NotMatched { get; set; }
+        public RouteContext ParentRouteContext { get; set; }
+
         public ModuleRouteContext(HttpContext httpContext, RouteContext parentRouteContext) : base(httpContext)
         {
             _parentRouteContext = parentRouteContext;
-            this.RouteData = _parentRouteContext.RouteData;
-            NotMatched = false;
+            RouteData = _parentRouteContext.RouteData;
         }
-
-        public bool NotMatched { get; set; }
-
-        public RouteContext ParentRouteContext { get; set; }
     }
-
 }

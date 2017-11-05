@@ -1,8 +1,6 @@
 ﻿using Dotnettency.Container;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,28 +9,24 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.Modules
 {
-
     public class ModuleManager<TModule> : IModuleManager<TModule>
     {
-
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private List<IModuleShell<TModule>> _modules { get; set; }
 
         public bool Started { get; private set; }
+        public ModulesRouter<TModule> ModulesRouter { get; set; }
 
         public ModuleManager(ModulesRouter<TModule> modulesRouter)
         {
-            Modules = new List<IModuleShell<TModule>>();
+            _modules = new List<IModuleShell<TModule>>();
             ModulesRouter = modulesRouter;
         }
-
-        private List<IModuleShell<TModule>> Modules { get; set; }
-
+        
         public void AddModule(IModuleShell<TModule> module)
         {
-            Modules.Add(module);
+            _modules.Add(module);
         }
-
-        public ModulesRouter<TModule> ModulesRouter { get; set; }
 
         public async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder)
         {
@@ -44,12 +38,13 @@ namespace Dotnettency.Modules
             await _semaphore.WaitAsync();
             try
             {
+                // Double lock
                 if (Started)
                 {
                     return;
                 }
 
-                var allModules = Modules.ToArray();
+                var allModules = _modules.ToArray();
 
                 var container = await containerFactory();
 
@@ -58,21 +53,18 @@ namespace Dotnettency.Modules
                     await Task.WhenAll(allModules.Select(m => m.EnsureStarted(containerFactory, rootAppBuilder, sharedServices)));
                 });
 
-                // collate routers
+                // Collate routers
                 foreach (var module in allModules.Where(m => m.Router != null))
                 {
-                    this.ModulesRouter.AddModuleRouter(module);
+                    ModulesRouter.AddModuleRouter(module);
                 }
 
-                // ModulesRouter = modulesRouter;
                 Started = true;
-
             }
             finally
             {
                 _semaphore.Release();
             }
-
         }
 
         public IRouter GetModulesRouter()

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-//using Microsoft.AspNetCore.Routing;
 
 namespace Dotnettency.Modules
 {
     /// <summary>
     /// An <see cref="IRoutedModule"/> is given its own container that it can configure with services, so that they are isolated from any other modules.
     /// The <see cref="IRoutedModule"/> must configure some Routes in it's <see cref="IRoutedModule.ConfigureRoutes(IRouteBuilder)"/> method, as these are the routes
-    /// under which this modules container will be restored into RequestServices for an incoming request.    /// 
+    /// under which this modules container will be restored into RequestServices for an incoming request.
     /// </summary>
     /// <remarks>
     /// During an incoming request the <see cref="ModulesRouter{TModule}"></see>
@@ -20,6 +19,4 @@ namespace Dotnettency.Modules
         void ConfigureRoutes(IRouteBuilder routes);
         void ConfigureServices(IServiceCollection services);
     }
-
- 
 }
