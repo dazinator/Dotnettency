@@ -1,28 +1,22 @@
-﻿using Dotnettency.Container;
-using System;
-
+﻿using System;
 
 namespace Dotnettency.Container
 {
     public class AdaptedContainerBuilderOptions<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
+        public ContainerBuilderOptions<TTenant> ContainerBuilderOptions { get; set; }
+        public Func<ITenantContainerAdaptor> HostContainerAdaptorFactory { get; set; }
 
         public AdaptedContainerBuilderOptions(ContainerBuilderOptions<TTenant> parentOptions, Func<ITenantContainerAdaptor> adaptorFactory)
         {
             ContainerBuilderOptions = parentOptions;
-            HostContainerAdaptor = adaptorFactory;
+            HostContainerAdaptorFactory = adaptorFactory;
 
             ContainerBuilderOptions.Builder.ServiceProviderFactory = new Func<IServiceProvider>(() =>
             {
-                return HostContainerAdaptor();
+                return HostContainerAdaptorFactory();
             });
         }
-
-
-        public ContainerBuilderOptions<TTenant> ContainerBuilderOptions { get; set; }
-
-        public Func<ITenantContainerAdaptor> HostContainerAdaptor { get; set; }
-
     }
 }
