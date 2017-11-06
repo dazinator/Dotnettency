@@ -4,7 +4,6 @@ using System;
 
 namespace Dotnettency.HostingEnvironment
 {
-
     public class TenantHostingEnvironmentOptionsBuilder<TTenant>
         where TTenant : class
     {
@@ -14,14 +13,15 @@ namespace Dotnettency.HostingEnvironment
         {
             Builder = builder;
             _parentHostingEnvironment = hostingEnvironment;
-            // Override the singleton registration of IHostingEnvironment with a scoped version so that we can configure it for the tenant
+
+            // Override the singleton registration of IHostingEnvironment with
+            // a scoped version so that we can configure it for the tenant
             // early on in each request.
             Builder.Services.AddScoped<IHostingEnvironment>((sp) =>
             {
                 return new TenantHostingEnvironment<TTenant>(hostingEnvironment);
             });
-
-        }       
+        }
 
         public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
 
@@ -38,44 +38,5 @@ namespace Dotnettency.HostingEnvironment
             Builder.Services.AddSingleton<ITenantWebRootFileSystemProviderFatory<TTenant>>(factory);
             return Builder;
         }
-
     }
-
-    //public class TenantHostingEnvironmentServiceCollectionBuilder<TTenant>
-    // where TTenant : class
-    //{
-    //    //private readonly IHostingEnvironment _parentHostingEnvironment;
-
-    //    public TenantHostingEnvironmentServiceCollectionBuilder(IServiceCollection services, IHostingEnvironment hostingEnvironment)
-    //    {
-    //        // Builder = builder;
-    //        //  _parentHostingEnvironment = hostingEnvironment;
-    //        // Override the singleton registration of IHostingEnvironment with a scoped version so that we can configure it for the tenant
-    //        // early on in each request.
-    //        services.AddScoped<IHostingEnvironment>((sp) =>
-    //        {
-    //            return new TenantHostingEnvironment<TTenant>(hostingEnvironment);
-    //        });
-
-    //    }
-
-    //    public IServiceCollection Services { get; set; }
-
-    //    //public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
-
-    //    public IServiceCollection OnInitialiseTenantContentRoot(IHostingEnvironment env, Action<TenantFileSystemBuilderContext<TTenant>> configureContentRoot)
-    //    {
-    //        var factory = new DelegateTenantContentRootFileSystemProviderFactory<TTenant>(env, configureContentRoot);
-    //        Services.AddSingleton<ITenantContentRootFileSystemProviderFatory<TTenant>>(factory);
-    //        return Builder;
-    //    }
-
-    //    public MultitenancyOptionsBuilder<TTenant> OnInitialiseTenantWebRoot(IHostingEnvironment env, Action<TenantFileSystemBuilderContext<TTenant>> configureWebRoot)
-    //    {
-    //        var factory = new DelegateTenantWebRootFileSystemProviderFactory<TTenant>(env, configureWebRoot);
-    //        Builder.Services.AddSingleton<ITenantWebRootFileSystemProviderFatory<TTenant>>(factory);
-    //        return Builder;
-    //    }
-
-    //}
 }

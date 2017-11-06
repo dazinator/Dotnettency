@@ -1,5 +1,5 @@
-﻿using System;
-using Dotnettency.Container;
+﻿using Dotnettency.Container;
+using System;
 
 namespace Dotnettency
 {
@@ -9,10 +9,7 @@ namespace Dotnettency
             where TTenant : class
         {
             var containerOptionsBuilder = new ContainerBuilderOptions<TTenant>(optionsBuilder);
-            if (configure != null)
-            {
-                configure(containerOptionsBuilder);
-            }
+            configure?.Invoke(containerOptionsBuilder);
             return optionsBuilder;
         }
     }

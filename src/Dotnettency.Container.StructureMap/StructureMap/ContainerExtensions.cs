@@ -12,10 +12,8 @@ using System.Linq.Expressions;
 
 namespace Dotnettency.Container.StructureMap
 {
-
     public static partial class ContainerExtensions
     {
-
         /// <summary>
         /// Populates the container using the specified service descriptors.
         /// </summary>
@@ -28,9 +26,7 @@ namespace Dotnettency.Container.StructureMap
         {
             container.Configure(config => config.Populate(descriptors));
         }
-
-
-
+        
         /// <summary>
         /// Populates the container using the specified service descriptors.
         /// </summary>
@@ -43,9 +39,7 @@ namespace Dotnettency.Container.StructureMap
         {
             Populate((Registry)config, descriptors);
         }
-
-
-
+        
         /// <summary>
         /// Populates the registry using the specified service descriptors.
         /// </summary>
@@ -56,11 +50,6 @@ namespace Dotnettency.Container.StructureMap
         /// <param name="descriptors">The service descriptors.</param>
         public static void Populate(this Registry registry, IEnumerable<ServiceDescriptor> descriptors)
         {
-
-            // HACK: We insert this action in order to prevent Populate being called twice on the same container.
-            //  registry.Configure(ThrowIfMarkerInterfaceIsRegistered);
-            // registry.For<IMarkerInterface>();
-
             registry.Policies.ConstructorSelector<AspNetConstructorSelector>();
 
             registry.For<ITenantContainerAdaptor>()
@@ -74,39 +63,15 @@ namespace Dotnettency.Container.StructureMap
                 .Use<TenantContainerServiceScopeFactory>();
 
             registry.Register(descriptors);
-
         }
-
-        //private static void ThrowIfMarkerInterfaceIsRegistered(PluginGraph graph)
-        //{
-
-        //    if (graph.HasFamily<IMarkerInterface>())
-
-        //    {
-
-        //        throw new InvalidOperationException("Populate should only be called once per container.");
-
-        //    }
-
-        //}
-
-
-
+        
         private static void Register(this IProfileRegistry registry, IEnumerable<ServiceDescriptor> descriptors)
-
         {
-
             foreach (var descriptor in descriptors)
-
             {
-
                 registry.Register(descriptor);
-
             }
-
         }
-
-
 
         private static void Register(this IProfileRegistry registry, ServiceDescriptor descriptor)
         {
@@ -121,24 +86,19 @@ namespace Dotnettency.Container.StructureMap
             if (descriptor.ImplementationFactory != null)
             {
                 registry.For(descriptor.ServiceType)
-                                        .LifecycleIs(descriptor.Lifetime)
-                                        .Use(descriptor.CreateFactory());
+                    .LifecycleIs(descriptor.Lifetime)
+                    .Use(descriptor.CreateFactory());
                 return;
             }
 
             registry.For(descriptor.ServiceType)
                 .LifecycleIs(descriptor.Lifetime)
                 .Use(descriptor.ImplementationInstance);
-
         }
-
-
-
+        
         private static Expression<Func<IContext, object>> CreateFactory(this ServiceDescriptor descriptor)
         {
             return context => descriptor.ImplementationFactory(context.GetInstance<IServiceProvider>());
         }
-
-        //  private interface IMarkerInterface { }
     }
 }

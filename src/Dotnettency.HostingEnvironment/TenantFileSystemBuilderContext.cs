@@ -9,20 +9,15 @@ namespace Dotnettency.HostingEnvironment
         where TTenant : class
     {
         private IFileProvider _parentFileProvider;
-        //  private readonly IHostingEnvironment _parentHostEnvironment;
 
         public TenantFileSystemBuilderContext(TTenant tenant, string defaultTenantsBaseFolder)
         {
             Tenant = tenant;
-            //_parentHostEnvironment = parentHostEnvironment;
             BaseFolder = defaultTenantsBaseFolder;
-
         }
 
         public TTenant Tenant { get; set; }
-
         public Guid PartitionId { get; set; }
-
         public string BaseFolder { get; set; }
 
         public TenantFileSystemBuilderContext<TTenant> AllowAccessTo(IFileProvider chainedFileProvider)
@@ -46,9 +41,7 @@ namespace Dotnettency.HostingEnvironment
             }
 
             var cabinetStorage = new PhysicalFileStorageProvider(BaseFolder, PartitionId);
-            var fp = _parentFileProvider;
-            var cabinet = new Cabinet(cabinetStorage, fp);
-            return cabinet;
+            return new Cabinet(cabinetStorage, _parentFileProvider);
         }
     }
 }

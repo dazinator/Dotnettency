@@ -6,24 +6,4 @@ namespace Dotnettency.Container
     {
         void ConfigureServices(IServiceCollection services);
     }
-
-
-    //public class ConfigureTenantFromServicesTenantContainerFactory<TTenant> : ITenantContainerFactory<TTenant>
-    //    where TTenant : class
-    //{
-
-    //    public ConfigureTenantFromServicesTenantContainerFactory()
-    //    {
-
-    //    }
-
-    //    public Task<IServiceProvider> Get(TenantIdentifier identifier)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
-
-
-
 }

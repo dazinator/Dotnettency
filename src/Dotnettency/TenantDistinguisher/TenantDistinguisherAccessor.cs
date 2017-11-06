@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 
 namespace Dotnettency
 {
-    // scoped so that each request has 
     public class TenantDistinguisherAccessor<TTenant>
         where TTenant : class
     {
@@ -18,12 +17,6 @@ namespace Dotnettency
             });
         }
 
-
-        public Lazy<Task<TenantDistinguisher>> TenantDistinguisher { get; }
+        public Lazy<Task<TenantDistinguisher>> TenantDistinguisher { get; private set; }
     }
-
-
-
-
-
 }

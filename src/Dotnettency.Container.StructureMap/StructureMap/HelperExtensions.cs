@@ -12,14 +12,12 @@ using System.Reflection;
 
 namespace Dotnettency.Container.StructureMap.StructureMap
 {
-
     internal static class HelperExtensions
     {
         public static bool IsGenericEnumerable(this Type type)
         {
             return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
         }
-
 
         public static GenericFamilyExpression LifecycleIs(this GenericFamilyExpression instance, ServiceLifetime lifetime)
         {
@@ -39,11 +37,9 @@ namespace Dotnettency.Container.StructureMap.StructureMap
             }
         }
 
-
         public static bool HasFamily<TPlugin>(this PluginGraph graph)
         {
             return graph.HasFamily(typeof(TPlugin));
         }
-
     }
 }

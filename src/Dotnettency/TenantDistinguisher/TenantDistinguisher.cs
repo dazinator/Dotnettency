@@ -17,6 +17,11 @@ namespace Dotnettency
             return value;
         }
 
+        public bool Equals(TenantDistinguisher other)
+        {
+            return other != null && other.Uri == Uri;
+        }
+
         public override int GetHashCode()
         {
             if (Uri == null)
@@ -30,14 +35,5 @@ namespace Dotnettency
         {
             return Equals(other as TenantDistinguisher);
         }
-
-        public bool Equals(TenantDistinguisher other)
-        {
-            return other != null && other.Uri == Uri;
-        }
     }
-
-
-
-
 }

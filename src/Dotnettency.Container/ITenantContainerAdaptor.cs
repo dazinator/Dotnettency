@@ -5,14 +5,8 @@ namespace Dotnettency.Container
 {
     public interface ITenantContainerAdaptor : IServiceProvider, IDisposable
     {
-       // IServiceProvider GetServiceProvider();
         ITenantContainerAdaptor CreateNestedContainer();
         ITenantContainerAdaptor CreateChildContainer();
-
-        string ContainerName { get; }
-        Guid ContainerId { get; }
-
-        ContainerRole Role { get; }
 
         /// <summary>
         /// Used to add services to a container AFTER its initialised.
@@ -20,23 +14,8 @@ namespace Dotnettency.Container
         /// <param name="configure"></param>
         void Configure(Action<IServiceCollection> configure);
 
+        string ContainerName { get; }
+        Guid ContainerId { get; }
+        ContainerRole Role { get; }
     }
-
-    public enum ContainerRole
-    {
-        /// <summary>
-        /// The root application level container.
-        /// </summary>
-        Root = 0,
-        /// <summary>
-        /// A child container, derived from a parent.
-        /// </summary>
-        Child = 1,
-        /// <summary>
-        /// A child container that is scoped for some lifetime such as a request.
-        /// </summary>
-        Scoped = 2
-    }
-
-
 }

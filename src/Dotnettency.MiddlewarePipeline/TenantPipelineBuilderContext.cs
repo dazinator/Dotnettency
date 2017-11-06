@@ -3,6 +3,5 @@
     public class TenantPipelineBuilderContext<TTenant>
     {
         public TTenant Tenant { get; set; }
-
     }
 }

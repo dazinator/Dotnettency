@@ -7,9 +7,8 @@ using Microsoft.AspNetCore.Builder;
 namespace Dotnettency.Container
 {
     public class TenantContainerMiddleware<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
-
         private readonly RequestDelegate _next;
         private readonly ILogger<TenantContainerMiddleware<TTenant>> _logger;
         private readonly IApplicationBuilder _appBuilder;
@@ -26,8 +25,8 @@ namespace Dotnettency.Container
 
         public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor, ITenantRequestContainerAccessor<TTenant> requestContainerAccessor)
         {
-            //  log.LogDebug("Using multitenancy provider {multitenancyProvidertype}.", tenantAccessor.GetType().Name);
             _logger.LogDebug("Tenant Container Middleware - Start.");
+
             var tenantContainer = await tenantContainerAccessor.TenantContainer.Value;
             if (tenantContainer == null)
             {
@@ -36,7 +35,8 @@ namespace Dotnettency.Container
                 return;
             }
 
-            IServiceProvider oldAppBuilderServices = _appBuilder.ApplicationServices;
+            var oldAppBuilderServices = _appBuilder.ApplicationServices;
+
             try
             {
                 _logger.LogDebug("Setting AppBuilder Services to Tenant Container: {containerId} - {containerName}", tenantContainer.ContainerId, tenantContainer.ContainerName);
@@ -45,20 +45,17 @@ namespace Dotnettency.Container
               
                 // Ensure container is disposed at end of request.
                 context.Response.RegisterForDispose(perRequestContainer);
-                // Replace request services with a nested version (for lifetime management - used to encpasulate a request).                
-
+                
+                // Replace request services with a nested version (for lifetime management - used to encpasulate a request).
                 _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
                 await perRequestContainer.ExecuteWithinSwappedRequestContainer(_next, context);
                 _logger.LogDebug("Restoring Request Container");
-
             }
             finally
             {
                 _logger.LogDebug("Restoring AppBuilder Services");
                 _appBuilder.ApplicationServices = oldAppBuilderServices;
             }
-
-
         }
     }
 }

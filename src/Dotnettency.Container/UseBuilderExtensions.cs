@@ -3,18 +3,6 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Dotnettency
 {
-
-    //public class MultitenenancyContainerMiddlewareOptionsBuilder<TTenant>
-    //    where TTenant : class
-    //{
-    //    private readonly MultitenancyMiddlewareOptionsBuilder<TTenant> _parentOptions;
-
-    //    public MultitenenancyContainerMiddlewareOptionsBuilder(MultitenancyMiddlewareOptionsBuilder<TTenant> parentOptions)
-    //    {
-    //        _parentOptions = parentOptions;
-    //    }
-    //}
-
     public static class UseBuilderExtensions
     {
         public static MultitenancyMiddlewareOptionsBuilder<TTenant> UsePerTenantContainers<TTenant>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder)
@@ -25,4 +13,3 @@ namespace Dotnettency
         }
     }
 }
-

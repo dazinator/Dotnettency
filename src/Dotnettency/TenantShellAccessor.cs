@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 
 namespace Dotnettency
 {
-
     public class TenantShellAccessor<TTenant> : ITenantShellAccessor<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
-
         private readonly ITenantShellFactory<TTenant> _tenantFactory;
         private readonly TenantDistinguisherAccessor<TTenant> _tenantDistinguisherAccessor;
         private readonly ITenantShellResolver<TTenant> _tenantResolver;
@@ -22,22 +20,16 @@ namespace Dotnettency
 
             CurrentTenantShell = new Lazy<Task<TenantShell<TTenant>>>(async () =>
             {
-                // return new Task<TTenant>(async () =>
-                //{
                 var identifier = await _tenantDistinguisherAccessor.TenantDistinguisher.Value;
                 if (identifier == null)
                 {
                     return null;
                 }
 
-                // grab the tenant id for the context id.
-                // if we don't have one then 
-                var tenantShell = await _tenantResolver.ResolveTenant(identifier, _tenantFactory);
-                return tenantShell;
+                return await _tenantResolver.ResolveTenant(identifier, _tenantFactory);
             });
         }
 
-        public Lazy<Task<TenantShell<TTenant>>> CurrentTenantShell { get; }
-
+        public Lazy<Task<TenantShell<TTenant>>> CurrentTenantShell { get; private set; }
     }
 }

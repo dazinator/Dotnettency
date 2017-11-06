@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Builder;
+using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency.MiddlewarePipeline
 {
     public interface ITenantPipelineAccessor<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
         Func<IApplicationBuilder, RequestDelegate, Lazy<Task<RequestDelegate>>> TenantPipeline { get; }
     }

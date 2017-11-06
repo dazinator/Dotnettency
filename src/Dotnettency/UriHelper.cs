@@ -25,7 +25,6 @@ namespace Dotnettency
     /// </summary>
     public static class UriHelper
     {
-
         private const string SchemeDelimiter = "://";
 
         /// <summary>
@@ -35,7 +34,6 @@ namespace Dotnettency
         /// <returns></returns>
         public static Uri GetUri(this HttpRequest request)
         {
-
             var host = request.Host.Value;
             var pathBase = request.PathBase.Value;
             var path = request.Path.Value;
@@ -62,10 +60,8 @@ namespace Dotnettency
         /// <returns></returns>
         public static Uri GetAuthorityUri(this HttpRequest request)
         {
-
             var host = request.Host.Value;
             var pathBase = request.PathBase.Value;
-            // var path = request.Path.Value;
             var queryString = request.QueryString.Value;
 
             // PERF: Calculate string length to allocate correct buffer size for StringBuilder.
@@ -77,7 +73,6 @@ namespace Dotnettency
                 .Append(SchemeDelimiter)
                 .Append(host)
                 .Append(pathBase)
-                //.Append(path)
                 .Append(queryString)
                 .ToString());
         }

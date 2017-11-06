@@ -7,7 +7,6 @@ namespace Dotnettency.MiddlewarePipeline
     public class TenantPipelineOptionsBuilder<TTenant>
         where TTenant : class
     {
-
         private readonly MultitenancyOptionsBuilder<TTenant> _builder;
 
         public TenantPipelineOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder)

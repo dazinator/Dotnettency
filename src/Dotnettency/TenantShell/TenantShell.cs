@@ -13,6 +13,7 @@ namespace Dotnettency
             Tenant = tenant;
             Properties = new ConcurrentDictionary<string, object>();
             Distinguishers = new HashSet<TenantDistinguisher>();
+
             if (distinguishers != null)
             {
                 foreach (var item in distinguishers)
@@ -20,8 +21,9 @@ namespace Dotnettency
                     Distinguishers.Add(item);
                 }
             }
-
         }
+
+        public ConcurrentDictionary<string, object> Properties { get; private set; }
 
         /// <summary>
         /// Uniquely identifies this tenant.
@@ -34,9 +36,5 @@ namespace Dotnettency
         /// Represents context distinguihers for this same tenant. Allows future request with any of these distinguishers to be mapped to this same tenant.
         /// </summary>
         internal HashSet<TenantDistinguisher> Distinguishers { get; set; }
-
-        public ConcurrentDictionary<string, object> Properties { get; }
-
-
-    }  
+    }
 }

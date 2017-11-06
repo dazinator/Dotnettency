@@ -4,7 +4,7 @@ using System;
 namespace Dotnettency
 {
     public class DelegateTenantShellFactory<TTenant> : ITenantShellFactory<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
         private readonly Func<TenantDistinguisher, TenantShell<TTenant>> _factory;
 

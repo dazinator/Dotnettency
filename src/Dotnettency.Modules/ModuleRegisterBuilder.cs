@@ -1,6 +1,4 @@
-﻿using Dotnettency.Container;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -10,6 +8,7 @@ namespace Dotnettency.Modules
         where TModule : class, IModule
     {
         public Func<IRouteHandler> DefaultRouteHandlerFactory { get; set; }
+        public IServiceCollection Services { get; set; }
 
         public ModuleRegisterBuilder(IServiceCollection servicies)
         {
@@ -20,7 +19,7 @@ namespace Dotnettency.Modules
                 {
                     return null;
                 });
-            };            
+            };
             Services.AddRouting(); // needed for modular routing.
         }
 
@@ -44,31 +43,26 @@ namespace Dotnettency.Modules
         public void ConfigureModules(IRouter moMatchRouteHandler)
         {
             OnSetupModule((moduleOptions) =>
-            {             
+            {
                 // TODO: visitor design pattern might be better suite here..
-                var sharedModule = moduleOptions.Module as ISharedModule;
-                if (sharedModule != null)
+                if (moduleOptions.Module is ISharedModule sharedModule)
                 {
                     // Modules adds services to tenant level container.
                     moduleOptions.HasSharedServices((moduleServices) =>
                     {
-                        //  logger.LogDebug("Module is adding to tenant services");
                         sharedModule.ConfigureServices(moduleServices);
                     });
                     // Module adds middleware to tenant level pipeline.
                     moduleOptions.HasMiddlewareConfiguration((appBuilder) =>
                     {
-                        // logger.LogDebug("Module is adding to tenant middleware pipeline");
                         sharedModule.ConfigureMiddleware(appBuilder);
                     });
                 }
 
                 // We allow IRoutedModules to partipate in configuring their own isolated services, associated with their router 
-                var routedModule = moduleOptions.Module as IRoutedModule;
-                if (routedModule != null)
+                if (moduleOptions.Module is IRoutedModule routedModule)
                 {
-                    // logger.LogDebug("Module is confoguring router");
-                    // module has its own container, that is associated with certain routes.
+                    // Module has its own container, that is associated with certain routes.
                     moduleOptions.HasRoutedContainer((moduleAppBuilder) =>
                     {
                         var moduleRouteBuilder = new RouteBuilder(moduleAppBuilder, moMatchRouteHandler);
@@ -82,7 +76,7 @@ namespace Dotnettency.Modules
         }
 
         public void OnSetupModule(Action<ModuleShellOptionsBuilder<TModule>> configureModuleOptionsBuilder)
-        {          
+        {
             Services.AddSingleton<IModuleManager<TModule>, ModuleManager<TModule>>((sp) =>
             {
                 var routeHandler = DefaultRouteHandlerFactory();
@@ -99,10 +93,9 @@ namespace Dotnettency.Modules
                     var moduleShell = new ModuleShell<TModule>(item, moduleShellOptions);
                     moduleManager.AddModule(moduleShell);
                 }
+
                 return moduleManager;
             });
         }
-
-        public IServiceCollection Services { get; set; }
     }
 }

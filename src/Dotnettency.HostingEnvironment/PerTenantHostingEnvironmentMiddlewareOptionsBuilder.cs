@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 namespace Dotnettency
 {
     public class PerTenantHostingEnvironmentMiddlewareOptionsBuilder<TTenant>
-          where TTenant : class
+        where TTenant : class
     {
         private MultitenancyMiddlewareOptionsBuilder<TTenant> _builder;
 
@@ -24,6 +24,5 @@ namespace Dotnettency
             _builder.ApplicationBuilder.UseMiddleware<TenantHostingEnvironmentWebRootMiddleware<TTenant>>(_builder.ApplicationBuilder);
             return this;
         }
-
     }
 }

@@ -18,13 +18,13 @@ namespace Dotnettency.Container
         public Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
         {
             var tenantContainer = _parentContainer.CreateChildContainer();
+
             tenantContainer.Configure(config =>
             {
                 _configureTenant(tenant, config);
             });
+
             return Task.FromResult(tenantContainer);
         }
     }
-
-
 }

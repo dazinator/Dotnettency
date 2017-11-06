@@ -7,8 +7,6 @@ namespace Dotnettency.Container
     public class TenantRequestContainerAccessor<TTenant> : ITenantRequestContainerAccessor<TTenant>
         where TTenant : class
     {
-        // private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
-        //private readonly ITenantContainerFactory<TTenant> _containerFactory;       
         private readonly ITenantContainerAccessor<TTenant> _tenantContainerAccessor;
         private readonly ILogger<TenantRequestContainerAccessor<TTenant>> _logger;
 
@@ -28,12 +26,10 @@ namespace Dotnettency.Container
                 }
 
                 var requestContainer = tenantContainer.CreateNestedContainer();
-                var tenantRequestContainer = new PerRequestContainer(requestContainer);
-                return tenantRequestContainer;
+                return new PerRequestContainer(requestContainer);
             });
         }
 
         public Lazy<Task<PerRequestContainer>> TenantRequestContainer { get; private set; }
-
     }
 }

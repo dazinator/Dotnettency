@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Dotnettency
 {
     public interface ITenantMiddlewarePipelineFactory<TTenant>
-     where TTenant : class
+        where TTenant : class
     {
         Task<RequestDelegate> Create(IApplicationBuilder appBuilder, TTenant tenant, RequestDelegate next);
     }

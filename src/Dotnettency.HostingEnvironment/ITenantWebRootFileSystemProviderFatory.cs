@@ -3,7 +3,7 @@
 namespace Dotnettency.HostingEnvironment
 {
     public interface ITenantWebRootFileSystemProviderFatory<TTenant>
-         where TTenant : class
+        where TTenant : class
     {
         ICabinet GetWebRoot(TTenant tenant);
     }
