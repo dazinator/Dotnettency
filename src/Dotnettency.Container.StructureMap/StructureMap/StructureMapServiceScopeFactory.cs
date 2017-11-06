@@ -8,70 +8,62 @@ namespace Dotnettency.Container.StructureMap
     {
         internal sealed class TenantContainerServiceScopeFactory : IServiceScopeFactory
         {
+            private readonly ITenantContainerAdaptor _container;
+
             public TenantContainerServiceScopeFactory(ITenantContainerAdaptor container)
             {
-                Container = container; // new StructureMapTenantContainerAdaptor(container, ContainerRole.Root);
+                _container = container;
             }
-
-            private ITenantContainerAdaptor Container { get; }
 
             public IServiceScope CreateScope()
             {
-                return new TenantContainerServiceScope(Container.CreateNestedContainer());
+                return new TenantContainerServiceScope(_container.CreateNestedContainer());
             }
-
-
+            
             private class TenantContainerServiceScope : IServiceScope
             {
-
-                public TenantContainerServiceScope(ITenantContainerAdaptor container)
-                {
-                    Container = container;
-                    ServiceProvider = Container;
-                }
-
-                private ITenantContainerAdaptor Container { get; }
+                private readonly ITenantContainerAdaptor _container;
 
                 public IServiceProvider ServiceProvider { get; }
 
-                public void Dispose() => Container.Dispose();
+                public TenantContainerServiceScope(ITenantContainerAdaptor container)
+                {
+                    _container = container;
+                    ServiceProvider = _container;
+                }
 
+                public void Dispose() => _container.Dispose();
             }
-
         }
 
         internal sealed class StructureMapServiceScopeFactory : IServiceScopeFactory
         {
+            private readonly IContainer _container;
+
             public StructureMapServiceScopeFactory(IContainer container)
             {
-                Container = container;
+                _container = container;
             }
-
-            private IContainer Container { get; }
 
             public IServiceScope CreateScope()
             {
-                return new StructureMapServiceScope(Container.GetNestedContainer());
+                return new StructureMapServiceScope(_container.GetNestedContainer());
             }
-
-
+            
             private class StructureMapServiceScope : IServiceScope
             {
-
-                public StructureMapServiceScope(IContainer container)
-                {
-                    Container = container;
-                    ServiceProvider = container.GetInstance<IServiceProvider>();
-                }
-
-                private IContainer Container { get; }
+                private readonly IContainer _container;
 
                 public IServiceProvider ServiceProvider { get; }
 
-                public void Dispose() => Container.Dispose();
+                public StructureMapServiceScope(IContainer container)
+                {
+                    _container = container;
+                    ServiceProvider = container.GetInstance<IServiceProvider>();
+                }
 
+                public void Dispose() => _container.Dispose();
             }
-
         }
     }
 }

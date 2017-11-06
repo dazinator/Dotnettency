@@ -1,9 +1,8 @@
-﻿using StructureMap;
-using System;
+﻿using Dotnettency.Container.StructureMap;
 using Microsoft.Extensions.DependencyInjection;
-using Dotnettency.Container.StructureMap;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using StructureMap;
+using System;
 
 namespace Dotnettency.Container
 {
@@ -13,12 +12,17 @@ namespace Dotnettency.Container
         private readonly Guid _id;
         private readonly ILogger<StructureMapTenantContainerAdaptor> _logger;
 
+        public ContainerRole Role { get; set; }
+        public string ContainerName => _container.Name;
+        public Guid ContainerId => _id;
+
         public StructureMapTenantContainerAdaptor(ILogger<StructureMapTenantContainerAdaptor> logger, IContainer container, ContainerRole role = ContainerRole.Root) : base(container)
         {
             _logger = logger;
             _container = container;
             _id = Guid.NewGuid();
             Role = role;
+
             if (role == ContainerRole.Root)
             {
                   _logger.LogDebug("Root Container Adaptor Created: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
@@ -27,28 +31,10 @@ namespace Dotnettency.Container
             {
                 _logger.LogDebug("Container Created: {id}, {role}", _id, _container.Name, _container.Role);
             }
-            //  _logger.LogInformation("Tenant Container Adaptor Created: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
-            //ServiceProvider = new Lazy<IServiceProvider>(() =>
-            //{
-            //    return 
-            //});
         }
-
-        //private IServiceProvider GetServiceProvider()
-        //{
-        //    return _container.GetInstance<IServiceProvider>();
-        //}
-
-        public ContainerRole Role { get; set; }
-
-        public string ContainerName => _container.Name;
-
-        public Guid ContainerId => _id;
 
         public void Configure(Action<IServiceCollection> configure)
         {
-            //return Task.Run(() =>
-            //{
             _container.Configure(_ =>
             {
                 _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
@@ -56,7 +42,6 @@ namespace Dotnettency.Container
                 configure(services);
                 _.Populate(services);
             });
-            // });
         }
 
         public ITenantContainerAdaptor CreateNestedContainer()
@@ -76,11 +61,5 @@ namespace Dotnettency.Container
             _logger.LogDebug("Disposing of container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
             _container.Dispose();
         }
-
-        //public new object GetService(Type serviceType)
-        //{
-        //    var sp = GetServiceProvider();
-        //    return sp.GetService(serviceType);
-        //}
     }
 }

@@ -11,12 +11,12 @@ namespace Dotnettency.Container.StructureMap
 {
     public class StructureMapServiceProvider : IServiceProvider, ISupportRequiredService
     {
+        private IContainer _container { get; }
+
         public StructureMapServiceProvider(IContainer container)
         {
-            Container = container;
+            _container = container;
         }
-
-        private IContainer Container { get; }
 
         public object GetService(Type serviceType)
         {
@@ -27,12 +27,12 @@ namespace Dotnettency.Container.StructureMap
                 return GetRequiredService(serviceType);
             }
 
-            return Container.TryGetInstance(serviceType);
+            return _container.TryGetInstance(serviceType);
         }
 
         public object GetRequiredService(Type serviceType)
         {
-            return Container.GetInstance(serviceType);
+            return _container.GetInstance(serviceType);
         }
     }
 }
