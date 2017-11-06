@@ -24,13 +24,13 @@ namespace Dotnettency.Container.StructureMap
             {
                 private readonly ITenantContainerAdaptor _container;
 
-                public IServiceProvider ServiceProvider { get; }
-
                 public TenantContainerServiceScope(ITenantContainerAdaptor container)
                 {
                     _container = container;
                     ServiceProvider = _container;
                 }
+
+                public IServiceProvider ServiceProvider { get; private set; }
 
                 public void Dispose() => _container.Dispose();
             }
@@ -54,13 +54,13 @@ namespace Dotnettency.Container.StructureMap
             {
                 private readonly IContainer _container;
 
-                public IServiceProvider ServiceProvider { get; }
-
                 public StructureMapServiceScope(IContainer container)
                 {
                     _container = container;
                     ServiceProvider = container.GetInstance<IServiceProvider>();
                 }
+
+                public IServiceProvider ServiceProvider { get; private set; }
 
                 public void Dispose() => _container.Dispose();
             }

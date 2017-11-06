@@ -7,9 +7,6 @@ namespace Dotnettency
     public class MultitenancyOptionsBuilder<TTenant>
         where TTenant : class
     {
-        public Func<IServiceProvider> ServiceProviderFactory { get; set; }
-        public IServiceCollection Services { get; set; }
-
         public MultitenancyOptionsBuilder(IServiceCollection serviceCollection)
         {
             Services = serviceCollection;
@@ -41,7 +38,10 @@ namespace Dotnettency
                 return sp.GetRequiredService<ITenantAccessor<TTenant>>().CurrentTenant.Value;
             });
         }
-        
+
+        public Func<IServiceProvider> ServiceProviderFactory { get; set; }
+        public IServiceCollection Services { get; set; }
+
         /// <summary>
         /// Call this to override the service used to provide a URI for the current request. The URI is used as an identifier
         /// for a tenant to be loaded.    

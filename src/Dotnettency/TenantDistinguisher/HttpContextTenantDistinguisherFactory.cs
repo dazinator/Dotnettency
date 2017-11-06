@@ -12,7 +12,7 @@ namespace Dotnettency
         protected const int DefaultHttpPort = 80;
         protected const int DefaultHttpsPort = 443;
 
-        public HttpContextTenantDistinguisherFactory(IHttpContextAccessor httpContextAccessor)
+        protected HttpContextTenantDistinguisherFactory(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccesor = httpContextAccessor;
         }

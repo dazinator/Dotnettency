@@ -10,8 +10,6 @@ namespace Dotnettency.Container
         private readonly ITenantContainerAccessor<TTenant> _tenantContainerAccessor;
         private readonly ILogger<TenantRequestContainerAccessor<TTenant>> _logger;
 
-        public Lazy<Task<PerRequestContainer>> TenantRequestContainer { get; private set; }
-
         public TenantRequestContainerAccessor(
             ILogger<TenantRequestContainerAccessor<TTenant>> logger,
             ITenantContainerAccessor<TTenant> tenantContainerAccessor)
@@ -31,5 +29,7 @@ namespace Dotnettency.Container
                 return new PerRequestContainer(requestContainer);
             });
         }
+
+        public Lazy<Task<PerRequestContainer>> TenantRequestContainer { get; private set; }
     }
 }

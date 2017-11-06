@@ -8,8 +8,6 @@ namespace Dotnettency
     {
         private ITenantDistinguisherFactory<TTenant> _factory;
 
-        public Lazy<Task<TenantDistinguisher>> TenantDistinguisher { get; private set; }
-
         public TenantDistinguisherAccessor(ITenantDistinguisherFactory<TTenant> factory)
         {
             _factory = factory;
@@ -18,5 +16,7 @@ namespace Dotnettency
                 return _factory.IdentifyContext();
             });
         }
+
+        public Lazy<Task<TenantDistinguisher>> TenantDistinguisher { get; private set; }
     }
 }

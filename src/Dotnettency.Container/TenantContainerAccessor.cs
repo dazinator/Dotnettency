@@ -9,8 +9,6 @@ namespace Dotnettency.Container
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
         private readonly ITenantContainerFactory<TTenant> _containerFactory;
 
-        public Lazy<Task<ITenantContainerAdaptor>> TenantContainer { get; private set; }
-
         public TenantContainerAccessor(ITenantShellAccessor<TTenant> tenantShellAccessor, ITenantContainerFactory<TTenant> factory)
         {
             _tenantShellAccessor = tenantShellAccessor;
@@ -34,5 +32,7 @@ namespace Dotnettency.Container
                 return await lazy.Value;
             });
         }
+
+        public Lazy<Task<ITenantContainerAdaptor>> TenantContainer { get; private set; }
     }
 }

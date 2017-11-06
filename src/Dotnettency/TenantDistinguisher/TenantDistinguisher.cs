@@ -4,12 +4,12 @@ namespace Dotnettency
 {
     public class TenantDistinguisher : IEquatable<TenantDistinguisher>
     {
-        public Uri Uri { get; set; }
-
         public TenantDistinguisher(Uri key)
         {
             Uri = key;
         }
+
+        public Uri Uri { get; set; }
 
         public static implicit operator TenantDistinguisher(Uri key)
         {

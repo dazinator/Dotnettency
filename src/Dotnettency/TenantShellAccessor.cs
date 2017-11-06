@@ -10,8 +10,6 @@ namespace Dotnettency
         private readonly TenantDistinguisherAccessor<TTenant> _tenantDistinguisherAccessor;
         private readonly ITenantShellResolver<TTenant> _tenantResolver;
 
-        public Lazy<Task<TenantShell<TTenant>>> CurrentTenantShell { get; private set; }
-
         public TenantShellAccessor(ITenantShellFactory<TTenant> tenantFactory,
             TenantDistinguisherAccessor<TTenant> tenantDistinguisherAccessor,
             ITenantShellResolver<TTenant> tenantResolver)
@@ -31,5 +29,7 @@ namespace Dotnettency
                 return await _tenantResolver.ResolveTenant(identifier, _tenantFactory);
             });
         }
+
+        public Lazy<Task<TenantShell<TTenant>>> CurrentTenantShell { get; private set; }
     }
 }

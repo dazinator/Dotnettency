@@ -5,8 +5,6 @@ namespace Dotnettency.Container
     public class ContainerBuilderOptions<TTenant>
         where TTenant : class
     {
-        public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
-
         public ContainerBuilderOptions(MultitenancyOptionsBuilder<TTenant> builder)
         {
             Builder = builder;
@@ -14,5 +12,7 @@ namespace Dotnettency.Container
             builder.Services.AddScoped<ITenantContainerAccessor<TTenant>, TenantContainerAccessor<TTenant>>();
             builder.Services.AddScoped<ITenantRequestContainerAccessor<TTenant>, TenantRequestContainerAccessor<TTenant>>();            
         }
+
+        public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
     }
 }

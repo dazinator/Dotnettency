@@ -8,8 +8,6 @@ namespace Dotnettency
     {
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
 
-        public Lazy<Task<TTenant>> CurrentTenant { get; private set; }
-
         public TenantAccessor(ITenantShellAccessor<TTenant> tenantShellAccessor)
         {
             _tenantShellAccessor = tenantShellAccessor;
@@ -20,5 +18,7 @@ namespace Dotnettency
                 return tenantShell?.Tenant;
             });
         }
+
+        public Lazy<Task<TTenant>> CurrentTenant { get; private set; }
     }
 }

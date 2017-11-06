@@ -6,15 +6,15 @@ namespace Dotnettency.Container
 {
     public class PerRequestContainer : IDisposable
     {
-        private Action _onDispose { get; set; }
-
-        public ITenantContainerAdaptor RequestContainer { get; }
+        private Action _onDispose;
 
         public PerRequestContainer(ITenantContainerAdaptor requestContainer)
         {
             RequestContainer = requestContainer;
         }
 
+        public ITenantContainerAdaptor RequestContainer { get; }
+        
         public async Task ExecuteWithinSwappedRequestContainer(RequestDelegate request, HttpContext context)
         {
             if (context.Items.ContainsKey(nameof(PerRequestContainer)))

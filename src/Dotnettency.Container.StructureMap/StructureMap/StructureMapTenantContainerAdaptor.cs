@@ -12,10 +12,6 @@ namespace Dotnettency.Container
         private readonly Guid _id;
         private readonly ILogger<StructureMapTenantContainerAdaptor> _logger;
 
-        public ContainerRole Role { get; set; }
-        public string ContainerName => _container.Name;
-        public Guid ContainerId => _id;
-
         public StructureMapTenantContainerAdaptor(ILogger<StructureMapTenantContainerAdaptor> logger, IContainer container, ContainerRole role = ContainerRole.Root) : base(container)
         {
             _logger = logger;
@@ -32,6 +28,10 @@ namespace Dotnettency.Container
                 _logger.LogDebug("Container Created: {id}, {role}", _id, _container.Name, _container.Role);
             }
         }
+
+        public ContainerRole Role { get; set; }
+        public string ContainerName => _container.Name;
+        public Guid ContainerId => _id;
 
         public void Configure(Action<IServiceCollection> configure)
         {

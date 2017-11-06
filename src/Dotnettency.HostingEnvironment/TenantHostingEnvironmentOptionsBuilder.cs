@@ -9,8 +9,6 @@ namespace Dotnettency.HostingEnvironment
     {
         private readonly IHostingEnvironment _parentHostingEnvironment;
 
-        public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
-
         public TenantHostingEnvironmentOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder, IHostingEnvironment hostingEnvironment)
         {
             Builder = builder;
@@ -23,7 +21,9 @@ namespace Dotnettency.HostingEnvironment
             {
                 return new TenantHostingEnvironment<TTenant>(hostingEnvironment);
             });
-        }       
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> Builder { get; set; }
 
         public MultitenancyOptionsBuilder<TTenant> OnInitialiseTenantContentRoot(Action<TenantFileSystemBuilderContext<TTenant>> configureContentRoot)
         {

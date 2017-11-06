@@ -11,8 +11,6 @@ namespace Dotnettency.MiddlewarePipeline
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
         private readonly ITenantMiddlewarePipelineFactory<TTenant> _tenantPipelineFactory;
 
-        public Func<IApplicationBuilder, RequestDelegate, Lazy<Task<RequestDelegate>>> TenantPipeline { get; private set; }
-
         public TenantPipelineAccessor(
             ITenantMiddlewarePipelineFactory<TTenant> tenantPipelineFactory,
             TenantShellAccessor<TTenant> tenantShellAccessor)
@@ -40,5 +38,7 @@ namespace Dotnettency.MiddlewarePipeline
                 });
             });
         }
+
+        public Func<IApplicationBuilder, RequestDelegate, Lazy<Task<RequestDelegate>>> TenantPipeline { get; private set; }
     }
 }

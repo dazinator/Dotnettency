@@ -10,16 +10,16 @@ namespace Dotnettency.HostingEnvironment
     {
         private IFileProvider _parentFileProvider;
 
-        public TTenant Tenant { get; set; }
-        public Guid PartitionId { get; set; }
-        public string BaseFolder { get; set; }
-
         public TenantFileSystemBuilderContext(TTenant tenant, string defaultTenantsBaseFolder)
         {
             Tenant = tenant;
             BaseFolder = defaultTenantsBaseFolder;
         }
-        
+
+        public TTenant Tenant { get; set; }
+        public Guid PartitionId { get; set; }
+        public string BaseFolder { get; set; }
+
         public TenantFileSystemBuilderContext<TTenant> AllowAccessTo(IFileProvider chainedFileProvider)
         {
             _parentFileProvider = chainedFileProvider;

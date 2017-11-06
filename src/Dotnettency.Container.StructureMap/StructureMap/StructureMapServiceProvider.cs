@@ -11,7 +11,7 @@ namespace Dotnettency.Container.StructureMap
 {
     public class StructureMapServiceProvider : IServiceProvider, ISupportRequiredService
     {
-        private IContainer _container { get; }
+        private IContainer _container;
 
         public StructureMapServiceProvider(IContainer container)
         {
