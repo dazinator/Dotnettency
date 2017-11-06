@@ -13,7 +13,7 @@ namespace Dotnettency.Container
             RequestContainer = requestContainer;
         }
 
-        public ITenantContainerAdaptor RequestContainer { get; }
+        public ITenantContainerAdaptor RequestContainer { get; private set; }
         
         public async Task ExecuteWithinSwappedRequestContainer(RequestDelegate request, HttpContext context)
         {
