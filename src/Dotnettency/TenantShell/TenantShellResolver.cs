@@ -49,9 +49,10 @@ namespace Dotnettency
                 bool distinguisherFound = false;
                 foreach (var item in tenantResult.Distinguishers)
                 {
-                    if (item == identifier)
+                    if (item.Equals(identifier))
                     {
                         distinguisherFound = true;
+                        continue;
                     }
                     _cache.AddOrUpdate(item, tenantResult, (a, b) => { return tenantResult; });
                 }
