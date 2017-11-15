@@ -34,6 +34,7 @@ namespace Sample
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
+                    .AddDefaultHttpServices()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                    {
