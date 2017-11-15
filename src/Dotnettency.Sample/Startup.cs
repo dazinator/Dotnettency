@@ -62,7 +62,8 @@ namespace Sample
 
 
                            });
-                       });
+                       })
+                       .AddPerRequestContainerMiddlewareServices();                      
 
                        // .WithModuleContainers(); // Creates a child container per IModule.
                    })
@@ -78,7 +79,7 @@ namespace Sample
 
                             // welcome page only enabled for tenant FOO.
                             if (context.Tenant?.Name == "Foo")
-                            {                               
+                            {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
                             //

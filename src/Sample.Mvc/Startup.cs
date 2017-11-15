@@ -24,7 +24,8 @@ namespace Sample.Mvc
 
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
-                options                   
+                options
+                    .AddDefaultHttpServices()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
@@ -46,7 +47,8 @@ namespace Sample.Mvc
                         containerBuilder.WithStructureMap((tenant, tenantServices) =>
                         {
                             // tenantServices.AddSingleton<SomeTenantService>();
-                        });
+                        })
+                        .AddPerRequestContainerMiddlewareServices(); // becuase we use per-request tenant container middleware.
                     })
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
@@ -104,7 +106,7 @@ namespace Sample.Mvc
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-         //   app.UseMvc();
+            //   app.UseMvc();
         }
     }
 }
