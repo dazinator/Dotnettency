@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Dotnettency;
 using System;
-using System.Text;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 
 namespace Sample.Mvc
 {

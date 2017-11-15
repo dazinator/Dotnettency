@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Dotnettency
@@ -10,11 +9,15 @@ namespace Dotnettency
         public MultitenancyOptionsBuilder(IServiceCollection serviceCollection)
         {
             Services = serviceCollection;
+            AddDefaultServices(Services);           
+        }
 
+        protected virtual void AddDefaultServices(IServiceCollection serviceCollection)
+        {
             // Add default services
-            Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+           // Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             Services.AddScoped<ITenantAccessor<TTenant>, TenantAccessor<TTenant>>();
-            
+
             // Tenant shell cache is special in that it houses the tenant shell for each tenant, and each 
             // tenant shell has state that needs to be kept local to the application (i.e the tenant's container or middleware pipeline.)
             // Therefore it should always be a local / in-memory based cache as will have will have fundamentally non-serialisable state.
@@ -24,7 +27,7 @@ namespace Dotnettency
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
 
             // By default, we use a URI from the request to identify tenants.
-            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
+           // Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
 
             // Support injection of TTenant (has side effect that may block during injection)
             Services.AddScoped(sp => {

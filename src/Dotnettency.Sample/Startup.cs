@@ -8,10 +8,8 @@ using System;
 using System.Text;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using Dotnettency.Modules;
-using Microsoft.AspNetCore.Routing;
-using Dotnettency.Container.StructureMap;
 using Dotnettency.Container;
+using Dotnettency.AspNetCore.Modules;
 
 namespace Sample
 {
