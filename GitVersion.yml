@@ -1,6 +1,5 @@
 branches:
-    feature:
-        regex: feature?[/-]
+    feature:        
         mode: ContinuousDelivery
         tag: useBranchName
         increment: Inherit
