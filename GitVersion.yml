@@ -1,5 +1,5 @@
 branches:
-    feature:        
+    (feature)?[/-]::        
         mode: ContinuousDelivery
         tag: useBranchName
         increment: Inherit
