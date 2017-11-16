@@ -1,8 +1,11 @@
-next-version: 0.3.0
+major-version-bump-message: '\+semver:\s?(breaking|major)'
+minor-version-bump-message: '\+semver:\s?(feature|minor)'
+patch-version-bump-message: '\+semver:\s?(fix|patch)'
+commit-message-incrementing: Enabled
 branches:
-    (feature)?[/-]::        
-        mode: ContinuousDelivery
-        tag: useBranchName
-        increment: Inherit
-        prevent-increment-of-merged-branch-version: false
-        track-merge-target: false
+    features?[/-]:
+    mode: ContinuousDelivery
+    tag: useBranchName
+    increment: Inherit
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
