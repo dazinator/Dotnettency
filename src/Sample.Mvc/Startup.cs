@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Dotnettency;
 using System;
-using System.Text;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 
 namespace Sample.Mvc
 {
@@ -28,7 +24,8 @@ namespace Sample.Mvc
 
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
-                options                   
+                options
+                    .AddDefaultHttpServices()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
@@ -50,7 +47,8 @@ namespace Sample.Mvc
                         containerBuilder.WithStructureMap((tenant, tenantServices) =>
                         {
                             // tenantServices.AddSingleton<SomeTenantService>();
-                        });
+                        })
+                        .AddPerRequestContainerMiddlewareServices(); // becuase we use per-request tenant container middleware.
                     })
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
@@ -108,7 +106,7 @@ namespace Sample.Mvc
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-         //   app.UseMvc();
+            //   app.UseMvc();
         }
     }
 }

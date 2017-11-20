@@ -8,10 +8,8 @@ using System;
 using System.Text;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using Dotnettency.Modules;
-using Microsoft.AspNetCore.Routing;
-using Dotnettency.Container.StructureMap;
 using Dotnettency.Container;
+using Dotnettency.AspNetCore.Modules;
 
 namespace Sample
 {
@@ -36,6 +34,7 @@ namespace Sample
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
+                    .AddDefaultHttpServices()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                    {
@@ -63,7 +62,8 @@ namespace Sample
 
 
                            });
-                       });
+                       })
+                       .AddPerRequestContainerMiddlewareServices();                      
 
                        // .WithModuleContainers(); // Creates a child container per IModule.
                    })
@@ -79,7 +79,7 @@ namespace Sample
 
                             // welcome page only enabled for tenant FOO.
                             if (context.Tenant?.Name == "Foo")
-                            {                               
+                            {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
                             //

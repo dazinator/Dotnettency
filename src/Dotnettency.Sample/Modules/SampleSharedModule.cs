@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Dotnettency.AspNetCore.Modules;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Dotnettency.Modules;
 
 namespace Sample
 {
