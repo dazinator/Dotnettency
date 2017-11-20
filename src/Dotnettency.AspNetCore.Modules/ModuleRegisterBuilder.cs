@@ -85,6 +85,9 @@ namespace Dotnettency.AspNetCore.Modules
                 var allModules = sp.GetServices<TModule>();
                 var moduleManager = new ModuleManager<TModule>(modulesRouter);
 
+                // todo consider notifying subscribers when new module container is created.
+                //  var containerEventsPublisher = sp.GetServices<IContainerEventsPublisher<TModule>>(); 
+
                 foreach (var item in allModules)
                 {
                     var moduleOptionsBuilder = new ModuleShellOptionsBuilder<TModule>(item);

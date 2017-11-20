@@ -17,19 +17,21 @@ namespace Dotnettency
                 var container = new StructureMap.Container();
                 container.Populate(options.Builder.Services);
                 var adaptedContainer = container.GetInstance<ITenantContainerAdaptor>();
+
+                var containerEventsPublisher = container.TryGetInstance<ITenantContainerEventsPublisher<TTenant>>();              
                 // add ITenantContainerBuilder<TTenant> service to the host container
                 // This service can be used to build a child container (adaptor) for a particular tenant, when required.
                 container.Configure(_ =>
                     _.For<ITenantContainerBuilder<TTenant>>()
-                        .Use(new TenantContainerBuilder<TTenant>(adaptedContainer, configureTenant))
+                        .Use(new TenantContainerBuilder<TTenant>(adaptedContainer, configureTenant, containerEventsPublisher))
                     );
 
-                var adaptor = container.GetInstance<ITenantContainerAdaptor>();
+                var adaptor = container.GetInstance<ITenantContainerAdaptor>();              
                 return adaptor;
             });
 
             var adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);
-            
+
             return adapted;
         }
     }

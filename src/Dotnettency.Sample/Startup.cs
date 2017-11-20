@@ -40,7 +40,22 @@ namespace Sample
                    {
                        // Extension methods available here for supported containers. We are using structuremap..
                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                       containerBuilder.WithStructureMap((tenant, tenantServices) =>
+                       containerBuilder.Events((events) =>
+                       {
+                           // callback invoked after tenant container is created.
+                           events.OnTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
+                           {
+                               var tenant = await tenantResolver;
+
+                           })
+                           // callback invoked after a nested container is created for a tenant. i.e typically during a request.
+                           .OnNestedTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
+                           {
+                               var tenant = await tenantResolver;
+
+                           });
+                       })
+                       .WithStructureMap((tenant, tenantServices) =>
                        {
                            tenantServices.AddSingleton<SomeTenantService>((sp) =>
                            {
@@ -62,8 +77,8 @@ namespace Sample
 
 
                            });
-                       })
-                       .AddPerRequestContainerMiddlewareServices();                      
+                       })                       
+                       .AddPerRequestContainerMiddlewareServices();
 
                        // .WithModuleContainers(); // Creates a child container per IModule.
                    })

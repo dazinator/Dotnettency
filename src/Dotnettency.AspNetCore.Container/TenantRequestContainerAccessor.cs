@@ -10,13 +10,16 @@ namespace Dotnettency.AspNetCore.Container
     {
         private readonly ITenantContainerAccessor<TTenant> _tenantContainerAccessor;
         private readonly ILogger<TenantRequestContainerAccessor<TTenant>> _logger;
+        private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;     
 
         public TenantRequestContainerAccessor(
             ILogger<TenantRequestContainerAccessor<TTenant>> logger,
-            ITenantContainerAccessor<TTenant> tenantContainerAccessor)
+            ITenantContainerAccessor<TTenant> tenantContainerAccessor,
+            ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
         {
             _logger = logger;
             _tenantContainerAccessor = tenantContainerAccessor;
+            _containerEventsPublisher = containerEventsPublisher;          
 
             TenantRequestContainer = new Lazy<Task<PerRequestContainer>>(async () =>
             {
@@ -27,6 +30,7 @@ namespace Dotnettency.AspNetCore.Container
                 }
 
                 var requestContainer = tenantContainer.CreateNestedContainer();
+                _containerEventsPublisher?.PublishNestedTenantContainerCreated(requestContainer);
                 return new PerRequestContainer(requestContainer);
             });
         }
