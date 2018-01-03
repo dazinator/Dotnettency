@@ -10,6 +10,7 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Dotnettency.Container;
 using Dotnettency.AspNetCore.Modules;
+using System.Threading.Tasks;
 
 namespace Sample
 {
@@ -28,6 +29,8 @@ namespace Sample
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddRouting();
+
             _loggerFactory.AddConsole();
             var logger = _loggerFactory.CreateLogger<Startup>();
 
@@ -37,7 +40,7 @@ namespace Sample
                     .AddDefaultHttpServices()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
-                   {                      
+                   {
                        containerBuilder.Events((events) =>
                        {
                            // callback invoked after tenant container is created.
@@ -52,7 +55,7 @@ namespace Sample
                                var tenant = await tenantResolver;
 
                            });
-                       }) 
+                       })
                        // Extension methods available here for supported containers. We are using structuremap..
                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
                        .WithStructureMap((tenant, tenantServices) =>
@@ -77,7 +80,7 @@ namespace Sample
 
 
                            });
-                       })                       
+                       })
                        .AddPerRequestContainerMiddlewareServices();
 
                        // .WithModuleContainers(); // Creates a child container per IModule.
@@ -97,8 +100,11 @@ namespace Sample
                             {
                                 appBuilder.UseWelcomePage("/welcome");
                             }
-                            //
+                            // display info.
+                            appBuilder.Run(DisplayInfo);
                         });
+
+
                     }) // Configure per tenant containers.
 
                 // configure per tenant hosting environment.
@@ -137,20 +143,42 @@ namespace Sample
             }
 
             // Add the multitenancy middleware.
-            app.UseMultitenancy<Tenant>((options) =>
-            {
-                options
-                       .UsePerTenantContainers()
-                       .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
-                        {
-                            // using tenant content root and web root.
-                            hostingEnvironmentOptions.UseTenantContentRootFileProvider();
-                            hostingEnvironmentOptions.UseTenantWebRootFileProvider();
-                        })
-                       .UsePerTenantMiddlewarePipeline();
-                //.UseModules<Tenant, ModuleBase>();
+            //var defaultRouteHandler = new RouteHandler(context =>
+            //{
+            //    var routeValues = context.GetRouteData().Values;
+            //    return context.Response.WriteAsync(
+            //        $"Hello! Route values: {string.Join(", ", routeValues)}");
+            //});
 
+            //var routeBuilder = new RouteBuilder(app);
+            // routeBuilder.MapTenantContainer<Tenant>()
+            app.UseRouter((routeBuilder) =>
+            {
+                routeBuilder.MapTenantContainer<Tenant>((childRouteBuilder) =>
+                {
+                    childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>();
+                });
             });
+
+            // This will run only if no routes above were handled.
+            app.Run(DisplayInfo);
+
+            //  var router = new TenantContainerRouter<Tenant>("tenantRouter", )
+            //app.UseMultitenancy<Tenant>((options) =>
+            //{
+            //    options
+            //    //.UsePerTenantContainers()
+
+            //    .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
+            //            {
+            //                // using tenant content root and web root.
+            //                hostingEnvironmentOptions.UseTenantContentRootFileProvider();
+            //                hostingEnvironmentOptions.UseTenantWebRootFileProvider();
+            //            })
+            //           .UsePerTenantMiddlewarePipeline();
+            //    //.UseModules<Tenant, ModuleBase>();
+
+            //});
 
             //app.UseOwin(x =>
             //{
@@ -161,51 +189,51 @@ namespace Sample
 
             //  app.UseMiddleware<SampleMiddleware<Tenant>>();
             //  app.
-            app.Run(async (context) =>
-            {
-                var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
-                logger.LogDebug("App Run..");
 
-                var container = context.RequestServices as ITenantContainerAdaptor;
-                logger.LogDebug("App Run Container Is: {id}, {containerNAme}, {role}", container.ContainerId, container.ContainerName, container.Role);
-
-
-                // Use ITenantAccessor to access the current tenant.
-                var tenantAccessor = container.GetRequiredService<ITenantAccessor<Tenant>>();
-                var tenant = await tenantAccessor.CurrentTenant.Value;
-
-                // This service was registered as singleton in tenant container.
-                var someTenantService = container.GetService<SomeTenantService>();
-
-                // The tenant shell to access context for the tenant - even if the tenant is null
-                var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
-                var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
-
-
-                string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
-                string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
-                string injectedTenantName = someTenantService?.TenantName ?? "{NULL SERVICE}";
-
-                // Accessing a content file.
-                string fileContent = someTenantService?.GetContentFile("/Info.txt");
-                context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                var result = new
-                {
-                    TenantShellId = tenantShellId,
-                    TenantName = tenantName,
-                    TenantScopedServiceId = someTenantService?.Id,
-                    InjectedTenantName = injectedTenantName,
-                    TenantContentFile = fileContent
-                };
-
-                var jsonResult = JsonConvert.SerializeObject(result);
-                await context.Response.WriteAsync(jsonResult, Encoding.UTF8);
-                logger.LogDebug("App Run Finished..");
-
-                //    context.Response.
-
-                // for null tenants we could optionally redirect somewhere?
-            });
         }
+
+        public async Task DisplayInfo(HttpContext context)
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
+            logger.LogDebug("App Run..");
+
+            var container = context.RequestServices as ITenantContainerAdaptor;
+            logger.LogDebug("App Run Container Is: {id}, {containerNAme}, {role}", container.ContainerId, container.ContainerName, container.Role);
+
+
+            // Use ITenantAccessor to access the current tenant.
+            var tenantAccessor = container.GetRequiredService<ITenantAccessor<Tenant>>();
+            var tenant = await tenantAccessor.CurrentTenant.Value;
+
+            // This service was registered as singleton in tenant container.
+            var someTenantService = container.GetService<SomeTenantService>();
+
+            // The tenant shell to access context for the tenant - even if the tenant is null
+            var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
+            var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
+
+
+            string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
+            string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
+            string injectedTenantName = someTenantService?.TenantName ?? "{NULL SERVICE}";
+
+            // Accessing a content file.
+            string fileContent = someTenantService?.GetContentFile("/Info.txt");
+            context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
+            var result = new
+            {
+                TenantShellId = tenantShellId,
+                TenantName = tenantName,
+                TenantScopedServiceId = someTenantService?.Id,
+                InjectedTenantName = injectedTenantName,
+                TenantContentFile = fileContent
+            };
+
+            var jsonResult = JsonConvert.SerializeObject(result);
+            await context.Response.WriteAsync(jsonResult, Encoding.UTF8);
+            logger.LogDebug("App Run Finished..");
+        }
+
+
     }
 }

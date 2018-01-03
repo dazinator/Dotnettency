@@ -8,6 +8,6 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
     public interface ITenantPipelineAccessor<TTenant>
         where TTenant : class
     {
-        Func<IApplicationBuilder, RequestDelegate, Lazy<Task<RequestDelegate>>> TenantPipeline { get; }
+        Func<IApplicationBuilder, IServiceProvider, RequestDelegate, Lazy<Task<RequestDelegate>>> TenantPipeline { get; }
     }
 }
