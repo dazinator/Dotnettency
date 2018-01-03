@@ -151,8 +151,8 @@ namespace Dotnettency.AspNetCore.Container
                 return 0;
             }
 
-            long contentLength;
-            if (!long.TryParse(headerValue, NumberStyles.Any, CultureInfo.InvariantCulture, out contentLength))
+            //long contentLength;
+            if (!long.TryParse(headerValue, NumberStyles.Any, CultureInfo.InvariantCulture, out long contentLength))
             {
                 return 0;
             }

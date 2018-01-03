@@ -37,9 +37,7 @@ namespace Sample
                     .AddDefaultHttpServices()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
-                   {
-                       // Extension methods available here for supported containers. We are using structuremap..
-                       // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
+                   {                      
                        containerBuilder.Events((events) =>
                        {
                            // callback invoked after tenant container is created.
@@ -54,7 +52,9 @@ namespace Sample
                                var tenant = await tenantResolver;
 
                            });
-                       })
+                       }) 
+                       // Extension methods available here for supported containers. We are using structuremap..
+                       // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
                        .WithStructureMap((tenant, tenantServices) =>
                        {
                            tenantServices.AddSingleton<SomeTenantService>((sp) =>
@@ -184,7 +184,7 @@ namespace Sample
 
                 string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
                 string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
-                string injectedTenantName = someTenantService?.TenantName == null ? "{NULL SERVICE}" : someTenantService?.TenantName;
+                string injectedTenantName = someTenantService?.TenantName ?? "{NULL SERVICE}";
 
                 // Accessing a content file.
                 string fileContent = someTenantService?.GetContentFile("/Info.txt");
