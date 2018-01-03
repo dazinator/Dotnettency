@@ -90,7 +90,7 @@ namespace Sample
                         // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
                         middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
                         {
-                            logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name);
+                            logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
                             // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
                             appBuilder.UseModules<Tenant, ModuleBase>();
@@ -155,12 +155,13 @@ namespace Sample
             app.UseRouter((routeBuilder) =>
             {
                 routeBuilder.MapTenantContainer<Tenant>((childRouteBuilder) =>
-                {
-                    childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>();
+                {                   
+                    // If any of these routes match, they will be executed within the tenants container.
+                    childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>(); // handled by the tenant's middleware pipeline - if there is one.                  
                 });
             });
 
-            // This will run only if no routes above were handled.
+            // This will only be reached if no routes above were executed.
             app.Run(DisplayInfo);
 
             //  var router = new TenantContainerRouter<Tenant>("tenantRouter", )
