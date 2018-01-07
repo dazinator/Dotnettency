@@ -12,6 +12,7 @@ namespace Dotnettency
         {
             builder.Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             return builder;
         }     
     }

@@ -15,14 +15,19 @@ namespace Dotnettency.AspNetCore.Routing
 
         private readonly ILogger<TenantMiddlewarePipelineRouter<TTenant>> _logger;
         private readonly IApplicationBuilder _rootAppBuilder;
+        // private readonly ITenantPipelineAccessor<TTenant> _pipelineAccessor;
+        private readonly ITenantMiddlewarePipelineFactory<TTenant> _pipelineFactory;
 
-        public TenantMiddlewarePipelineRouter(string name, ILogger<TenantMiddlewarePipelineRouter<TTenant>> logger, IApplicationBuilder rootAppBuilder)
+        public TenantMiddlewarePipelineRouter(string name,
+            ILogger<TenantMiddlewarePipelineRouter<TTenant>> logger,
+            IApplicationBuilder rootAppBuilder,
+            ITenantMiddlewarePipelineFactory<TTenant> pipelineFactory)
         {
             Name = name;
             _logger = logger;
             _rootAppBuilder = rootAppBuilder;
-            //   ChildRouter = new RouteCollection();
-            //  _tenantDistinguisherFactory = tenantDistinguisherFactory;
+            _pipelineFactory = pipelineFactory;
+
         }
 
         public string Name { get; set; }
@@ -40,12 +45,17 @@ namespace Dotnettency.AspNetCore.Routing
         {
 
             //  context.han
-            var tenantContainerAccessor = context.HttpContext.RequestServices.GetRequiredService<ITenantContainerAccessor<TTenant>>();
+            var sp = context.HttpContext.RequestServices;
+            var tenantContainerAccessor = sp.GetRequiredService<ITenantContainerAccessor<TTenant>>();
             var tenantContainer = await tenantContainerAccessor.TenantContainer.Value;
-            var tenantPipelineAccessor = context.HttpContext.RequestServices.GetRequiredService<ITenantPipelineAccessor<TTenant>>();
+
+          //  Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<>
+            var tenantPipelineAccessor = tenantContainer.GetRequiredService<ITenantPipelineAccessor<TTenant>>();
+
+
 
             _logger.LogDebug("Tenant Pipeline Router - Getting Tenant Pipeline.");
-            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_rootAppBuilder, tenantContainer, null).Value;
+            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_rootAppBuilder, tenantContainer, null, _pipelineFactory).Value;
 
             if (tenantPipeline != null)
             {
@@ -58,7 +68,7 @@ namespace Dotnettency.AspNetCore.Routing
             {
                 _logger.LogDebug("No Tenant Middleware Pipeline to execute.");
                 return;
-            }                    
+            }
 
         }
     }

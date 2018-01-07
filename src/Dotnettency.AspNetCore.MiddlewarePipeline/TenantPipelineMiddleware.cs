@@ -22,10 +22,10 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
             _logger = logger;
         }
 
-        public async Task Invoke(HttpContext context, ITenantPipelineAccessor<TTenant> tenantPipelineAccessor)
+        public async Task Invoke(HttpContext context, ITenantPipelineAccessor<TTenant> tenantPipelineAccessor, ITenantMiddlewarePipelineFactory<TTenant> tenantPipelineFactory)
         {
             _logger.LogDebug("Tenant Pipeline Middleware - Getting Tenant Pipeline.");
-            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_rootApp, _rootApp.ApplicationServices, _next).Value;
+            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_rootApp, _rootApp.ApplicationServices, _next, tenantPipelineFactory).Value;
 
             if (tenantPipeline != null)
             {

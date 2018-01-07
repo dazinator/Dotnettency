@@ -60,6 +60,10 @@ namespace Sample
                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
                        .WithStructureMap((tenant, tenantServices) =>
                        {
+
+
+
+
                            tenantServices.AddSingleton<SomeTenantService>((sp) =>
                            {
                                //var logger = sp.GetRequiredService<ILogger<SomeTenantService>>();
@@ -81,32 +85,10 @@ namespace Sample
 
                            });
                        })
-                       .AddPerRequestContainerMiddlewareServices();
-
+                       .AddPerRequestContainerMiddlewareServices()
+                       .AddPerTenantMiddlewarePipelineServices(); // allows tenants to have there own middleware pipeline accessor stored in their tenant containers.
                        // .WithModuleContainers(); // Creates a child container per IModule.
                    })
-                    .ConfigureTenantMiddleware((middlewareOptions) =>
-                    {
-                        // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
-                        middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
-                        {
-                            logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
-                            // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
-
-                            appBuilder.UseModules<Tenant, ModuleBase>();
-
-                            // welcome page only enabled for tenant FOO.
-                            if (context.Tenant?.Name == "Foo")
-                            {
-                                appBuilder.UseWelcomePage("/welcome");
-                            }
-                            // display info.
-                            appBuilder.Run(DisplayInfo);
-                        });
-
-
-                    }) // Configure per tenant containers.
-
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
                 {
@@ -142,54 +124,37 @@ namespace Sample
                 app.UseDeveloperExceptionPage();
             }
 
-            // Add the multitenancy middleware.
-            //var defaultRouteHandler = new RouteHandler(context =>
-            //{
-            //    var routeValues = context.GetRouteData().Values;
-            //    return context.Response.WriteAsync(
-            //        $"Hello! Route values: {string.Join(", ", routeValues)}");
-            //});
-
-            //var routeBuilder = new RouteBuilder(app);
-            // routeBuilder.MapTenantContainer<Tenant>()
-            app.UseRouter((routeBuilder) =>
+            app.UseRouter(((routeBuilder) =>
             {
-                routeBuilder.MapTenantContainer<Tenant>((childRouteBuilder) =>
-                {                   
-                    // If any of these routes match, they will be executed within the tenants container.
-                    childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>(); // handled by the tenant's middleware pipeline - if there is one.                  
-                });
-            });
+                // Makes sure that should any child route match, then the tenant container is restored prior to that route handling the request.
+                routeBuilder.EnsureTenantContainer<Tenant>((childRouteBuilder) =>
+                {
+                    // Adds a route that will handle the request via the current tenants middleware pipleine. 
+                    childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>((context, appBuilder) =>
+                    {
 
-            // This will only be reached if no routes above were executed.
+                        var logger = appBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
+                        logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
+                        // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
+
+                        appBuilder.UseModules<Tenant, ModuleBase>();
+
+                        // welcome page only enabled for tenant FOO.
+                        if (context.Tenant?.Name == "Foo")
+                        {
+                            appBuilder.UseWelcomePage("/welcome");
+                        }
+                        // display info.
+                        appBuilder.Run(DisplayInfo);
+
+                    }); // handled by the tenant's middleware pipeline - if there is one.                  
+                });
+            }));
+
+            // This will only be reached if no routes were resolved above.
             app.Run(DisplayInfo);
 
-            //  var router = new TenantContainerRouter<Tenant>("tenantRouter", )
-            //app.UseMultitenancy<Tenant>((options) =>
-            //{
-            //    options
-            //    //.UsePerTenantContainers()
 
-            //    .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
-            //            {
-            //                // using tenant content root and web root.
-            //                hostingEnvironmentOptions.UseTenantContentRootFileProvider();
-            //                hostingEnvironmentOptions.UseTenantWebRootFileProvider();
-            //            })
-            //           .UsePerTenantMiddlewarePipeline();
-            //    //.UseModules<Tenant, ModuleBase>();
-
-            //});
-
-            //app.UseOwin(x =>
-            //{
-            //    x.UseMyMiddleware(new MyMiddlewareOptions());
-            //    x.UseNancy();
-            //});
-
-
-            //  app.UseMiddleware<SampleMiddleware<Tenant>>();
-            //  app.
 
         }
 

@@ -9,16 +9,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnettency.AspNetCore.Routing
 {
-
-    public class TenantContainerRouter<TTenant> : INamedRouter
-        where TTenant : class
+    public class ContainerRouter<TTenant> : INamedRouter
+       where TTenant : class
     {
 
         private readonly ILogger<TenantContainerRouter<TTenant>> _logger;
         private readonly IApplicationBuilder _rootAppBuilder;
         private readonly Action<IRouteBuilder> _configureChildRoutes;
 
-        public TenantContainerRouter(string name, ILogger<TenantContainerRouter<TTenant>> logger, IApplicationBuilder rootAppBuilder, Action<IRouteBuilder> configureChildRoutes)
+        public ContainerRouter(string name, ILogger<TenantContainerRouter<TTenant>> logger, IApplicationBuilder rootAppBuilder, Action<IRouteBuilder> configureChildRoutes)
         {
             Name = name;
             _logger = logger;
@@ -51,6 +50,7 @@ namespace Dotnettency.AspNetCore.Routing
             if (tenantContainer == null)
             {
                 _logger.LogDebug("Tenant Container Middleware - No tenant container.");
+                //await _next.Invoke(context);
                 return;
             }
 
@@ -72,7 +72,6 @@ namespace Dotnettency.AspNetCore.Routing
                     _logger.LogDebug("Restored Request Container");
                 };
             }
-
-        }    
+        }
     }
 }
