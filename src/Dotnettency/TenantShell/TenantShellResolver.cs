@@ -16,8 +16,7 @@ namespace Dotnettency
 
         public async Task<TenantShell<TTenant>> ResolveTenant(TenantDistinguisher identifier, ITenantShellFactory<TTenant> tenantFactory)
         {
-            TenantShell<TTenant> result;
-            if (_cache.TryGetValue(identifier, out result))
+            if (_cache.TryGetValue(identifier, out TenantShell<TTenant> result))
             {
                 return result;
             }

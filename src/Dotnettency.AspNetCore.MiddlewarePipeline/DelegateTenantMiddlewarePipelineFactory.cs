@@ -15,16 +15,17 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
             _configuration = configuration;
         }
 
-        public async Task<RequestDelegate> Create(IApplicationBuilder appBuilder, TTenant tenant, RequestDelegate next)
+        public async Task<RequestDelegate> Create(IApplicationBuilder appBuilder, IServiceProvider serviceProviderOverride, TTenant tenant, RequestDelegate next)
         {
-            return await BuildTenantPipeline(appBuilder, tenant, next);
+            return await BuildTenantPipeline(appBuilder, serviceProviderOverride, tenant, next);
         }
 
-        protected virtual Task<RequestDelegate> BuildTenantPipeline(IApplicationBuilder rootApp, TTenant tenant, RequestDelegate next)
+        protected virtual Task<RequestDelegate> BuildTenantPipeline(IApplicationBuilder rootApp,  IServiceProvider serviceProviderOverride, TTenant tenant, RequestDelegate next)
         {
             return Task.Run(() =>
             {
                 var branchBuilder = rootApp.New();
+                branchBuilder.ApplicationServices = serviceProviderOverride;
                 var builderContext = new TenantPipelineBuilderContext<TTenant>
                 {
                     Tenant = tenant
@@ -33,7 +34,10 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
                 _configuration(builderContext, branchBuilder);
 
                 // register root pipeline at the end of the tenant branch
-                branchBuilder.Run(next);
+                if(next!=null)
+                {
+                    branchBuilder.Run(next);
+                }              
                 return branchBuilder.Build();
             });
         }

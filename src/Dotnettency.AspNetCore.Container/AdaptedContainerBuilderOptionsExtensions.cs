@@ -11,6 +11,6 @@ namespace Dotnettency
         {
             options.ContainerBuilderOptions.Builder.Services.AddScoped<ITenantRequestContainerAccessor<TTenant>, TenantRequestContainerAccessor<TTenant>>();
             return options;             
-        }
+        }      
     }
 }

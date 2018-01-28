@@ -9,31 +9,32 @@ namespace Dotnettency.AspNetCore.Container
     {
         private Action _onDispose;
 
+        private string _key;
+
         public PerRequestContainer(ITenantContainerAdaptor requestContainer)
         {
             RequestContainer = requestContainer;
+            _key = nameof(PerRequestContainer) + RequestContainer.ContainerId;
         }
 
         public ITenantContainerAdaptor RequestContainer { get; private set; }
-        
-        public async Task ExecuteWithinSwappedRequestContainer(RequestDelegate request, HttpContext context)
-        {
-            if (context.Items.ContainsKey(nameof(PerRequestContainer)))
-            {
-                await request.Invoke(context);
-                return;
-            }
 
-            context.Items[nameof(PerRequestContainer)] = this;
+        public async Task ExecuteWithinSwappedRequestContainer(RequestDelegate request, HttpContext context)
+        {          
             var oldServiceProvider = context.RequestServices;
 
             try
             {
-                _onDispose = () =>
+                if (!context.Items.ContainsKey(_key))
                 {
-                    context.Items.Remove(nameof(PerRequestContainer));
-                    RequestContainer.Dispose();
-                };
+                    context.Items[_key] = this;
+
+                    _onDispose = () =>
+                    {
+                        context.Items.Remove(_key);
+                        RequestContainer.Dispose();
+                    };
+                }
 
                 context.RequestServices = RequestContainer;
                 await request.Invoke(context);
