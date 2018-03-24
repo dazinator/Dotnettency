@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Dotnettency;
 using System;
+using Dotnettency.AspNetCore;
 
 namespace Sample.Mvc
 {
@@ -22,10 +23,10 @@ namespace Sample.Mvc
 
             services.AddMvc();
 
-            var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
+            var serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .AddDefaultHttpServices()
+                    .DistinguishTenantsWith<RequestAuthorityTenantDistinguisherFactory<Tenant>>()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {

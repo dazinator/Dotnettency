@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Dotnettency.Container;
 using Dotnettency.AspNetCore.Modules;
 using System.Threading.Tasks;
+using Dotnettency.AspNetCore;
 
 namespace Sample
 {
@@ -34,10 +35,10 @@ namespace Sample
             _loggerFactory.AddConsole();
             var logger = _loggerFactory.CreateLogger<Startup>();
 
-            var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
+            var serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .AddDefaultHttpServices()
+                    .DistinguishTenantsWith<RequestAuthorityTenantDistinguisherFactory<Tenant>>()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                    {
