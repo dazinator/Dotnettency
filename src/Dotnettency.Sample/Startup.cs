@@ -37,8 +37,7 @@ namespace Sample
 
             var serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
             {
-                options
-                    .DistinguishTenantsWith<RequestAuthorityTenantDistinguisherFactory<Tenant>>()
+                options                  
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                    {

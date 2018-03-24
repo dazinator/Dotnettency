@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Dotnettency.AspNetCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -13,6 +14,8 @@ namespace Dotnettency
             var sp = serviceCollection.AddMultiTenancy<TTenant>((builder) =>
             {
                 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                builder.Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
+
                 configure(builder);
             });
 
