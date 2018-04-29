@@ -3,12 +3,16 @@ Mutlitenancy library for dotnet applications.
 
 | Branch  | Build Status | Dotnettency Core Library | Middleware | Container | StructureMap |
 | ------------- | ------------- | ----- | ----- | ----- | ----- |
-| Master  |[![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![MiddlewarePipeline](https://img.shields.io/nuget/v/Dotnettency.MiddlewarePipeline.svg)](https://www.nuget.org/packages/Dotnettency.MiddlewarePipeline/) | [![Container](https://img.shields.io/nuget/v/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) | [![StructureMap](https://img.shields.io/nuget/v/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) |
-| Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop)  | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![MiddlewarePipeline](https://img.shields.io/nuget/vpre/Dotnettency.MiddlewarePipeline.svg)](https://www.nuget.org/packages/Dotnettency.MiddlewarePipeline/) | [![Container](https://img.shields.io/nuget/vpre/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) |  [![StructureMap](https://img.shields.io/nuget/vpre/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) |
+| Master  | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | 
+| Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop) | 
+
+| Branch  | Dotnettency Core Library | Middleware | Container | StructureMap | EF Core |
+| ------------- | ------------- | ----- | ----- | ----- | ----- |
+| Master  | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![MiddlewarePipeline](https://img.shields.io/nuget/v/Dotnettency.MiddlewarePipeline.svg)](https://www.nuget.org/packages/Dotnettency.MiddlewarePipeline/) | [![Container](https://img.shields.io/nuget/v/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) | [![StructureMap](https://img.shields.io/nuget/v/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) | | [![EF Core](https://img.shields.io/nuget/v/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
+| Develop | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![MiddlewarePipeline](https://img.shields.io/nuget/vpre/Dotnettency.MiddlewarePipeline.svg)](https://www.nuget.org/packages/Dotnettency.MiddlewarePipeline/) | [![Container](https://img.shields.io/nuget/vpre/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) |  [![StructureMap](https://img.shields.io/nuget/vpre/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) | [![EF Core](https://img.shields.io/nuget/vpre/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
 
 
-
-Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
+Inspired by [saaskit](https://github.com/saaskit/saaskit)
 
 ## Resources
 
@@ -23,6 +27,7 @@ Heavily inspired by [saaskit](https://github.com/saaskit/saaskit)
 - Per Tenant Containers
 - Per Tenant HostingEnvironment
 - Modules (Shared and Routed)
+- Multitenant EF Core DbContext
 
 ## Tenant Injection
 
