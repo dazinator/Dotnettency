@@ -34,9 +34,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.AspNetCore.Midd
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.AspNetCore.Modules", "Dotnettency.AspNetCore.Modules\Dotnettency.AspNetCore.Modules.csproj", "{05195457-36B8-4D50-A1C8-9CA1FF8BC944}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Tests", "Dotnettency.Tests\Dotnettency.Tests.csproj", "{27BFCF41-5919-4DD6-B923-2E5F3D43AC2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Tests", "Dotnettency.Tests\Dotnettency.Tests.csproj", "{27BFCF41-5919-4DD6-B923-2E5F3D43AC2C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{8A66EA6A-F09D-4941-8E92-4DDFDA911D42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.EFCore", "Dotnettency.EFCore\Dotnettency.EFCore.csproj", "{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -192,9 +194,25 @@ Global
 		{27BFCF41-5919-4DD6-B923-2E5F3D43AC2C}.Release|x64.Build.0 = Release|Any CPU
 		{27BFCF41-5919-4DD6-B923-2E5F3D43AC2C}.Release|x86.ActiveCfg = Release|Any CPU
 		{27BFCF41-5919-4DD6-B923-2E5F3D43AC2C}.Release|x86.Build.0 = Release|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Debug|x64.Build.0 = Debug|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Release|x64.ActiveCfg = Release|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Release|x64.Build.0 = Release|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4C346402-1A2A-4C65-A95F-8E696EE5CEC3} = {8A66EA6A-F09D-4941-8E92-4DDFDA911D42}
+		{35717DCE-7CC2-482F-A699-2FF157C2258F} = {8A66EA6A-F09D-4941-8E92-4DDFDA911D42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CDE5153E-0835-41A9-A40E-3E930F41F681}
