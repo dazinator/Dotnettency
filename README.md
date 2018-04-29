@@ -1,7 +1,7 @@
 c# Dotnettency
 Mutlitenancy library for dotnet applications.
 
-| Branch  | Build Status | Dotnettency Core Library | Middleware | Container | StructureMap |
+| Branch  | Build Status | 
 | ------------- | ------------- | ----- | ----- | ----- | ----- |
 | Master  | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | 
 | Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop) | 
