@@ -14,6 +14,62 @@ using System.Threading.Tasks;
 
 namespace Sample
 {
+
+    public class SampleStartup : MultitenantStartup<Tenant>
+    {
+        public SampleStartup(IHostingEnvironment environment, ILogger<MultitenantStartup<Tenant>> logger) : base(environment, logger)
+        {
+        }
+
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            return base.ConfigureMultitenancy(services);
+        }
+
+        protected override AdaptedContainerBuilderOptions<Tenant> ConfigureContainerAndAdapt(ContainerBuilderOptions<Tenant> optionsBuilder, Action<Tenant, IServiceCollection> configureTenantServices)
+        {
+            return optionsBuilder.WithStructureMap(configureTenantServices);
+        }
+
+        protected override TenantShell<Tenant> ResolveTenantShell(TenantDistinguisher distinguisher)
+        {
+            if (distinguisher.Uri.Port == 5004)
+            {
+                Guid tenantId = Guid.Parse("b17fcd22-0db1-47c0-9fef-1aa1cb09605e");
+                var tenant = new Tenant(tenantId) { Name = "Foo" };
+                var result = new TenantShell<Tenant>(tenant);
+                return result;
+            }
+
+            if (distinguisher.Uri.Port == 5000 || distinguisher.Uri.Port == 5001)
+            {
+                Guid tenantId = Guid.Parse("049c8cc4-3660-41c7-92f0-85430452be22");
+                var tenant = new Tenant(tenantId) { Name = "Bar" };
+                var result = new TenantShell<Tenant>(tenant, new Uri("http://localhost:5000"), new Uri("http://localhost:5001")); // additional distinguishers to map this same tenant shell instance too.
+                return result;
+            }
+
+            // for an unknown tenant, we can either create the tenant shell as a NULL tenant by returning a TenantShell<TTenant>(null),
+            // which results in the TenantShell being created, and will explicitly have to be reloaded() in order for this method to be called again.                        
+            if (distinguisher.Uri.Port == 5002)
+            {
+                var result = new TenantShell<Tenant>(null);
+                return result;
+            }
+
+            if (distinguisher.Uri.Port == 5003)
+            {
+
+                // or we can return null - which means we wil keep attempting to resolve the tenant on every subsequent request until a result is returned in future.
+                // (i.e allows tenant to be created in backend in a few moments time). 
+                return null;
+            }
+
+            throw new NotImplementedException("Please make request on ports 5000 - 5003 to see various behaviour. Can also use 63291 when launching under IISExpress");
+
+        }
+    }
+
     public class Startup
     {
         private readonly IHostingEnvironment _environment;
@@ -45,25 +101,21 @@ namespace Sample
                        {
                            // callback invoked after tenant container is created.
                            events.OnTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
-                           {
-                               var tenant = await tenantResolver;
+                       {
+                           var tenant = await tenantResolver;
 
-                           })
-                           // callback invoked after a nested container is created for a tenant. i.e typically during a request.
-                           .OnNestedTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
-                           {
-                               var tenant = await tenantResolver;
+                       })
+                       // callback invoked after a nested container is created for a tenant. i.e typically during a request.
+                       .OnNestedTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
+                       {
+                           var tenant = await tenantResolver;
 
-                           });
+                       });
                        })
                        // Extension methods available here for supported containers. We are using structuremap..
                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
                        .WithStructureMap((tenant, tenantServices) =>
                        {
-
-
-
-
                            tenantServices.AddSingleton<SomeTenantService>((sp) =>
                            {
                                //var logger = sp.GetRequiredService<ILogger<SomeTenantService>>();
@@ -87,7 +139,7 @@ namespace Sample
                        })
                        .AddPerRequestContainerMiddlewareServices()
                        .AddPerTenantMiddlewarePipelineServices(); // allows tenants to have there own middleware pipeline accessor stored in their tenant containers.
-                       // .WithModuleContainers(); // Creates a child container per IModule.
+                                                                  // .WithModuleContainers(); // Creates a child container per IModule.
                    })
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
@@ -128,27 +180,27 @@ namespace Sample
             {
                 // Makes sure that should any child route match, then the tenant container is restored prior to that route handling the request.
                 routeBuilder.EnsureTenantContainer<Tenant>((childRouteBuilder) =>
+            {
+                // Adds a route that will handle the request via the current tenants middleware pipleine. 
+                childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>((context, appBuilder) =>
+            {
+
+                var logger = appBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
+                logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
+                // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
+
+                appBuilder.UseModules<Tenant, ModuleBase>();
+
+                // welcome page only enabled for tenant FOO.
+                if (context.Tenant?.Name == "Foo")
                 {
-                    // Adds a route that will handle the request via the current tenants middleware pipleine. 
-                    childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>((context, appBuilder) =>
-                    {
+                    appBuilder.UseWelcomePage("/welcome");
+                }
+                // display info.
+                appBuilder.Run(DisplayInfo);
 
-                        var logger = appBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
-                        logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
-                        // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
-
-                        appBuilder.UseModules<Tenant, ModuleBase>();
-
-                        // welcome page only enabled for tenant FOO.
-                        if (context.Tenant?.Name == "Foo")
-                        {
-                            appBuilder.UseWelcomePage("/welcome");
-                        }
-                        // display info.
-                        appBuilder.Run(DisplayInfo);
-
-                    }); // handled by the tenant's middleware pipeline - if there is one.                  
-                });
+            }); // handled by the tenant's middleware pipeline - if there is one.                  
+            });
             }));
 
             // This will only be reached if no routes were resolved above.
