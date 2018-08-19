@@ -20,9 +20,9 @@ namespace Dotnettency.Container
             _logger = logger;
             _container = container;
             _id = Guid.NewGuid();
-            Role = role;           
+            Role = role;
 
-            if(name == null)
+            if (name == null)
             {
                 ContainerName = _container.Name;
             }
@@ -50,7 +50,7 @@ namespace Dotnettency.Container
             _container.Configure(_ =>
             {
                 _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
-                var services = new ServiceCollection();
+                ServiceCollection services = new ServiceCollection();
                 configure(services);
                 _.Populate(services);
 
@@ -78,6 +78,18 @@ namespace Dotnettency.Container
             _container.Dispose();
         }
 
-      
+        public ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, Action<IServiceCollection> configure)
+        {
+            ITenantContainerAdaptor container = CreateChildContainer(Name);
+            Configure(configure);
+            return container;
+        }
+
+        public ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure)
+        {
+            ITenantContainerAdaptor container = CreateNestedContainer(Name);
+            Configure(configure);
+            return container;
+        }
     }
 }
