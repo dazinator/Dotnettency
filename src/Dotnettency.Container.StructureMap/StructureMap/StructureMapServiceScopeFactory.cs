@@ -17,7 +17,7 @@ namespace Dotnettency.Container.StructureMap
 
             public IServiceScope CreateScope()
             {
-                return new TenantContainerServiceScope(_container.CreateNestedContainer());
+                return new TenantContainerServiceScope(_container.CreateNestedContainer(_container.ContainerName + " - Scoped()"));
             }
             
             private class TenantContainerServiceScope : IServiceScope

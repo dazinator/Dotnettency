@@ -7,7 +7,8 @@ namespace Dotnettency
 {
     public static class StructureMapContainerBuilderOptionsExtensions
     {
-        public static AdaptedContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(this ContainerBuilderOptions<TTenant> options,
+        public static AdaptedContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(
+            this ContainerBuilderOptions<TTenant> options,
             Action<TTenant, IServiceCollection> configureTenant)
             where TTenant : class
         {

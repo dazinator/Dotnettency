@@ -22,7 +22,7 @@ namespace Dotnettency.Container
 
         public Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
         {
-            var tenantContainer = _parentContainer.CreateChildContainer();
+            var tenantContainer = _parentContainer.CreateChildContainer("Tenant: " + tenant.ToString());
 
             tenantContainer.Configure(config =>
             {

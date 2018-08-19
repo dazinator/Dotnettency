@@ -5,8 +5,8 @@ namespace Dotnettency.Container
 {
     public interface ITenantContainerAdaptor : IServiceProvider, IDisposable
     {
-        ITenantContainerAdaptor CreateNestedContainer();
-        ITenantContainerAdaptor CreateChildContainer();
+        ITenantContainerAdaptor CreateNestedContainer(string Name);
+        ITenantContainerAdaptor CreateChildContainer(string Name);
 
         /// <summary>
         /// Used to add services to a container AFTER its initialised.

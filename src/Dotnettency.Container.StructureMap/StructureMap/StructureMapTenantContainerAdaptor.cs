@@ -12,54 +12,72 @@ namespace Dotnettency.Container
         private readonly Guid _id;
         private readonly ILogger<StructureMapTenantContainerAdaptor> _logger;
 
-        public StructureMapTenantContainerAdaptor(ILogger<StructureMapTenantContainerAdaptor> logger, IContainer container, ContainerRole role = ContainerRole.Root) : base(container)
+        public StructureMapTenantContainerAdaptor(ILogger<StructureMapTenantContainerAdaptor> logger,
+            IContainer container,
+            ContainerRole role = ContainerRole.Root,
+            string name = "") : base(container)
         {
             _logger = logger;
             _container = container;
             _id = Guid.NewGuid();
-            Role = role;
+            Role = role;           
 
-            if (role == ContainerRole.Root)
+            if(name == null)
             {
-                  _logger.LogDebug("Root Container Adaptor Created: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
+                ContainerName = _container.Name;
             }
             else
             {
-                _logger.LogDebug("Container Created: {id}, {role}", _id, _container.Name, _container.Role);
+                ContainerName = name;
+            }
+
+            if (role == ContainerRole.Root)
+            {
+                _logger.LogDebug("Root Container Created: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+            }
+            else
+            {
+                _logger.LogDebug("Container Created: {id}, {role}", _id, ContainerName, _container.Role);
             }
         }
 
         public ContainerRole Role { get; set; }
-        public string ContainerName => _container.Name;
+        public string ContainerName { get; set; }
         public Guid ContainerId => _id;
 
         public void Configure(Action<IServiceCollection> configure)
         {
             _container.Configure(_ =>
             {
-                _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
+                _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
                 var services = new ServiceCollection();
                 configure(services);
                 _.Populate(services);
+
+                _logger.LogDebug("Root Container Adaptor Created: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
+
+
             });
         }
 
-        public ITenantContainerAdaptor CreateNestedContainer()
+        public ITenantContainerAdaptor CreateNestedContainer(string Name)
         {
-            _logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
-            return new StructureMapTenantContainerAdaptor(_logger, _container.GetNestedContainer(), ContainerRole.Scoped);
+            _logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
+            return new StructureMapTenantContainerAdaptor(_logger, _container.GetNestedContainer(), ContainerRole.Scoped, Name);
         }
 
-        public ITenantContainerAdaptor CreateChildContainer()
+        public ITenantContainerAdaptor CreateChildContainer(string Name)
         {
-            _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
-            return new StructureMapTenantContainerAdaptor(_logger, _container.CreateChildContainer(), ContainerRole.Child);
+            _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
+            return new StructureMapTenantContainerAdaptor(_logger, _container.CreateChildContainer(), ContainerRole.Child, Name);
         }
 
         public void Dispose()
         {
-            _logger.LogDebug("Disposing of container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
+            _logger.LogDebug("Disposing of container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
             _container.Dispose();
         }
+
+      
     }
 }

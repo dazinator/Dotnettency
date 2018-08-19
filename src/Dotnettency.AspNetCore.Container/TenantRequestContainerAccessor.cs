@@ -29,7 +29,7 @@ namespace Dotnettency.AspNetCore.Container
                     return null;
                 }
 
-                var requestContainer = tenantContainer.CreateNestedContainer();
+                var requestContainer = tenantContainer.CreateNestedContainer(tenantContainer.ContainerName + " - Request ");
                 _containerEventsPublisher?.PublishNestedTenantContainerCreated(requestContainer);
                 return new PerRequestContainer(requestContainer);
             });
