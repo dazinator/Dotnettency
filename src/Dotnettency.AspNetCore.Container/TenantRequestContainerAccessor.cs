@@ -33,7 +33,7 @@ namespace Dotnettency.AspNetCore.Container
                     return null;
                 }
 
-                var requestId = _httpContextAccessor.HttpContext.TraceIdentifier;
+                var requestId = _httpContextAccessor.HttpContext?.TraceIdentifier;
                 var requestContainer = tenantContainer.CreateNestedContainer($"{tenantContainer.ContainerName} - Request {requestId}");
                 logger.LogDebug("Creating container name: {ContainerName} and RequestId: {RequestId}", tenantContainer.ContainerName, requestId);
 

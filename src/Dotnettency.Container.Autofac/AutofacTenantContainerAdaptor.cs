@@ -5,7 +5,8 @@ using Microsoft.Extensions.Logging;
 using System;
 
 namespace Dotnettency.Container
-{  
+{
+
 
     public class AutofacTenantContainerAdaptor : AutofacServiceProvider, ITenantContainerAdaptor
     {
@@ -68,7 +69,10 @@ namespace Dotnettency.Container
 
         public ITenantContainerAdaptor CreateNestedContainer(string Name)
         {
-            throw new NotImplementedException();
+
+           // return new AutofacServiceScope(this._lifetimeScope.BeginLifetimeScope());
+            return CreateNestedContainerAndConfigure(Name, null);
+           // throw new NotImplementedException();
             //_logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
             //ILifetimeScope perRequestScope = _container.BeginLifetimeScope()
 
@@ -108,7 +112,7 @@ namespace Dotnettency.Container
             var scope = _container.BeginLifetimeScope((builder) =>
             {
                 ServiceCollection services = new ServiceCollection();
-                configure(services);
+                configure?.Invoke(services);
                 builder.Populate(services);
             });
 

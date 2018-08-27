@@ -13,22 +13,24 @@ namespace Dotnettency
             Action<TTenant, IServiceCollection> configureTenant)
             where TTenant : class
         {
-            var adaptorFactory = new Func<ITenantContainerAdaptor>(() =>
+            Func<ITenantContainerAdaptor> adaptorFactory = new Func<ITenantContainerAdaptor>(() =>
             {
                 // host level container.
-                var builder = new ContainerBuilder();
+                ContainerBuilder builder = new ContainerBuilder();
                 builder.Populate(options.Builder.Services);
+                builder.AddDotnettencyContainerServices();
+                
+                
 
-                var container = builder.Build();
-                var adaptedContainer = container.Resolve<ITenantContainerAdaptor>();
+                IContainer container = builder.Build();
+                ITenantContainerAdaptor adaptedContainer = container.Resolve<ITenantContainerAdaptor>();
 
-                ITenantContainerEventsPublisher<TTenant> containerEventsPublisher;
                 //  bool containerEventsPublisher =
-                container.TryResolve<ITenantContainerEventsPublisher<TTenant>>(out containerEventsPublisher);
+                container.TryResolve<ITenantContainerEventsPublisher<TTenant>>(out ITenantContainerEventsPublisher<TTenant> containerEventsPublisher);
                 // add ITenantContainerBuilder<TTenant> service to the host container
                 // This service can be used to build a child container (adaptor) for a particular tenant, when required.
 
-                var updateBuilder = new ContainerBuilder();
+                ContainerBuilder updateBuilder = new ContainerBuilder();
                 updateBuilder.RegisterInstance(new TenantContainerBuilder<TTenant>(adaptedContainer, configureTenant, containerEventsPublisher)).As<ITenantContainerBuilder<TTenant>>();
                 updateBuilder.Update(container);
 
@@ -38,11 +40,11 @@ namespace Dotnettency
                 //        .Use()
                 //    );
 
-                var adaptor = container.Resolve<ITenantContainerAdaptor>();              
+                ITenantContainerAdaptor adaptor = container.Resolve<ITenantContainerAdaptor>();
                 return adaptor;
             });
 
-            var adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);
+            AdaptedContainerBuilderOptions<TTenant> adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);
             return adapted;
         }
     }
