@@ -67,62 +67,62 @@ namespace Dotnettency.Tests
 
         }
 
-        [Fact]
-        public void Options_Configure_Child_Resolve_Child()
-        {
+        //[Fact]
+        //public void Options_Configure_Child_Resolve_Child()
+        //{
 
-            ServiceCollection services = new ServiceCollection();         
+        //    ServiceCollection services = new ServiceCollection();         
           
-            StructureMap.Container container = new StructureMap.Container();
-            container.Populate(services);
+        //    StructureMap.Container container = new StructureMap.Container();
+        //    container.Populate(services);
 
-            var childContainer = container.CreateChildContainer();
-            childContainer.Configure((a) =>
-            {
-                var childServices = new ServiceCollection();
-                childServices.AddOptions();
-                childServices.Configure<MyOptions>((b) =>
-                {
-                    b.Prop = true;
-                });
-                a.Populate(childServices);
-            });
+        //    var childContainer = container.CreateChildContainer();
+        //    childContainer.Configure((a) =>
+        //    {
+        //        var childServices = new ServiceCollection();
+        //        childServices.AddOptions();
+        //        childServices.Configure<MyOptions>((b) =>
+        //        {
+        //            b.Prop = true;
+        //        });
+        //        a.Populate(childServices);
+        //    });
 
-            // container.Populate(services);
+        //    // container.Populate(services);
 
-            IServiceProvider sp = childContainer.GetInstance<IServiceProvider>();
-            IOptions<MyOptions> options = sp.GetRequiredService<IOptions<MyOptions>>();
-            Assert.True(options.Value?.Prop);
+        //    IServiceProvider sp = childContainer.GetInstance<IServiceProvider>();
+        //    IOptions<MyOptions> options = sp.GetRequiredService<IOptions<MyOptions>>();
+        //    Assert.True(options.Value?.Prop);
 
-        }
+        //}
 
-        [Fact]
-        public void Options_Populate_Child_Resolve_Child()
-        {
+        //[Fact]
+        //public void Options_Populate_Child_Resolve_Child()
+        //{
 
-            ServiceCollection services = new ServiceCollection();
+        //    ServiceCollection services = new ServiceCollection();
 
-            StructureMap.Container container = new StructureMap.Container();
-            container.Populate(services);
+        //    StructureMap.Container container = new StructureMap.Container();
+        //    container.Populate(services);
 
-            var childContainer = container.CreateChildContainer();
+        //    var childContainer = container.CreateChildContainer();
 
-            var childServices = new ServiceCollection();
-            childServices.AddOptions();
-            childServices.Configure<MyOptions>((b) =>
-            {
-                b.Prop = true;
-            });
+        //    var childServices = new ServiceCollection();
+        //    childServices.AddOptions();
+        //    childServices.Configure<MyOptions>((b) =>
+        //    {
+        //        b.Prop = true;
+        //    });
 
-            childContainer.Populate(childServices);            
+        //    childContainer.Populate(childServices);            
 
-            // container.Populate(services);
+        //    // container.Populate(services);
 
-            IServiceProvider sp = childContainer.GetInstance<IServiceProvider>();
-            IOptions<MyOptions> options = sp.GetRequiredService<IOptions<MyOptions>>();
-            Assert.True(options.Value?.Prop);
+        //    IServiceProvider sp = childContainer.GetInstance<IServiceProvider>();
+        //    IOptions<MyOptions> options = sp.GetRequiredService<IOptions<MyOptions>>();
+        //    Assert.True(options.Value?.Prop);
 
-        }
+        //}
 
         [Fact]
         public void Options_Populate_Root_Resolve_Root_Using_TenantContainerAdaptor()
