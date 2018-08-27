@@ -100,7 +100,7 @@ namespace Sample.RazorPages
                         })
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        .WithStructureMap((tenant, tenantServices) =>
+                        .WithAutofac((tenant, tenantServices) =>
                         {
                           //  var actionContextAccessor = new MyActionContextAccessor();
                            // tenantServices.AddSingleton<IActionContextAccessor>(actionContextAccessor);
