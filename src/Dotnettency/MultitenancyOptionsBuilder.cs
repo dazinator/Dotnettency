@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency
 {
@@ -56,7 +57,14 @@ namespace Dotnettency
         {
             Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, T>();
             return this;
-        }     
+        }
+      
+        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantTask(Func<Task<TenantDistinguisher>> factory)            
+        {
+            var delegateFactory = new DelegateTenantDistinguisherFactory<TTenant>(factory);
+            Services.AddSingleton<ITenantDistinguisherFactory<TTenant>>(delegateFactory);
+            return this;
+        }
 
         public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>()
             where T : class, ITenantShellFactory<TTenant>

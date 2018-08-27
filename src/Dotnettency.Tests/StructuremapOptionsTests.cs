@@ -12,9 +12,9 @@ namespace Dotnettency.Tests
     public class MyOptions
     {
         public bool Prop { get; set; }
-
+        public bool Foo { get; internal set; }
     }
-    public class FooTest
+    public class StructuremapOptionsTests
     {
 
 

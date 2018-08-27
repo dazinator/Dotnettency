@@ -1,20 +1,30 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Dotnettency;
+using Dotnettency.AspNetCore.Modules;
+using Dotnettency.Container;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Dotnettency;
-using System;
-using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using Dotnettency.Container;
-using Dotnettency.AspNetCore.Modules;
+using System;
+using System.Text;
 using System.Threading.Tasks;
-using Dotnettency.AspNetCore;
 
 namespace Sample
 {
+
+    public class MyOptions
+    {
+
+        public bool Foo { get; set; }
+
+
+    }
+
+
     public class Startup
     {
         private readonly IHostingEnvironment _environment;
@@ -33,11 +43,11 @@ namespace Sample
             services.AddRouting();
 
             _loggerFactory.AddConsole();
-            var logger = _loggerFactory.CreateLogger<Startup>();
+            ILogger<Startup> logger = _loggerFactory.CreateLogger<Startup>();
 
-            var serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            IServiceProvider serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
             {
-                options                  
+                options
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                    {
@@ -46,13 +56,15 @@ namespace Sample
                            // callback invoked after tenant container is created.
                            events.OnTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
                            {
-                               var tenant = await tenantResolver;
+                               Tenant tenant = await tenantResolver;
+
+                              
 
                            })
                            // callback invoked after a nested container is created for a tenant. i.e typically during a request.
                            .OnNestedTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
                            {
-                               var tenant = await tenantResolver;
+                               Tenant tenant = await tenantResolver;
 
                            });
                        })
@@ -62,7 +74,8 @@ namespace Sample
                        {
 
 
-
+                           tenantServices.AddOptions();
+                           tenantServices.Configure<MyOptions>((a) => { a.Foo = true; });
 
                            tenantServices.AddSingleton<SomeTenantService>((sp) =>
                            {
@@ -96,7 +109,7 @@ namespace Sample
                     {
                         // WE use a tenant's guid id to partition one tenants files from another on disk.
                         // NOTE: We use an empty guid for NULL tenants, so that all NULL tenants share the same location.
-                        var tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                        Guid tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
                         contentRootOptions.TenantPartitionId(tenantGuid)
                                            .AllowAccessTo(_environment.ContentRootFileProvider); // We allow the tenant content root file provider to access to the environments content root.
                     });
@@ -104,7 +117,7 @@ namespace Sample
                     tenantHostingEnvironmentOptions.OnInitialiseTenantWebRoot((webRootOptions) =>
                     {
                         // WE use the tenant's guid id to partition one tenants files from another on disk.
-                        var tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                        Guid tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
                         webRootOptions.TenantPartitionId(tenantGuid)
                                            .AllowAccessTo(_environment.WebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
                     });
@@ -133,7 +146,7 @@ namespace Sample
                     childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>((context, appBuilder) =>
                     {
 
-                        var logger = appBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
+                        ILogger<Startup> logger = appBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
                         logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
                         // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
@@ -160,24 +173,25 @@ namespace Sample
 
         public async Task DisplayInfo(HttpContext context)
         {
-            var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
+            ILogger<Startup> logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
             logger.LogDebug("App Run..");
 
-            var container = context.RequestServices as ITenantContainerAdaptor;
+            ITenantContainerAdaptor container = context.RequestServices as ITenantContainerAdaptor;
             logger.LogDebug("App Run Container Is: {id}, {containerNAme}, {role}", container.ContainerId, container.ContainerName, container.Role);
 
 
             // Use ITenantAccessor to access the current tenant.
-            var tenantAccessor = container.GetRequiredService<ITenantAccessor<Tenant>>();
-            var tenant = await tenantAccessor.CurrentTenant.Value;
+            ITenantAccessor<Tenant> tenantAccessor = container.GetRequiredService<ITenantAccessor<Tenant>>();
+            Tenant tenant = await tenantAccessor.CurrentTenant.Value;
 
             // This service was registered as singleton in tenant container.
-            var someTenantService = container.GetService<SomeTenantService>();
+            SomeTenantService someTenantService = container.GetService<SomeTenantService>();
 
             // The tenant shell to access context for the tenant - even if the tenant is null
-            var tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
-            var tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
+            ITenantShellAccessor<Tenant> tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
+            TenantShell<Tenant> tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
 
+            var myOptions = context.RequestServices.GetRequiredService<IOptions<MyOptions>>();
 
             string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
             string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
@@ -192,10 +206,11 @@ namespace Sample
                 TenantName = tenantName,
                 TenantScopedServiceId = someTenantService?.Id,
                 InjectedTenantName = injectedTenantName,
-                TenantContentFile = fileContent
+                TenantContentFile = fileContent,
+                OptionsFoo= myOptions.Value.Foo
             };
 
-            var jsonResult = JsonConvert.SerializeObject(result);
+            string jsonResult = JsonConvert.SerializeObject(result);
             await context.Response.WriteAsync(jsonResult, Encoding.UTF8);
             logger.LogDebug("App Run Finished..");
         }

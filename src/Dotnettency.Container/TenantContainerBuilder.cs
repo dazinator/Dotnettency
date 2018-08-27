@@ -22,12 +22,12 @@ namespace Dotnettency.Container
 
         public Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
         {
-            var tenantContainer = _parentContainer.CreateChildContainer("Tenant: " + tenant.ToString());
-
-            tenantContainer.Configure(config =>
+            var tenantContainer = _parentContainer.CreateChildContainerAndConfigure("Tenant: " + tenant.ToString(), config =>
             {
                 _configureTenant(tenant, config);
             });
+
+           // tenantContainer.Configure();
 
             _containerEventsPublisher?.PublishTenantContainerCreated(tenantContainer);
 

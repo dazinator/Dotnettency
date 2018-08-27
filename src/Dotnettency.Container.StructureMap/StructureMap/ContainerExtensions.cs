@@ -2,6 +2,7 @@
 /// Licenced under MIT Licence.
 /// With changes by Darrell Tunnell.
 /// 
+using Dotnettency.Container;
 using Dotnettency.Container.StructureMap.StructureMap;
 using Microsoft.Extensions.DependencyInjection;
 using StructureMap;
@@ -12,7 +13,7 @@ using System.Linq.Expressions;
 
 namespace Dotnettency.Container.StructureMap
 {
-    public static partial class ContainerExtensions
+    public static class ContainerExtensions
     {
         /// <summary>
         /// Populates the container using the specified service descriptors.
@@ -60,7 +61,7 @@ namespace Dotnettency.Container.StructureMap
 
             registry.For<IServiceScopeFactory>()
                 .LifecycleIs(Lifecycles.Container)
-                .Use<TenantContainerServiceScopeFactory>();
+                .Use< TenantContainerServiceScopeFactory>();
 
             registry.Register(descriptors);
         }
