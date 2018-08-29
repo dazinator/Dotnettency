@@ -48,18 +48,17 @@ namespace Dotnettency.AspNetCore.Modules
 
                 var container = await containerFactory();
 
-                throw new NotImplementedException();
-                // consider rebuilding container?
-                //container.Configure(async sharedServices =>
-                //{
-                //    await Task.WhenAll(allModules.Select(m => m.EnsureStarted(containerFactory, rootAppBuilder, sharedServices)));
-                //});
+                container.AddServices(sharedServices =>
+                {
+                    allModules.Select(m => m.EnsureStarted(containerFactory, rootAppBuilder, sharedServices));
+                   // await Task.WhenAll();
+                });
 
                 // Collate routers
-                //foreach (var module in allModules.Where(m => m.Router != null))
-                //{
-                //    ModulesRouter.AddModuleRouter(module);
-                //}
+                foreach (var module in allModules.Where(m => m.Router != null))
+                {
+                    ModulesRouter.AddModuleRouter(module);
+                }
 
                 Started = true;
             }

@@ -53,19 +53,19 @@ namespace Dotnettency.Container
         public string ContainerName { get; set; }
         public Guid ContainerId => _id;
 
-        //public void Configure(Action<IServiceCollection> configure)
-        //{
+        public void Configure(Action<IServiceCollection> configure)
+        {
 
-        //    _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
-        //    ServiceCollection services = new ServiceCollection();
-        //    configure(services);
+            _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+            ServiceCollection services = new ServiceCollection();
+            configure(services);
 
-        //    ContainerBuilder builder = new ContainerBuilder();
-        //    builder.Populate(services);
-        //    builder.Update(_container);
+            ContainerBuilder builder = new ContainerBuilder();
+            builder.Populate(services);            
+            builder.Update(_container.ComponentRegistry);
 
-        //    _logger.LogDebug("Configured container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
-        //}
+            _logger.LogDebug("Configured container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+        }
 
         public ITenantContainerAdaptor CreateNestedContainer(string Name)
         {
@@ -87,10 +87,10 @@ namespace Dotnettency.Container
             // return new AutofacTenantContainerAdaptor(_logger, _container.CreateChildContainer(), ContainerRole.Child, Name);
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             _logger.LogDebug("Disposing of container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
-            _container.Dispose();
+           // _container.Dispose();
             base.Dispose();
         }
 
@@ -118,6 +118,11 @@ namespace Dotnettency.Container
 
             _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
             return new AutofacTenantContainerAdaptor(_logger, scope, ContainerRole.Scoped, Name);
+        }
+
+        public void AddServices(Action<IServiceCollection> configure)
+        {
+            Configure(configure);
         }
     }
 }

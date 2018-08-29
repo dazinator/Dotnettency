@@ -91,5 +91,10 @@ namespace Dotnettency.Container
             Configure(configure);
             return container;
         }
+
+        public void AddServices(Action<IServiceCollection> configure)
+        {
+             Configure(configure);
+        }
     }
 }

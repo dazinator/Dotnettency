@@ -9,7 +9,7 @@ namespace Dotnettency.Container
     {
         private readonly ITenantContainerAdaptor _parentContainer;
         private readonly Action<TTenant, IServiceCollection> _configureTenant;
-        private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;      
+        private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
         public TenantContainerBuilder(ITenantContainerAdaptor parentContainer,
             Action<TTenant, IServiceCollection> configureTenant,
@@ -17,17 +17,17 @@ namespace Dotnettency.Container
         {
             _parentContainer = parentContainer;
             _configureTenant = configureTenant;
-            _containerEventsPublisher = containerEventsPublisher;           
+            _containerEventsPublisher = containerEventsPublisher;
         }
 
         public Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
         {
-            var tenantContainer = _parentContainer.CreateChildContainerAndConfigure("Tenant: " + tenant.ToString(), config =>
-            {
-                _configureTenant(tenant, config);
-            });
+            var tenantContainer = _parentContainer.CreateChildContainerAndConfigure("Tenant: " + (tenant?.ToString() ?? "NULL").ToString(), config =>
+             {
+                 _configureTenant(tenant, config);
+             });
 
-           // tenantContainer.Configure();
+            // tenantContainer.Configure();
 
             _containerEventsPublisher?.PublishTenantContainerCreated(tenantContainer);
 

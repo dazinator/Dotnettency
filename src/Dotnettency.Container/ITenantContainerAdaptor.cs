@@ -11,6 +11,12 @@ namespace Dotnettency.Container
         ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, Action<IServiceCollection> configure);
         ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure);
 
+        /// <summary>
+        /// Adding services to an already running / configured container is bad. Safer to treat a created container as immutable.
+        /// Need to re-design modules system to solve this.
+        /// </summary>
+        /// <param name="configure"></param>
+        void AddServices(Action<IServiceCollection> configure);
 
         /// <summary>
         /// Used to add services to a container AFTER its initialised.

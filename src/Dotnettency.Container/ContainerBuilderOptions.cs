@@ -16,9 +16,8 @@ namespace Dotnettency.Container
             builder.Services.AddScoped<ITenantContainerAccessor<TTenant>, TenantContainerAccessor<TTenant>>();
 
             builder.Services.AddSingleton<ITenantContainerEventsPublisher<TTenant>>((sp) =>
-            {
-                var tenantAccessor = sp.GetRequiredService<ITenantAccessor<TTenant>>();
-                var events = new TenantContainerEventsPublisher<TTenant>(tenantAccessor);
+            {              
+                var events = new TenantContainerEventsPublisher<TTenant>();
 
                 var containerEventsOptions = this.ContainerEventsOptions;
                 foreach (var item in containerEventsOptions.TenantContainerCreatedCallbacks)
