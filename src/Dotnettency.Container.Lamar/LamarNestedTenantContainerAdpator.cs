@@ -1,44 +1,37 @@
-﻿using Dotnettency.Container.StructureMap;
+﻿using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using StructureMap;
 using System;
 
 namespace Dotnettency.Container
 {
-    public class StructureMapTenantContainerAdaptor : StructureMapServiceProvider, ITenantContainerAdaptor
+    public class LamarNestedTenantContainerAdpator : ITenantContainerAdaptor
     {
-        private readonly IContainer _container;
+        private readonly INestedContainer _container;
         private readonly Guid _id;
-        private readonly ILogger<StructureMapTenantContainerAdaptor> _logger;
+        private readonly ILogger<LamarNestedTenantContainerAdpator> _logger;
 
-        public StructureMapTenantContainerAdaptor(ILogger<StructureMapTenantContainerAdaptor> logger,
-            IContainer container,
-            ContainerRole role = ContainerRole.Root,
-            string name = "") : base(container)
+        public LamarNestedTenantContainerAdpator(
+            ILogger<LamarNestedTenantContainerAdpator> logger,
+            INestedContainer container,
+            string name = "") : base()
         {
             _logger = logger;
             _container = container;
             _id = Guid.NewGuid();
-            Role = role;
+            Role = ContainerRole.Scoped;
 
             if (name == null)
             {
-                ContainerName = _container.Name;
+                ContainerName = "Nested";
             }
             else
             {
                 ContainerName = name;
             }
 
-            if (role == ContainerRole.Root)
-            {
-                _logger.LogDebug("Root Container Created: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
-            }
-            else
-            {
-                _logger.LogDebug("Container Created: {id}, {role}", _id, ContainerName, _container.Role);
-            }
+            _logger.LogDebug("Container Created: {id}, {role}", _id, ContainerName, Role);
+
         }
 
         public ContainerRole Role { get; set; }
@@ -50,31 +43,26 @@ namespace Dotnettency.Container
             _container.Configure(_ =>
             {
                 _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
-                ServiceCollection services = new ServiceCollection();
-                configure(services);
-                _.Populate(services);
-
+                configure(_);
                 _logger.LogDebug("Root Container Adaptor Created: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
-
-
             });
         }
 
         public ITenantContainerAdaptor CreateNestedContainer(string Name)
         {
-            _logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
-            return new StructureMapTenantContainerAdaptor(_logger, _container.GetNestedContainer(), ContainerRole.Scoped, Name);
+            _logger.LogCritical("Lamar does not support creating a nested container from a nested container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+            return this;
         }
 
         public ITenantContainerAdaptor CreateChildContainer(string Name)
         {
-            _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
-            return new StructureMapTenantContainerAdaptor(_logger, _container.CreateChildContainer(), ContainerRole.Child, Name);
+            _logger.LogCritical("Lamar does not support creating child containers from a nested container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+            return this;
         }
 
         public void Dispose()
         {
-            _logger.LogDebug("Disposing of container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
+            _logger.LogDebug("Disposing of container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
             _container.Dispose();
         }
 
@@ -94,7 +82,13 @@ namespace Dotnettency.Container
 
         public void AddServices(Action<IServiceCollection> configure)
         {
-             Configure(configure);
+            Configure(configure);
         }
+
+        public object GetService(Type serviceType)
+        {
+            return _container.GetService(serviceType);
+        }
+
     }
 }

@@ -22,7 +22,6 @@
     <ProjectReference Include="..\Dotnettency.AspNetCore.Container\Dotnettency.AspNetCore.Container.csproj" />
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
-    <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
     <ProjectReference Include="..\Dotnettency.Container\Dotnettency.Container.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>

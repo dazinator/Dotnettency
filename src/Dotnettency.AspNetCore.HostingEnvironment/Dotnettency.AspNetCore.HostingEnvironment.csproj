@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNet.Cabinets" Version="1.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
     <ProjectReference Include="..\Dotnettency.TenantFileSystem\Dotnettency.TenantFileSystem.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />

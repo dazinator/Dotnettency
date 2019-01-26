@@ -58,7 +58,7 @@ namespace Sample
                            {
                                Tenant tenant = await tenantResolver;
 
-                              
+
 
                            })
                            // callback invoked after a nested container is created for a tenant. i.e typically during a request.
@@ -70,7 +70,7 @@ namespace Sample
                        })
                        // Extension methods available here for supported containers. We are using structuremap..
                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                       .WithStructureMap((tenant, tenantServices) =>
+                       .WithAutofac((tenant, tenantServices) =>
                        {
 
 
@@ -102,6 +102,16 @@ namespace Sample
                        .AddPerTenantMiddlewarePipelineServices(); // allows tenants to have there own middleware pipeline accessor stored in their tenant containers.
                        // .WithModuleContainers(); // Creates a child container per IModule.
                    })
+                   .ConfigureTenantMiddlewarePipeline((m) =>
+                   {
+                       m.OnInitialiseTenantPipeline((t, a) =>
+                       {
+                           a.UseStaticFiles();
+                           a.Run(DisplayInfo);
+
+                       });
+                   })
+
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
                 {
@@ -137,35 +147,51 @@ namespace Sample
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouter(((routeBuilder) =>
+            // Add the multitenancy middleware.
+            app.UseMultitenancy<Tenant>((options) =>
             {
-                // Makes sure that should any child route match, then the tenant container is restored prior to that route handling the request.
-                routeBuilder.EnsureTenantContainer<Tenant>((childRouteBuilder) =>
-                {
-                    // Adds a route that will handle the request via the current tenants middleware pipleine. 
-                    childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>((context, appBuilder) =>
-                    {
+                options
+                       .UsePerTenantContainers()
+                       .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
+                       {
+                           // using tenant content root and web root.
+                           hostingEnvironmentOptions.UseTenantContentRootFileProvider();
+                           hostingEnvironmentOptions.UseTenantWebRootFileProvider();
+                       })
+                       .UsePerTenantMiddlewarePipeline();
+            });
 
-                        ILogger<Startup> logger = appBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
-                        logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
-                        // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
+            //app.UseRouter(((routeBuilder) =>
+            //{
+            //    // Makes sure that should any child route match, then the tenant container is restored prior to that route handling the request.
+            //    routeBuilder.EnsureTenantContainer<Tenant>((childRouteBuilder) =>
+            //    {
+            //        // Adds a route that will handle the request via the current tenants middleware pipleine. 
+            //        childRouteBuilder.MapTenantMiddlewarePipeline<Tenant>((context, appBuilder) =>
+            //        {
 
-                        appBuilder.UseModules<Tenant, ModuleBase>();
+            //            ILogger<Startup> logger = appBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
+            //            logger.LogDebug("Configuring tenant middleware pipeline for tenant: " + context.Tenant?.Name ?? "");
+            //            // appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 
-                        // welcome page only enabled for tenant FOO.
-                        if (context.Tenant?.Name == "Foo")
-                        {
-                            appBuilder.UseWelcomePage("/welcome");
-                        }
-                        // display info.
-                        appBuilder.Run(DisplayInfo);
+            //            appBuilder.UseModules<Tenant, ModuleBase>();
 
-                    }); // handled by the tenant's middleware pipeline - if there is one.                  
-                });
-            }));
+            //            // welcome page only enabled for tenant FOO.
+            //            if (context.Tenant?.Name == "Foo")
+            //            {
+            //                appBuilder.UseWelcomePage("/welcome");
+            //            }
+
+            //           // appBuilder.use
+            //            // display info.
+            //            appBuilder.Run(DisplayInfo);
+
+            //        }); // handled by the tenant's middleware pipeline - if there is one.                  
+            //    });
+            //}));
 
             // This will only be reached if no routes were resolved above.
-            app.Run(DisplayInfo);
+            // app.Run(DisplayInfo);
 
 
 
@@ -191,7 +217,7 @@ namespace Sample
             ITenantShellAccessor<Tenant> tenantShellAccessor = context.RequestServices.GetRequiredService<ITenantShellAccessor<Tenant>>();
             TenantShell<Tenant> tenantShell = await tenantShellAccessor.CurrentTenantShell.Value;
 
-            var myOptions = context.RequestServices.GetRequiredService<IOptions<MyOptions>>();
+            IOptions<MyOptions> myOptions = context.RequestServices.GetRequiredService<IOptions<MyOptions>>();
 
             string tenantShellId = tenantShell == null ? "{NULL TENANT SHELL}" : tenantShell.Id.ToString();
             string tenantName = tenant == null ? "{NULL TENANT}" : tenant.Name;
@@ -207,7 +233,7 @@ namespace Sample
                 TenantScopedServiceId = someTenantService?.Id,
                 InjectedTenantName = injectedTenantName,
                 TenantContentFile = fileContent,
-                OptionsFoo= myOptions.Value.Foo
+                OptionsFoo = myOptions.Value.Foo
             };
 
             string jsonResult = JsonConvert.SerializeObject(result);

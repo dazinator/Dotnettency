@@ -44,7 +44,7 @@ namespace Sample.Mvc
                     {
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        containerBuilder.WithStructureMap((tenant, tenantServices) =>
+                        containerBuilder.WithAutofac((tenant, tenantServices) =>
                         {
                             // tenantServices.AddSingleton<SomeTenantService>();
                         })
