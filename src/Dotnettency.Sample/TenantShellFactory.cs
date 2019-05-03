@@ -6,7 +6,7 @@ namespace Sample
 {
     public class TenantShellFactory : ITenantShellFactory<Tenant>
     {
-        public Task<TenantShell<Tenant>> Get(TenantDistinguisher distinguisher)
+        public Task<TenantShell<Tenant>> Get(TenantIdentifier distinguisher)
         {
             if (distinguisher.Uri.Port == 5004)
             {

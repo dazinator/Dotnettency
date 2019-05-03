@@ -83,10 +83,11 @@ namespace Dotnettency.Tests
             IServiceCollection services = new ServiceCollection() as IServiceCollection;
             services.AddLogging();
 
-            IServiceProvider serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .IdentifyTenantTask(() => Task.FromResult(new TenantDistinguisher(new Uri("unittest://"))))
+                    .IdentifyTenantTask(() => Task.FromResult(new TenantIdentifier(new Uri("unittest://"))))
+                    .AddAspNetCore()
                     .InitialiseTenant(tenantId =>
                     {                        
                         if (tenantId.Uri.Scheme != "unittest")

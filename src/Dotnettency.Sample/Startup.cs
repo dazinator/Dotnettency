@@ -45,9 +45,10 @@ namespace Sample
             _loggerFactory.AddConsole();
             ILogger<Startup> logger = _loggerFactory.CreateLogger<Startup>();
 
-            IServiceProvider serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
+                    .AddAspNetCore()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                    {

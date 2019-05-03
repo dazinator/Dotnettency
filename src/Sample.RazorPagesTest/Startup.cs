@@ -24,10 +24,11 @@ namespace Sample.RazorPagesTest
 
             services.AddMvc();
 
-            IServiceProvider serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
+                    .AddAspNetCore()
                     .ConfigureTenantContainers((containerBuilder) =>
                     {
                         containerBuilder.Events((events) =>

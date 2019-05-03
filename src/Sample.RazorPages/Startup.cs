@@ -77,9 +77,10 @@ namespace Sample.RazorPages
             var logger = _loggerFactory.CreateLogger<Startup>();
 
 
-            var serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
+                    .AddAspNetCore()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                     {
