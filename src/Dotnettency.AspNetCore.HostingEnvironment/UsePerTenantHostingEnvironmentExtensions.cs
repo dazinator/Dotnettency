@@ -1,5 +1,6 @@
 ﻿using Dotnettency.AspNetCore;
 using Dotnettency.AspNetCore.HostingEnvironment;
+using Dotnettency.Middleware;
 using System;
 
 namespace Dotnettency

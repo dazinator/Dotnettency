@@ -17,13 +17,11 @@ namespace Dotnettency.AspNetCore.HostingEnvironment
 
         public TenantHostingEnvironmentWebRootMiddleware(
             RequestDelegate next,
-            //IApplicationBuilder rootApp,
             ILogger<TenantHostingEnvironmentContentRootMiddleware<TTenant>> logger,
             ITenantWebRootFileSystemProviderFactory<TTenant> factory)
 
         {
-            _next = next;
-            _rootApp = rootApp;
+            _next = next;           
             _logger = logger;
             _factory = factory;
         }

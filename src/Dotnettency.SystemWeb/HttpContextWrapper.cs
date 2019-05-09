@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 
 namespace Dotnettency.SystemWeb
 {
@@ -13,5 +14,29 @@ namespace Dotnettency.SystemWeb
         }
 
         public override RequestBase Request { get; }
+
+        public override TItem GetItem<TItem>(string key)
+        {
+            if (_context.Items.Contains(key))
+            {
+                return _context.Items[key] as TItem;
+            }
+
+            return null;           
+        }
+
+        public override void SetItem(string key, object item)
+        {
+            _context.Items[key] = item;
+        }
+
+        public override void SetItem(string key, IDisposable item, bool disposeOnRequestCompletion = true)
+        {
+            SetItem(key, item);
+            if(disposeOnRequestCompletion)
+            {
+                _context.DisposeOnPipelineCompleted(item);
+            }           
+        }
     }
 }

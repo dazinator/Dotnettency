@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Dotnettency.Middleware;
+using Microsoft.AspNetCore.Builder;
 
 namespace Dotnettency.AspNetCore.HostingEnvironment
 {

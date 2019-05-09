@@ -1,6 +1,5 @@
 ﻿using DavidLievrouw.OwinRequestScopeContext;
 using System;
-using System.Collections.Generic;
 
 namespace Dotnettency.Owin
 {
