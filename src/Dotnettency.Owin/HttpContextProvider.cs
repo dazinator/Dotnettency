@@ -11,7 +11,7 @@ namespace Dotnettency.Owin
         public HttpContextBase GetCurrent()
         {
             var requestScopeContext = OwinRequestScopeContext.Current;
-            var context = new HttpContextWrapper(requestScopeContext.OwinEnvironment);
+            var context = new HttpContextWrapper(requestScopeContext);
             return context;
         }
     }

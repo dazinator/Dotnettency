@@ -1,4 +1,5 @@
 ﻿using System;
+using DavidLievrouw.OwinRequestScopeContext;
 using Dotnettency.Middleware;
 using Owin;
 
@@ -12,7 +13,7 @@ namespace Dotnettency.Owin
         public AppBuilderAdaptor(IAppBuilder appBuilder, IServiceProvider serviceProvider)
         {
             _appBuilder = appBuilder;
-            ApplicationServices = serviceProvider;
+            ApplicationServices = serviceProvider;           
         }
 
         public override IServiceProvider ApplicationServices { get; set; }

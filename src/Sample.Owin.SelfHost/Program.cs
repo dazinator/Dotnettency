@@ -4,7 +4,6 @@ using Dotnettency;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin.Hosting;
-using DavidLievrouw.OwinRequestScopeContext;
 
 namespace Sample.Owin.SelfHost
 {
@@ -38,22 +37,26 @@ namespace Sample.Owin.SelfHost
             Configure(services);
             IServiceProvider sp = services.BuildServiceProvider();
 
+
 #if DEBUG
-            app.UseRequestScopeContext(); // required so that dotnettency services can gain access to OwinContext.
 
             app.UseErrorPage();
 
-            app.Use(async (context, next) =>
+            app.UseMultitenancy<Tenant>(sp, (options) =>
             {
-                using(var requestScope = sp.CreateScope())
+               
+                app.Use(async (context, next) =>
                 {
+                    // Todo: could offer an Extension method on IOwinContext for this.
+                    var requestScopeAccessor = sp.GetRequiredService<ICurrentRequestItemAccessor<IServiceScope>>();
+                    var requestServices = requestScopeAccessor.GetCurrent().ServiceProvider;
 
                     await context.Response.WriteAsync($"Browse on ports 5000 - 5004 to witness multitenancy behaviours.");
-                    
-                    var tenantResolver = requestScope.ServiceProvider.GetRequiredService<Task<Tenant>>();
+                   
+                    var tenantResolver = requestServices.GetRequiredService<Task<Tenant>>();
                     var tenant = await tenantResolver;
 
-                    if(tenant == null)
+                    if (tenant == null)
                     {
                         await context.Response.WriteAsync($"No Tenant mapped to this url!");
                     }
@@ -63,8 +66,28 @@ namespace Sample.Owin.SelfHost
                     }
 
                     await next();
-                }                
+
+                });
+
+
+                //  Optionally use tenant containers before starting request scope();
+                //options.UseRequestScope(() => sp.CreateScope());
             });
+            // above method needs to automatically do following:
+            // 1. app.UseRequestScopeContext()
+            // 2. Add middleware that will take the root sp, and create a request scope() sp, before onward processing of the request
+            //     - Dotnettency should provide a way to expose the newly created request scope sp - so that:
+            //           - can directly resolve the current tenant using it.
+            //           - can set web api's / framework x's DependencyResolver.Current to use same one.
+
+
+
+
+
+         
+
+
+           
 
             // There is no middleware required for Tenant resolution itself, as it is a case of 
             // resolving the Tenant from the configured sp.
@@ -101,6 +124,11 @@ namespace Sample.Owin.SelfHost
                        .IdentifyTenantsWithRequestAuthorityUri()
                        .InitialiseTenant<TenantShellFactory>();
 
+            });
+
+            services.AddCurrentRequestItemAccessor<IServiceScope>((sp) =>
+            {
+                return sp.CreateScope();
             });
         }
     }
