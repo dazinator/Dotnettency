@@ -1,6 +1,5 @@
-﻿using Dotnettency.AspNetCore;
-using Dotnettency.AspNetCore.Container;
-using Microsoft.AspNetCore.Builder;
+﻿using Dotnettency.AspNetCore.Container;
+using Dotnettency.Middleware;
 
 namespace Dotnettency
 {

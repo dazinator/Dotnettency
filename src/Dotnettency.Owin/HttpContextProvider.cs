@@ -4,7 +4,7 @@ namespace Dotnettency.Owin
 {
     public class HttpContextProvider : IHttpContextProvider
     {
-        protected HttpContextProvider()
+        public HttpContextProvider()
         {
         }
 

@@ -67,8 +67,7 @@ namespace Dotnettency
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantsWithRequestAuthorityUri<T>()
-            where T : class, ITenantIdentifierFactory<TTenant>
+        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantsWithRequestAuthorityUri()           
         {
             IdentifyTenantsWith<RequestAuthorityTenantIdentifierFactory<TTenant>>();
             return this;

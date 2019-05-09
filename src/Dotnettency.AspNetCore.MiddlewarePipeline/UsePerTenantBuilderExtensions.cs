@@ -12,7 +12,5 @@ namespace Dotnettency
             builder.ApplicationBuilder.UseMiddleware<TenantPipelineMiddleware<TTenant>>(builder.ApplicationBuilder);
             return builder;
         }
-    }
-
-   
+    }   
 }

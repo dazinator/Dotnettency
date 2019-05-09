@@ -1,4 +1,5 @@
-﻿using Dotnettency.Owin;
+﻿using Dotnettency.Middleware;
+using Dotnettency.Owin;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dotnettency
@@ -10,8 +11,20 @@ namespace Dotnettency
         {
             // this service will only work when 
             //  IAppBuilder.UseRequestScopeContext() middleware has been activated.
-            builder.Services.AddSingleton<IHttpContextProvider, HttpContextProvider>();            
+            builder.Services.AddSingleton<IHttpContextProvider, HttpContextProvider>();
             return builder;
-        }               
+
+        }
+        public static MultitenancyMiddlewareOptionsBuilder<TTenant> UseOwin<TTenant>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder)
+      where TTenant : class
+        {
+            // this service will only work when 
+            //  IAppBuilder.UseRequestScopeContext() middleware has been activated.
+            //   builder.Services.AddSingleton<IHttpContextProvider, HttpContextProvider>();
+            return builder;
+        }
+
+
+
     }
 }

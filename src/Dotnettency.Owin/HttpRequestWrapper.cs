@@ -22,11 +22,15 @@ namespace Dotnettency.Owin
         /// <returns></returns>
         public static Uri GetUri(IReadOnlyDictionary<string, object> environment)
         {
-            var host = (string)environment["Host"];
-            var pathBase = (string)environment["owin.RequestPathBase"]; 
+
+
+            var headers = (IDictionary<string, string[]>)environment["owin.RequestHeaders"];
+            //   requestHeaders = 
+            var host = headers["Host"][0];
+            var pathBase = (string)environment["owin.RequestPathBase"];
             var path = (string)environment["owin.RequestPath"];
             var queryString = (string)environment["owin.RequestQueryString"];
-            var scheme = (string)environment["owin.RequestScheme"]; 
+            var scheme = (string)environment["owin.RequestScheme"];
 
             // PERF: Calculate string length to allocate correct buffer size for StringBuilder.
             var length = scheme + SchemeDelimiter.Length + host.Length
@@ -41,7 +45,7 @@ namespace Dotnettency.Owin
                 .Append(queryString)
                 .ToString());
         }
-        
+
         public override Uri GetUri()
         {
             return GetUri(_environment);

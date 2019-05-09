@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Dotnettency.Container;
+using Dotnettency.Middleware;
 
 namespace Dotnettency.AspNetCore.Container
 {
@@ -11,12 +12,12 @@ namespace Dotnettency.AspNetCore.Container
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<TenantContainerMiddleware<TTenant>> _logger;
-        private readonly IApplicationBuilder _appBuilder;
+        private readonly AppBuilderAdaptorBase _appBuilder;
 
         public TenantContainerMiddleware(
             RequestDelegate next,
             ILogger<TenantContainerMiddleware<TTenant>> logger,
-            IApplicationBuilder appBuilder)
+            AppBuilderAdaptorBase appBuilder)
         {
             _next = next;
             _logger = logger;

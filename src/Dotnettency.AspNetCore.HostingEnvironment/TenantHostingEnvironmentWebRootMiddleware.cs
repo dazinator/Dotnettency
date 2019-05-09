@@ -1,5 +1,4 @@
 ﻿using DotNet.Cabinets;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -12,13 +11,13 @@ namespace Dotnettency.AspNetCore.HostingEnvironment
         where TTenant : class
     {
         private readonly RequestDelegate _next;
-        private readonly IApplicationBuilder _rootApp;
+       // private readonly IApplicationBuilder _rootApp;
         private readonly ILogger<TenantHostingEnvironmentContentRootMiddleware<TTenant>> _logger;
         private readonly ITenantWebRootFileSystemProviderFactory<TTenant> _factory;
 
         public TenantHostingEnvironmentWebRootMiddleware(
             RequestDelegate next,
-            IApplicationBuilder rootApp,
+            //IApplicationBuilder rootApp,
             ILogger<TenantHostingEnvironmentContentRootMiddleware<TTenant>> logger,
             ITenantWebRootFileSystemProviderFactory<TTenant> factory)
 

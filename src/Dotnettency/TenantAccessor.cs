@@ -14,6 +14,7 @@ namespace Dotnettency
 
             CurrentTenant = new Lazy<Task<TTenant>>(async () =>
             {
+
                 var tenantShell = await _tenantShellAccessor.CurrentTenantShell?.Value;
                 return tenantShell?.Tenant;
             });
