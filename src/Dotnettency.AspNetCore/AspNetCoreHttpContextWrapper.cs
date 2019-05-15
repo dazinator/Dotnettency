@@ -15,10 +15,20 @@ namespace Dotnettency.AspNetCore
 
         public override RequestBase Request { get; }
 
+        public override bool ContainsKey(string key)
+        {
+            return _context.Items.ContainsKey(key);
+        }
+
         public override TItem GetItem<TItem>(string key)
         {
             _context.Items.TryGetValue(key, out object item);
             return item as TItem;
+        }
+
+        public override IServiceProvider GetRequestServices()
+        {
+            return _context.RequestServices;
         }
 
         public override void SetItem(string key, object item)
@@ -33,6 +43,11 @@ namespace Dotnettency.AspNetCore
             {
                 _context.Response.RegisterForDispose(item);
             }                    
+        }
+
+        public override void SetRequestServices(IServiceProvider requestServices)
+        {
+            _context.RequestServices = requestServices;
         }
     }
 }

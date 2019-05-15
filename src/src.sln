@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency", "Dotnettency\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Dotnettency.Sample\Sample.csproj", "{4C346402-1A2A-4C65-A95F-8E696EE5CEC3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Container", "Dotnettency.Container\Dotnettency.Container.csproj", "{9D449854-6932-436B-B9F6-FC298273C6F5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Container.StructureMap", "Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj", "{5FDA86A9-0751-409D-9C3E-0BF344FA4CE2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4FB5543E-ED1F-4B32-A770-2675A16E508F}"
@@ -50,11 +48,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.SystemWeb", "Do
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Owin", "Dotnettency.Owin\Dotnettency.Owin.csproj", "{5576DF17-6282-4F9F-B962-7E59204CB5A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Owin.SelfHost", "Sample.Owin.SelfHost\Sample.Owin.SelfHost.csproj", "{FCEAF112-1B55-4DAD-8B2F-33DBB12311A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Owin.SelfHost", "Sample.Owin.SelfHost\Sample.Owin.SelfHost.csproj", "{FCEAF112-1B55-4DAD-8B2F-33DBB12311A9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", "{725AEBDF-B939-4F7F-91CD-1B5D48E496A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.WebApi", "Dotnettency.WebApi\Dotnettency.WebApi.csproj", "{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.WebApi", "Dotnettency.WebApi\Dotnettency.WebApi.csproj", "{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,18 +88,6 @@ Global
 		{4C346402-1A2A-4C65-A95F-8E696EE5CEC3}.Release|x64.Build.0 = Release|Any CPU
 		{4C346402-1A2A-4C65-A95F-8E696EE5CEC3}.Release|x86.ActiveCfg = Release|Any CPU
 		{4C346402-1A2A-4C65-A95F-8E696EE5CEC3}.Release|x86.Build.0 = Release|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Debug|x64.Build.0 = Debug|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Debug|x86.Build.0 = Debug|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Release|x64.ActiveCfg = Release|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Release|x64.Build.0 = Release|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Release|x86.ActiveCfg = Release|Any CPU
-		{9D449854-6932-436B-B9F6-FC298273C6F5}.Release|x86.Build.0 = Release|Any CPU
 		{5FDA86A9-0751-409D-9C3E-0BF344FA4CE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5FDA86A9-0751-409D-9C3E-0BF344FA4CE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FDA86A9-0751-409D-9C3E-0BF344FA4CE2}.Debug|x64.ActiveCfg = Debug|Any CPU

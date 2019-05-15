@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnettency.AspNetCore.Routing
 {
-
+  
     public class TenantContainerRouter<TTenant> : INamedRouter
         where TTenant : class
     {

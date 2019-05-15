@@ -21,18 +21,21 @@ namespace Dotnettency
 
         public static IAppBuilder UseRequestServices(this IAppBuilder builder, IHttpContextProvider httpContextProvider, Func<IServiceScope> factory)
         {
-            UseRequestContextItem<IServiceScope>(builder, httpContextProvider, factory, true);
+            UseRequestContextItem<IServiceScope>(builder, httpContextProvider, factory, true, (item)=> {
+                httpContextProvider.GetCurrent().SetRequestServices(item.ServiceProvider);
+            });
             return builder;
         }
 
-        public static IAppBuilder UseRequestContextItem<TItem>(this IAppBuilder builder, IHttpContextProvider httpContextProvider, Func<TItem> factory, bool disposeOfAtEndOfRequest)
+        public static IAppBuilder UseRequestContextItem<TItem>(this IAppBuilder builder, IHttpContextProvider httpContextProvider, Func<TItem> factory, bool disposeOfAtEndOfRequest, Action<TItem> onInstanceCreated)
                  where TItem : IDisposable
         {
             var options = new SetRequestContextItemMiddlewareOptions<TItem>()
             {
                 HttpContextProvider = httpContextProvider,
                 Factory = factory,
-                DisposeAtEndOfRequest = disposeOfAtEndOfRequest
+                DisposeAtEndOfRequest = disposeOfAtEndOfRequest,
+                OnInstanceCreated = onInstanceCreated
             };
             builder.Use(typeof(SetRequestContextItemMiddleware<TItem>), options);
             return builder;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Dotnettency.Container;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -43,6 +44,13 @@ namespace Dotnettency
             Services.AddScoped(sp => {
                 return sp.GetRequiredService<ITenantAccessor<TTenant>>().CurrentTenant.Value;
             });
+
+            // This is used to swap out RequestServices, and then swap it back once disposed.
+            // This was originally only needed for tenant containers, but moved to default services because 
+            // OWIN envoronments may want to use this to set / get a request scoped IServiceProvider, even if not using per tenant containers.
+            // As OWIN doesn't have a mechanism / concept for RequestServices of its own, unlike ASP.NET Core.
+            Services.AddScoped<RequestServicesSwapper<TTenant>>();
+
         }
 
         public Func<IServiceProvider> ServiceProviderFactory { get; set; }

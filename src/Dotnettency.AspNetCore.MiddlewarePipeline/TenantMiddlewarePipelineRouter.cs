@@ -8,7 +8,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnettency.AspNetCore.Routing
 {
-
+    /// <summary>
+    /// This is a router, that routes the request through the current tenants pipeline. As such, it matches, as long as the current tenant has it's own pipeline.
+    /// </summary>
+    /// <typeparam name="TTenant"></typeparam>
     public class TenantMiddlewarePipelineRouter<TTenant> : INamedRouter
         where TTenant : class
     {

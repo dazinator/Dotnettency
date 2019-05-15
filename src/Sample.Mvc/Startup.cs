@@ -90,7 +90,7 @@ namespace Sample.Mvc
             app.UseMultitenancy<Tenant>((options) =>
             {
                 options
-                       .UsePerTenantContainers()
+                       .UseTenantContainers()
                        .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
                        {
                            // using tenant content root and web root.

@@ -10,5 +10,6 @@ namespace Dotnettency.Owin
         public IHttpContextProvider HttpContextProvider { get; set; }
 
         public bool DisposeAtEndOfRequest { get; set; }
+        public Action<TItem> OnInstanceCreated { get; internal set; }
     }
 }

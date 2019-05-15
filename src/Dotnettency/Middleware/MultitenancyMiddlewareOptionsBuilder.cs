@@ -8,7 +8,7 @@
         }
 
         public AppBuilderAdaptorBase ApplicationBuilder { get; }
+
+
     }
-
-
 }

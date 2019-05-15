@@ -13,6 +13,18 @@ namespace Dotnettency
             //  IAppBuilder.UseRequestScopeContext() middleware has been activated.
             builder.Services.AddSingleton<IHttpContextProvider, HttpContextProvider>();       
             return builder;
-        }       
+        }
+
+        public static MultitenancyOptionsBuilder<TTenant> AddTenantContainerServices<TTenant>(this MultitenancyOptionsBuilder<TTenant> builder)
+           where TTenant : class
+        {
+            // this service will only work when 
+            //  IAppBuilder.UseRequestScopeContext() middleware has been activated.
+            builder.Services.AddSingleton<IHttpContextProvider, HttpContextProvider>();
+            return builder;
+        }
+
+
+
     }
 }

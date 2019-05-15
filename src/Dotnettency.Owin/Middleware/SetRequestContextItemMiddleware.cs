@@ -6,6 +6,11 @@ using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, objec
 namespace Dotnettency.Owin
 {
 
+
+    /// <summary>
+    /// Middleware that creates an instance of <see cref="TItem"/> and stores it in request items, optionally disposing it once request is processed.
+    /// </summary>
+    /// <typeparam name="TItem"></typeparam>
     public class SetRequestContextItemMiddleware<TItem>
         where TItem : IDisposable
     {
@@ -23,8 +28,8 @@ namespace Dotnettency.Owin
         {
             var item = _options.Factory.Invoke();
             _options.HttpContextProvider.GetCurrent().SetItem(typeof(TItem).Name, item, _options.DisposeAtEndOfRequest);
+            _options.OnInstanceCreated?.Invoke(item);
             await _next?.Invoke(environment);
-
         }
     }
 }

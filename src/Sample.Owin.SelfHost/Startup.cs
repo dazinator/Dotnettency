@@ -12,20 +12,27 @@ namespace Sample.Owin.SelfHost
         {
 
             IServiceCollection services = new ServiceCollection();
-            Configure(services);
-            IServiceProvider sp = services.BuildServiceProvider();
+            var sp = Configure(services);
 
             app.UseErrorPage();
 
             app.UseMultitenancy<Tenant>(sp, (options) =>
             {
-                // Creates IServiceScope.ServiceProvider for current request scoped services,
-                // which you can then get access to from any middleware using IOwinContext.GetRequestServices() extension method.           
+                // Have to establish a scoped IServiceProvider for the current request first,
+                // because there are dotnettency services that provide tenant level stuff, 
+                // which are registered as Scoped() and so require this. Without this, they will be created in Application scope and stuff won't work!
                 options.UseRequestServices(() => sp.CreateScope()); // You could optionally also set your WebAPI or Framework of choices DependencyResolver.Current here to use same scope.
+
+                // Note: You can then get access to the current RequestServices from anywhere during a request, 
+                // using IOwinContext.GetRequestServices() extension method.              
+                options.UseTenantContainers(); // Will resolve current tenant's container, then swap out RequestServices for a tenant scoped IServiceProvider.
+
+
             });
 
             app.Use(async (context, next) =>
             {
+                // Tenant resolution
                 var tenant = await context.GetTenantAysnc<Tenant>();
                 await context.Response.WriteAsync($"Browse on ports 5000 - 5004 to witness multitenancy behaviours.");
                 if (tenant == null)
@@ -37,20 +44,44 @@ namespace Sample.Owin.SelfHost
                     await context.Response.WriteAsync($"Hello from tenant: {tenant.Name}");
                 }
 
+                // Tenant services (containers).
+                var requestSp = context.GetRequestServices();
+                var service = requestSp.GetService<SomeTenantService>();
+                if (service == null)
+                {
+                    await context.Response.WriteAsync($"SomeTenantService is null");
+                }
+                else
+                {
+                    await context.Response.WriteAsync($"SomeTenantService is: Name: {service.TenantName}, Id: {service.Id}");
+                }
+
+
                 await next();
 
             });
         }
 
-        private void Configure(IServiceCollection services)
+        private IServiceProvider Configure(IServiceCollection services)
         {
-            services.AddMultiTenancy<Tenant>((builder) =>
-            {
-                builder.AddOwin()
-                       .IdentifyTenantsWithRequestAuthorityUri()
-                       .InitialiseTenant<TenantShellFactory>();
+            services.AddLogging();
 
-            });
+            var sp = services.AddMultiTenancy<Tenant>((builder) =>
+             {
+                 builder.AddOwin()
+                        .IdentifyTenantsWithRequestAuthorityUri()
+                        .InitialiseTenant<TenantShellFactory>()
+                        .ConfigureTenantContainers((containerOptions) =>
+                        {
+                            containerOptions.Autofac((tenant, tenantServices) =>
+                            {
+                                tenantServices.AddSingleton<SomeTenantService>(new SomeTenantService(tenant));
+                            });
+                        });
+             });
+
+            // Note: You must return / use dotnettency's IServiceProvider, as it is backed by autofac in this instance, and has additional services that won't be contained in your original IServiceCollecton.
+            return sp;
         }
     }
 }

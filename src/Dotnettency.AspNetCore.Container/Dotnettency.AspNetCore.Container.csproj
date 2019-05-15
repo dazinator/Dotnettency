@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
-    <ProjectReference Include="..\Dotnettency.Container\Dotnettency.Container.csproj" />
   </ItemGroup>
 
 </Project>

@@ -13,18 +13,28 @@ namespace Dotnettency.AspNetCore.Container
         private readonly RequestDelegate _next;
         private readonly ILogger<TenantContainerMiddleware<TTenant>> _logger;
         private readonly AppBuilderAdaptorBase _appBuilder;
+        private readonly IHttpContextProvider _httpContextProvider;
 
         public TenantContainerMiddleware(
             RequestDelegate next,
-            ILogger<TenantContainerMiddleware<TTenant>> logger,
-            AppBuilderAdaptorBase appBuilder)
+            ILogger<TenantContainerMiddleware<TTenant>> logger,            
+            AppBuilderAdaptorBase appBuilder,
+            IHttpContextProvider httpContextProvider
+            
+            )
         {
             _next = next;
             _logger = logger;
             _appBuilder = appBuilder;
+            _httpContextProvider = httpContextProvider;
         }
 
-        public async Task Invoke(HttpContext context, ITenantContainerAccessor<TTenant> tenantContainerAccessor, ITenantRequestContainerAccessor<TTenant> requestContainerAccessor)
+        public IHttpContextProvider HttpContextProvider => _httpContextProvider;
+
+        public async Task Invoke(HttpContext context,
+            RequestServicesSwapper<TTenant> requestServicesSwapper,
+            ITenantContainerAccessor<TTenant> tenantContainerAccessor,
+            ITenantRequestContainerAccessor<TTenant> requestContainerAccessor)
         {
             _logger.LogDebug("Tenant Container Middleware - Start.");
 
@@ -44,12 +54,17 @@ namespace Dotnettency.AspNetCore.Container
                 _appBuilder.ApplicationServices = tenantContainer;
                 var perRequestContainer = await requestContainerAccessor.TenantRequestContainer.Value;
               
-                // Ensure container is disposed at end of request.
+                // Ensure per request container is disposed at end of request.
                 context.Response.RegisterForDispose(perRequestContainer);
                 
                 // Replace request services with a nested version (for lifetime management - used to encpasulate a request).
-                _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
-                await perRequestContainer.ExecuteWithinSwappedRequestContainer(_next, context);
+                _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.ContainerId, perRequestContainer.ContainerName);
+
+                requestServicesSwapper.SwapRequestServices(perRequestContainer);
+                //  var swapContextRequestServices = new RequestServicesSwapper(perRequestContainer);                
+                // swapContextRequestServices.SwapRequestServices()
+                await _next?.Invoke(context);
+                 //await swapContextRequestServices.ExecuteWithinSwappedRequestContainer(_next, context);
                 _logger.LogDebug("Restoring Request Container");
             }
             finally

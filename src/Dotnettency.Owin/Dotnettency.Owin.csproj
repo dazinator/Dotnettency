@@ -13,4 +13,8 @@
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Container\" />
+  </ItemGroup>
+
 </Project>
