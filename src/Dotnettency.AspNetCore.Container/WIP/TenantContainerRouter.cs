@@ -44,6 +44,7 @@ namespace Dotnettency.AspNetCore.Routing
             //  context.han
             var tenantContainerAccessor = context.HttpContext.RequestServices.GetRequiredService<ITenantContainerAccessor<TTenant>>();
             var requestContainerAccessor = context.HttpContext.RequestServices.GetRequiredService<ITenantRequestContainerAccessor<TTenant>>();
+            var swapper = context.HttpContext.RequestServices.GetRequiredService<RequestServicesSwapper<TTenant>>();
 
             _logger.LogDebug("Tenant Container Middleware - Start.");
 
@@ -67,9 +68,11 @@ namespace Dotnettency.AspNetCore.Routing
                 {
                     var perRequestContainer = await requestContainerAccessor.TenantRequestContainer.Value;
                     context.HttpContext.Response.RegisterForDispose(perRequestContainer);
-                    _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.RequestContainer.ContainerId, perRequestContainer.RequestContainer.ContainerName);
-                    await perRequestContainer.ExecuteWithinSwappedRequestContainer(wrapped, context.HttpContext);
-                    _logger.LogDebug("Restored Request Container");
+                    _logger.LogDebug("Setting Request Container: {containerId} - {containerName}", perRequestContainer.ContainerId, perRequestContainer.ContainerName);
+
+                    swapper.SwapRequestServices(perRequestContainer);
+                    await wrapped(context.HttpContext);
+
                 };
             }
 

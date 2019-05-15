@@ -50,6 +50,7 @@ namespace Dotnettency.AspNetCore.Container
 
             try
             {
+                // Can't remember why this is necessary to swap appBuilder.ApplicationServices here.. might be some mvc thing, need to rediscover.
                 _logger.LogDebug("Setting AppBuilder Services to Tenant Container: {containerId} - {containerName}", tenantContainer.ContainerId, tenantContainer.ContainerName);
                 _appBuilder.ApplicationServices = tenantContainer;
                 var perRequestContainer = await requestContainerAccessor.TenantRequestContainer.Value;
