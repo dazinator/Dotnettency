@@ -3,7 +3,7 @@ minor-version-bump-message: '\+semver:\s?(feature|minor)'
 patch-version-bump-message: '\+semver:\s?(fix|patch)'
 commit-message-incrementing: Enabled
 branches:
-    features?[/-]:
+    feature:
         mode: ContinuousDelivery
         tag: useBranchName
         increment: Inherit
