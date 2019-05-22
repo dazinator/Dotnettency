@@ -11,13 +11,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="4.8.1" />
+		<PackageReference Include="Autofac" Version="4.9.2" />
 		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Dotnettency.Container\Dotnettency.Container.csproj" />
+	  <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
 	</ItemGroup>
 
 </Project>

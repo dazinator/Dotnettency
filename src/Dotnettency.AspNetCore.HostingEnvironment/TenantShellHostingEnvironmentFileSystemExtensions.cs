@@ -15,6 +15,18 @@ namespace Dotnettency.AspNetCore.HostingEnvironment
             return tenantShell.GetOrAddTenantFileSystem(ContentRootKey, factory) as Lazy<ICabinet>;           
         }
 
+        public static Lazy<ICabinet> TryGetContentRootFileSystem<TTenant>(this TenantShell<TTenant> tenantShell)
+            where TTenant : class
+        {
+            return tenantShell.TryGetTenantFileSystem(ContentRootKey) as Lazy<ICabinet>;
+        }
+
+        public static Lazy<ICabinet> TryGetWebRootFileSystem<TTenant>(this TenantShell<TTenant> tenantShell)
+            where TTenant : class
+        {
+            return tenantShell.TryGetTenantFileSystem(WebRootKey) as Lazy<ICabinet>;
+        }
+
         public static Lazy<ICabinet> GetOrAddTenantWebRootFileSystem<TTenant>(this TenantShell<TTenant> tenantShell, Lazy<ICabinet> factory)
             where TTenant : class
         {

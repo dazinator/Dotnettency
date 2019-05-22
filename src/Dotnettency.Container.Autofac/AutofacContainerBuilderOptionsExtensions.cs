@@ -8,7 +8,7 @@ namespace Dotnettency
 {
     public static class AutofacContainerBuilderOptionsExtensions
     {
-        public static AdaptedContainerBuilderOptions<TTenant> WithAutofac<TTenant>(
+        public static AdaptedContainerBuilderOptions<TTenant> Autofac<TTenant>(
             this ContainerBuilderOptions<TTenant> options,
             Action<TTenant, IServiceCollection> configureTenant)
             where TTenant : class

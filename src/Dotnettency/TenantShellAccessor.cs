@@ -7,11 +7,11 @@ namespace Dotnettency
         where TTenant : class
     {
         private readonly ITenantShellFactory<TTenant> _tenantFactory;
-        private readonly TenantDistinguisherAccessor<TTenant> _tenantDistinguisherAccessor;
+        private readonly TenantIdentifierAccessor<TTenant> _tenantDistinguisherAccessor;
         private readonly ITenantShellResolver<TTenant> _tenantResolver;
 
         public TenantShellAccessor(ITenantShellFactory<TTenant> tenantFactory,
-            TenantDistinguisherAccessor<TTenant> tenantDistinguisherAccessor,
+            TenantIdentifierAccessor<TTenant> tenantDistinguisherAccessor,
             ITenantShellResolver<TTenant> tenantResolver)
         {
             _tenantFactory = tenantFactory;

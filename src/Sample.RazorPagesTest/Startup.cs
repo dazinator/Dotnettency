@@ -24,10 +24,11 @@ namespace Sample.RazorPagesTest
 
             services.AddMvc();
 
-            IServiceProvider serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
+                    .AddAspNetCore()
                     .ConfigureTenantContainers((containerBuilder) =>
                     {
                         containerBuilder.Events((events) =>
@@ -47,7 +48,7 @@ namespace Sample.RazorPagesTest
                         })
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        .WithAutofac((tenant, tenantServices) =>
+                        .Autofac((tenant, tenantServices) =>
                         {
                             //  var actionContextAccessor = new MyActionContextAccessor();
                             // tenantServices.AddSingleton<IActionContextAccessor>(actionContextAccessor);
@@ -67,7 +68,7 @@ namespace Sample.RazorPagesTest
                             //   mvcBuilder.AddRazorPagesOptions((r) => { r. });
 
                         })
-                        .AddPerRequestContainerMiddlewareServices()
+                        //.AddPerRequestContainerMiddlewareServices()
                         .AddPerTenantMiddlewarePipelineServices(); // allows tenants to have there own middleware pipeline accessor stored in their tenant containers.
                                                                    // .WithModuleContainers(); // Creates a child container per IModule.
                     })
@@ -127,8 +128,8 @@ namespace Sample.RazorPagesTest
 
             app = app.UseMultitenancy<Tenant>((options) =>
             {
-                options.UsePerTenantContainers();
-                options.UsePerTenantMiddlewarePipeline();
+                options.UseTenantContainers();
+                options.UsePerTenantMiddlewarePipeline(app);
             });
 
 

@@ -23,7 +23,6 @@
     <ProjectReference Include="..\Dotnettency.AspNetCore.HostingEnvironment\Dotnettency.AspNetCore.HostingEnvironment.csproj" />
     <ProjectReference Include="..\Dotnettency.AspNetCore.MiddlewarePipeline\Dotnettency.AspNetCore.MiddlewarePipeline.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
-    <ProjectReference Include="..\Dotnettency.Container\Dotnettency.Container.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 

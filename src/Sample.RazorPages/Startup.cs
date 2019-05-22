@@ -77,9 +77,10 @@ namespace Sample.RazorPages
             var logger = _loggerFactory.CreateLogger<Startup>();
 
 
-            var serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
+                    .AddAspNetCore()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                     {
@@ -100,7 +101,7 @@ namespace Sample.RazorPages
                         })
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        .WithAutofac((tenant, tenantServices) =>
+                        .Autofac((tenant, tenantServices) =>
                         {
                           //  var actionContextAccessor = new MyActionContextAccessor();
                            // tenantServices.AddSingleton<IActionContextAccessor>(actionContextAccessor);
@@ -109,7 +110,7 @@ namespace Sample.RazorPages
                          //   mvcBuilder.AddRazorPagesOptions((r) => { r. });
 
                         })
-                        .AddPerRequestContainerMiddlewareServices()
+                        //.AddPerRequestContainerMiddlewareServices()
                         .AddPerTenantMiddlewarePipelineServices(); // allows tenants to have there own middleware pipeline accessor stored in their tenant containers.
                                                                    // .WithModuleContainers(); // Creates a child container per IModule.
                     })
@@ -252,8 +253,8 @@ namespace Sample.RazorPages
 
             app = app.UseMultitenancy<Tenant>((options) =>
           {
-              options.UsePerTenantContainers();
-              options.UsePerTenantMiddlewarePipeline();
+              options.UseTenantContainers();
+              options.UsePerTenantMiddlewarePipeline(app);
           });
 
           // app.UseStaticFiles();

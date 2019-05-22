@@ -5,27 +5,36 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.AspNetCore.MiddlewarePipeline
 {
+
+    public class TenantPipelineMiddlewareOptions
+    {
+        public IApplicationBuilder RootApp { get; set; }
+
+        public bool IsTerminal { get; set; }
+
+
+    }
     public class TenantPipelineMiddleware<TTenant>
         where TTenant : class
     {
         private readonly RequestDelegate _next;
-        private readonly IApplicationBuilder _rootApp;
-        private readonly ILogger<TenantPipelineMiddleware<TTenant>> _logger;
+        private readonly TenantPipelineMiddlewareOptions _options;
+        private readonly ILogger<TenantPipelineMiddleware<TTenant>> _logger;        
 
         public TenantPipelineMiddleware(
             RequestDelegate next,
-            IApplicationBuilder rootApp,
+            TenantPipelineMiddlewareOptions options,
             ILogger<TenantPipelineMiddleware<TTenant>> logger)
         {
             _next = next;
-            _rootApp = rootApp;
-            _logger = logger;
+            _options = options;
+            _logger = logger;          
         }
 
         public async Task Invoke(HttpContext context, ITenantPipelineAccessor<TTenant> tenantPipelineAccessor, ITenantMiddlewarePipelineFactory<TTenant> tenantPipelineFactory)
         {
             _logger.LogDebug("Tenant Pipeline Middleware - Getting Tenant Pipeline.");
-            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_rootApp, _rootApp.ApplicationServices, _next, tenantPipelineFactory).Value;
+            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_options.RootApp, _options.RootApp.ApplicationServices, _next, tenantPipelineFactory, !_options.IsTerminal).Value;
 
             if (tenantPipeline != null)
             {

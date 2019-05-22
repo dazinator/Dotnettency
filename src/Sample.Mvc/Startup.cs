@@ -23,9 +23,10 @@ namespace Sample.Mvc
 
             services.AddMvc();
 
-            var serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
+                    .AddAspNetCore()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
@@ -47,8 +48,8 @@ namespace Sample.Mvc
                         containerBuilder.WithStructureMap((tenant, tenantServices) =>
                         {
                             // tenantServices.AddSingleton<SomeTenantService>();
-                        })
-                        .AddPerRequestContainerMiddlewareServices(); // becuase we use per-request tenant container middleware.
+                        });
+                        //.AddPerRequestContainerMiddlewareServices(); // becuase we use per-request tenant container middleware.
                     })
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
@@ -89,14 +90,8 @@ namespace Sample.Mvc
             app.UseMultitenancy<Tenant>((options) =>
             {
                 options
-                       .UsePerTenantContainers()
-                       .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
-                       {
-                           // using tenant content root and web root.
-                           hostingEnvironmentOptions.UseTenantContentRootFileProvider();
-                           hostingEnvironmentOptions.UseTenantWebRootFileProvider();
-                       })
-                       .UsePerTenantMiddlewarePipeline();
+                       .UseTenantContainers()                      
+                       .UsePerTenantMiddlewarePipeline(app);
             });
 
             app.UseMvc(routes =>

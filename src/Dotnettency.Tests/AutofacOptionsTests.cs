@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Dotnettency.AspNetCore.Container;
+using Dotnettency.Container;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -83,10 +84,11 @@ namespace Dotnettency.Tests
             IServiceCollection services = new ServiceCollection() as IServiceCollection;
             services.AddLogging();
 
-            IServiceProvider serviceProvider = services.AddAspNetCoreMultiTenancy<Tenant>((options) =>
+            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .IdentifyTenantTask(() => Task.FromResult(new TenantDistinguisher(new Uri("unittest://"))))
+                    .IdentifyTenantTask(() => Task.FromResult(new TenantIdentifier(new Uri("unittest://"))))
+                    .AddAspNetCore()
                     .InitialiseTenant(tenantId =>
                     {                        
                         if (tenantId.Uri.Scheme != "unittest")
@@ -114,12 +116,11 @@ namespace Dotnettency.Tests
                         })
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        .WithAutofac((tenant, tenantServices) =>
+                        .Autofac((tenant, tenantServices) =>
                         {
                             tenantServices.AddOptions();
                             tenantServices.Configure<MyOptions>((a) => { a.Foo = true; });
-                        })
-                        .AddPerRequestContainerMiddlewareServices();
+                        });                        
                     });
             });
 
@@ -129,9 +130,9 @@ namespace Dotnettency.Tests
 
 
             ITenantRequestContainerAccessor<Tenant> tenantRequestContainerAccessor = scoped.ServiceProvider.GetRequiredService<ITenantRequestContainerAccessor<Tenant>>();
-            PerRequestContainer requestContainer = await tenantRequestContainerAccessor.TenantRequestContainer.Value;
+            var requestContainer = await tenantRequestContainerAccessor.TenantRequestContainer.Value;
 
-            IOptions<MyOptions> registeredoptions = requestContainer.RequestContainer.GetRequiredService<IOptions<MyOptions>>();
+            IOptions<MyOptions> registeredoptions = requestContainer.GetRequiredService<IOptions<MyOptions>>();
             var myOptions = registeredoptions.Value;
 
             Assert.True(myOptions.Foo);

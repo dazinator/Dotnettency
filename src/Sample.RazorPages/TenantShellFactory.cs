@@ -6,7 +6,7 @@ namespace Sample.RazorPages
 {
     public class TenantShellFactory : ITenantShellFactory<Tenant>
     {
-        public Task<TenantShell<Tenant>> Get(TenantDistinguisher distinguisher)
+        public Task<TenantShell<Tenant>> Get(TenantIdentifier distinguisher)
         {
             if (distinguisher.Uri.Port == 5000 || distinguisher.Uri.Port == 5001)
             {

@@ -1,5 +1,6 @@
 ﻿using Dotnettency.AspNetCore;
 using Dotnettency.AspNetCore.Modules;
+using Dotnettency.Middleware;
 using Microsoft.AspNetCore.Builder;
 
 namespace Dotnettency

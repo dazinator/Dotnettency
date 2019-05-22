@@ -8,6 +8,6 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
     public interface ITenantMiddlewarePipelineFactory<TTenant>
         where TTenant : class
     {
-        Task<RequestDelegate> Create(IApplicationBuilder appBuilder, IServiceProvider serviceProviderOverride, TTenant tenant, RequestDelegate next);
+        Task<RequestDelegate> Create(IApplicationBuilder appBuilder, IServiceProvider serviceProviderOverride, TTenant tenant, RequestDelegate next, bool reJoin);
     }
 }
