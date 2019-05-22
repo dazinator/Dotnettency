@@ -19,9 +19,7 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dotnettency.AspNetCore.Container\Dotnettency.AspNetCore.Container.csproj" />
     <ProjectReference Include="..\Dotnettency.AspNetCore.HostingEnvironment\Dotnettency.AspNetCore.HostingEnvironment.csproj" />
-    <ProjectReference Include="..\Dotnettency.AspNetCore.MiddlewarePipeline\Dotnettency.AspNetCore.MiddlewarePipeline.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
