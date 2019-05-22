@@ -7,7 +7,7 @@ namespace Dotnettency
 {
     public class MultitenancyOptionsBuilder<TTenant>
         where TTenant : class
-    {
+    {        
         public MultitenancyOptionsBuilder(IServiceCollection serviceCollection)
         {
             Services = serviceCollection;
@@ -80,8 +80,6 @@ namespace Dotnettency
             IdentifyTenantsWith<RequestAuthorityTenantIdentifierFactory<TTenant>>();
             return this;
         }
-
-
 
         public MultitenancyOptionsBuilder<TTenant> IdentifyTenantTask(Func<Task<TenantIdentifier>> factory)            
         {

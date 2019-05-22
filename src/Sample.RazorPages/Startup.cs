@@ -81,6 +81,7 @@ namespace Sample.RazorPages
             {
                 options
                     .AddAspNetCore()
+                    .IdentifyTenantsWithRequestAuthorityUri()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                     {
@@ -103,10 +104,10 @@ namespace Sample.RazorPages
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
                         .Autofac((tenant, tenantServices) =>
                         {
-                          //  var actionContextAccessor = new MyActionContextAccessor();
-                           // tenantServices.AddSingleton<IActionContextAccessor>(actionContextAccessor);
+                            //  var actionContextAccessor = new MyActionContextAccessor();
+                            // tenantServices.AddSingleton<IActionContextAccessor>(actionContextAccessor);
 
-                           var mvcBuilder = tenantServices.AddMvc();
+                            var mvcBuilder = tenantServices.AddMvc();
                          //   mvcBuilder.AddRazorPagesOptions((r) => { r. });
 
                         })
