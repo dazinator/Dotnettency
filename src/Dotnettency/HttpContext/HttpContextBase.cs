@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dotnettency
 {
@@ -21,5 +23,12 @@ namespace Dotnettency
         public abstract void SetRequestServices(IServiceProvider requestServices);
 
         public abstract IServiceProvider GetRequestServices();
+
+        public Task<TenantShell<TTenant>> GetTenantShell<TTenant>()
+            where TTenant : class
+        {
+            var tenantShellAccessor = GetRequestServices().GetService<ITenantShellAccessor<TTenant>>();
+            return tenantShellAccessor.CurrentTenantShell.Value;           
+        }
     }
 }

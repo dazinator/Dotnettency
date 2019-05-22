@@ -10,17 +10,27 @@ namespace Dotnettency.AspNetCore.HostingEnvironment
     {
         private readonly IHostingEnvironment _parentHostingEnvironment;
 
-        public TenantHostingEnvironmentOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder, IHostingEnvironment hostingEnvironment)
+        /// <summary>
+        /// Add this to Tenant Container.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="hostingEnvironment"></param>
+        public TenantHostingEnvironmentOptionsBuilder(
+            MultitenancyOptionsBuilder<TTenant> builder, 
+            IHostingEnvironment hostingEnvironment)
         {
             Builder = builder;
             _parentHostingEnvironment = hostingEnvironment;
 
-            // Override the singleton registration of IHostingEnvironment with
-            // a scoped version so that we can configure it for the tenant
-            // early on in each request.
-            Builder.Services.AddScoped<IHostingEnvironment>((sp) =>
+            // Wrap the singleton registration of IHostingEnvironment with
+            // one that resolves current tenant specific file providers.
+            Builder.Services.AddSingleton<IHostingEnvironment>((sp) =>
             {
-                return new TenantHostingEnvironment<TTenant>(hostingEnvironment);
+                var contextProvider = sp.GetRequiredService<IHttpContextProvider>();
+                var factory = sp.GetRequiredService<IHttpContextProvider>();
+                var webRootfactory = sp.GetRequiredService<ITenantWebRootFileSystemProviderFactory<TTenant>>();
+                var contentRootfactory = sp.GetRequiredService<ITenantContentRootFileSystemProviderFactory<TTenant>>();
+                return new TenantHostingEnvironment<TTenant>(hostingEnvironment, contextProvider, webRootfactory, contentRootfactory);
             });
         }
 

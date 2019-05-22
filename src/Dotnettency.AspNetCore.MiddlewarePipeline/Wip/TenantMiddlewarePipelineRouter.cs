@@ -55,10 +55,8 @@ namespace Dotnettency.AspNetCore.Routing
           //  Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetServiceOrCreateInstance<>
             var tenantPipelineAccessor = tenantContainer.GetRequiredService<ITenantPipelineAccessor<TTenant>>();
 
-
-
             _logger.LogDebug("Tenant Pipeline Router - Getting Tenant Pipeline.");
-            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_rootAppBuilder, tenantContainer, null, _pipelineFactory).Value;
+            var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_rootAppBuilder, tenantContainer, null, _pipelineFactory, true).Value;
 
             if (tenantPipeline != null)
             {

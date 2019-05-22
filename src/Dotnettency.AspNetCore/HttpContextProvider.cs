@@ -5,7 +5,7 @@ namespace Dotnettency.AspNetCore
     public class HttpContextProvider : IHttpContextProvider
     {
         private readonly IHttpContextAccessor _httpContextAccesor;
-        protected HttpContextProvider(IHttpContextAccessor httpContextAccessor)
+        public HttpContextProvider(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccesor = httpContextAccessor;
         }

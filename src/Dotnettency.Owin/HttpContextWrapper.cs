@@ -1,5 +1,6 @@
 ﻿using DavidLievrouw.OwinRequestScopeContext;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dotnettency.Owin
 {
@@ -26,7 +27,7 @@ namespace Dotnettency.Owin
         {
             _context.Items.TryGetValue(key, out object val);
             return val as TItem;
-        }
+        }        
 
         public override IServiceProvider GetRequestServices()
         {

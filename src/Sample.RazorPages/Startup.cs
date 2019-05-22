@@ -110,7 +110,7 @@ namespace Sample.RazorPages
                          //   mvcBuilder.AddRazorPagesOptions((r) => { r. });
 
                         })
-                        .AddPerRequestContainerMiddlewareServices()
+                        //.AddPerRequestContainerMiddlewareServices()
                         .AddPerTenantMiddlewarePipelineServices(); // allows tenants to have there own middleware pipeline accessor stored in their tenant containers.
                                                                    // .WithModuleContainers(); // Creates a child container per IModule.
                     })
@@ -254,7 +254,7 @@ namespace Sample.RazorPages
             app = app.UseMultitenancy<Tenant>((options) =>
           {
               options.UseTenantContainers();
-              options.UsePerTenantMiddlewarePipeline();
+              options.UsePerTenantMiddlewarePipeline(app);
           });
 
           // app.UseStaticFiles();

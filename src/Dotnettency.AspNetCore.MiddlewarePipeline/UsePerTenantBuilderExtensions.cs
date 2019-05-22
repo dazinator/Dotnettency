@@ -7,10 +7,11 @@ namespace Dotnettency
 {
     public static class UsePerTenantBuilderExtensions
     {
-        public static MultitenancyMiddlewareOptionsBuilder<TTenant> UsePerTenantMiddlewarePipeline<TTenant>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder)
+        public static MultitenancyMiddlewareOptionsBuilder<TTenant> UsePerTenantMiddlewarePipeline<TTenant>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder, IApplicationBuilder rootAppBuilder)
             where TTenant : class
         {
-            builder.ApplicationBuilder.UseMiddleware<TenantPipelineMiddleware<TTenant>>(builder.ApplicationBuilder);
+            var options = new TenantPipelineMiddlewareOptions() { IsTerminal = false, RootApp = rootAppBuilder };
+            builder.ApplicationBuilder.UseMiddleware<TenantPipelineMiddleware<TTenant>>(options);
             return builder;
         }
     }   

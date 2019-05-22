@@ -48,8 +48,8 @@ namespace Sample.Mvc
                         containerBuilder.WithStructureMap((tenant, tenantServices) =>
                         {
                             // tenantServices.AddSingleton<SomeTenantService>();
-                        })
-                        .AddPerRequestContainerMiddlewareServices(); // becuase we use per-request tenant container middleware.
+                        });
+                        //.AddPerRequestContainerMiddlewareServices(); // becuase we use per-request tenant container middleware.
                     })
                 // configure per tenant hosting environment.
                 .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
@@ -90,14 +90,8 @@ namespace Sample.Mvc
             app.UseMultitenancy<Tenant>((options) =>
             {
                 options
-                       .UseTenantContainers()
-                       .UsePerTenantHostingEnvironment((hostingEnvironmentOptions) =>
-                       {
-                           // using tenant content root and web root.
-                           hostingEnvironmentOptions.UseTenantContentRootFileProvider();
-                           hostingEnvironmentOptions.UseTenantWebRootFileProvider();
-                       })
-                       .UsePerTenantMiddlewarePipeline();
+                       .UseTenantContainers()                      
+                       .UsePerTenantMiddlewarePipeline(app);
             });
 
             app.UseMvc(routes =>
