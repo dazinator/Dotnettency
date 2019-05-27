@@ -1,4 +1,4 @@
-﻿using Dotnettency.AspNetCore.MiddlewarePipeline;
+﻿using Dotnettency.MiddlewarePipeline;
 using System;
 
 namespace Dotnettency

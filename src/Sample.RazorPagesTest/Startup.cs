@@ -75,7 +75,7 @@ namespace Sample.RazorPagesTest
                     })
                     .ConfigureTenantMiddleware((a) =>
                     {
-                        a.OnInitialiseTenantPipeline((b, c) =>
+                        a.AspNetCorePipeline((b, c) =>
                         {
                             c.UseDeveloperExceptionPage();
                             c.UseStaticFiles();

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Dotnettency.MiddlewarePipeline;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
             _logger = logger;          
         }
 
-        public async Task Invoke(HttpContext context, ITenantPipelineAccessor<TTenant> tenantPipelineAccessor, ITenantMiddlewarePipelineFactory<TTenant> tenantPipelineFactory)
+        public async Task Invoke(HttpContext context, ITenantPipelineAccessor<TTenant, IApplicationBuilder, RequestDelegate> tenantPipelineAccessor, ITenantMiddlewarePipelineFactory<TTenant, IApplicationBuilder, RequestDelegate> tenantPipelineFactory)
         {
             _logger.LogDebug("Tenant Pipeline Middleware - Getting Tenant Pipeline.");
             var tenantPipeline = await tenantPipelineAccessor.TenantPipeline(_options.RootApp, _options.RootApp.ApplicationServices, _next, tenantPipelineFactory, !_options.IsTerminal).Value;

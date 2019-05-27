@@ -1,4 +1,4 @@
-﻿namespace Dotnettency.AspNetCore.MiddlewarePipeline
+﻿namespace Dotnettency.MiddlewarePipeline
 {
     public class TenantPipelineBuilderContext<TTenant>
     {

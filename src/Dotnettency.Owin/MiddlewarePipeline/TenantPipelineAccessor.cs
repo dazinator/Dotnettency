@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Dotnettency.MiddlewarePipeline;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+using Owin;
+using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
-namespace Dotnettency.AspNetCore.MiddlewarePipeline
+namespace Dotnettency.Owin.MiddlewarePipeline
 {
-    public class TenantPipelineAccessor<TTenant> : ITenantPipelineAccessor<TTenant, IApplicationBuilder, RequestDelegate>
+    public class TenantPipelineAccessor<TTenant> : ITenantPipelineAccessor<TTenant, IAppBuilder, AppFunc>
         where TTenant : class
     {
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
@@ -16,9 +16,9 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
         {
             _tenantShellAccessor = tenantShellAccessor;
 
-            TenantPipeline = new Func<IApplicationBuilder, IServiceProvider, RequestDelegate, ITenantMiddlewarePipelineFactory<TTenant, IApplicationBuilder, RequestDelegate>, bool, Lazy<Task<RequestDelegate>>>((appBuilder, sp, next, factory, reJoin) =>
+            TenantPipeline = new Func<IAppBuilder, IServiceProvider, AppFunc, ITenantMiddlewarePipelineFactory<TTenant, IAppBuilder, AppFunc>, bool, Lazy<Task<AppFunc>>>((appBuilder, sp, next, factory, reJoin) =>
             {
-                return new Lazy<Task<RequestDelegate>>(async () =>
+                return new Lazy<Task<AppFunc>>(async () =>
                 {
                     var tenantShell = await _tenantShellAccessor.CurrentTenantShell.Value;
                     if (tenantShell == null)
@@ -27,7 +27,7 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
                     }
 
                     var tenant = tenantShell?.Tenant;
-                    var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline(new Lazy<Task<RequestDelegate>>(() =>
+                    var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline(new Lazy<Task<AppFunc>>(() =>
                     {
                         return factory.Create(appBuilder, sp, tenant, next, reJoin);
                     }));
@@ -37,6 +37,6 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
             });
         }
 
-        public Func<IApplicationBuilder, IServiceProvider, RequestDelegate, ITenantMiddlewarePipelineFactory<TTenant, IApplicationBuilder, RequestDelegate>, bool, Lazy<Task<RequestDelegate>>> TenantPipeline { get; private set; }
+        public Func<IAppBuilder, IServiceProvider, AppFunc, ITenantMiddlewarePipelineFactory<TTenant, IAppBuilder, AppFunc>, bool, Lazy<Task<AppFunc>>> TenantPipeline { get; private set; }
     }
 }

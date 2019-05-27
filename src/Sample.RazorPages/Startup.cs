@@ -117,7 +117,7 @@ namespace Sample.RazorPages
                     })
                     .ConfigureTenantMiddleware((a) =>
                     {
-                        a.OnInitialiseTenantPipeline((b, c) =>
+                        a.AspNetCorePipeline((b, c) =>
                         {
                             var log = c.ApplicationServices.GetRequiredService<ILogger<Startup>>();
                             c.UseWelcomePage("/welcome");

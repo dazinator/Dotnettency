@@ -102,7 +102,7 @@ namespace Sample
                    })
                     .ConfigureTenantMiddleware((tenantBuilder) =>
                     {
-                        var appBuilder = tenantBuilder.OnInitialiseTenantPipeline((tenantContext, tenantAppBuilder) =>
+                        tenantBuilder.AspNetCorePipeline((tenantContext, tenantAppBuilder) =>
                         {
                             var startupLogger = tenantAppBuilder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
                             startupLogger.LogDebug("Configuring tenant middleware pipeline for tenant: " + tenantContext.Tenant?.Name ?? "");
@@ -163,7 +163,7 @@ namespace Sample
                 //    tenantFileOptions.UseTenantWebRootFileProvider();
                 //});
                 options.UsePerTenantMiddlewarePipeline(app);
-               
+
             });
 
 

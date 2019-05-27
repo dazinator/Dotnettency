@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Dotnettency.MiddlewarePipeline;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 
 namespace Dotnettency.AspNetCore.MiddlewarePipeline
 {
-    public class DelegateTenantMiddlewarePipelineFactory<TTenant> : ITenantMiddlewarePipelineFactory<TTenant>
+    public class DelegateTenantMiddlewarePipelineFactory<TTenant> : ITenantMiddlewarePipelineFactory<TTenant, IApplicationBuilder, RequestDelegate>
         where TTenant : class
     {
         private readonly Action<TenantPipelineBuilderContext<TTenant>, IApplicationBuilder> _configuration;

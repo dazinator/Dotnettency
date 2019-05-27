@@ -31,7 +31,7 @@ namespace Sample.Mvc
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
                         // This method is called when need to initialise the middleware pipeline for a tenant (i.e on first request for the tenant)
-                        middlewareOptions.OnInitialiseTenantPipeline((context, appBuilder) =>
+                        middlewareOptions.AspNetCorePipeline((context, appBuilder) =>
                         {
                             appBuilder.UseStaticFiles(); // This demonstrates static files middleware, but below I am also using per tenant hosting environment which means each tenant can see its own static files in addition to the main application level static files.
 

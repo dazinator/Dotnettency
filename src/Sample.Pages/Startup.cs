@@ -48,7 +48,7 @@ namespace Sample.Pages
                         })
                         .ConfigureTenantMiddleware((tenantOptions) =>
                         {
-                            tenantOptions.OnInitialiseTenantPipeline((context, tenantAppBuilder) =>
+                            tenantOptions.AspNetCorePipeline((context, tenantAppBuilder) =>
                             {
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {

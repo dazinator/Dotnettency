@@ -27,14 +27,16 @@ namespace Sample.Owin.SelfHost
                 // using IOwinContext.GetRequestServices() extension method.              
                 options.UseTenantContainers(); // Will resolve current tenant's container, then swap out RequestServices for a tenant scoped IServiceProvider.
 
+                options.UsePerTenantMiddlewarePipeline(app);
 
             });
+
 
             app.Use(async (context, next) =>
             {
                 // Tenant resolution
                 var tenant = await context.GetTenantAysnc<Tenant>();
-                await context.Response.WriteAsync($"Browse on ports 5000 - 5004 to witness multitenancy behaviours.");
+                await context.Response.WriteAsync($"Browse on ports 5000 - 5004 to witness multitenancy behaviours. Also /Welcome for tenant 'Bar' has welcome page middleware but other tenants don't!");
                 if (tenant == null)
                 {
                     await context.Response.WriteAsync($"No Tenant mapped to this url!");
@@ -60,6 +62,8 @@ namespace Sample.Owin.SelfHost
                 await next();
 
             });
+
+
         }
 
         private IServiceProvider Configure(IServiceCollection services)
@@ -76,6 +80,20 @@ namespace Sample.Owin.SelfHost
                             containerOptions.Autofac((tenant, tenantServices) =>
                             {
                                 tenantServices.AddSingleton<SomeTenantService>(new SomeTenantService(tenant));
+                            });
+                        })
+                        .ConfigureTenantMiddleware((b) =>
+                        {
+                            b.OwinPipeline((p, c) =>
+                            {
+                                var tenant = p.Tenant;
+                                if(tenant?.Name == "Bar")
+                                {
+                                    c.UseWelcomePage(new Microsoft.Owin.Diagnostics.WelcomePageOptions()
+                                    {
+                                        Path = new Microsoft.Owin.PathString("/Welcome")
+                                    });
+                                }
                             });
                         });
              });

@@ -10,8 +10,9 @@ namespace Dotnettency
     {
         public static MultitenancyMiddlewareOptionsBuilder<TTenant> UseRequestServices<TTenant>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder, Func<IServiceScope> factory)
             where TTenant : class
-        {           
-            UseRequestContextItem<TTenant, IServiceScope>(builder, factory, true, (scope)=> {
+        {
+            UseRequestContextItem<TTenant, IServiceScope>(builder, factory, true, (scope) =>
+            {
                 // Set the request scoped IServiceProvider as the current .RequestServices for the environment.
                 // In ASP.NET Core this is HttpContext.RequestServices, in OWIN, we store it in an Items dictionary.
                 var swapper = builder.ApplicationBuilder.ApplicationServices.GetRequiredService<RequestServicesSwapper<TTenant>>();
@@ -48,5 +49,7 @@ namespace Dotnettency
             builder.ApplicationBuilder.UseMiddleware<TenantContainerMiddleware<TTenant>>(options);
             return builder;
         }
+                    
+
     }
 }
