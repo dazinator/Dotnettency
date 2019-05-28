@@ -1,15 +1,17 @@
 c# Dotnettency
-Mutlitenancy library for dotnet applications.
+Mutlitenancy library for applications running on:
+  - ASP.NET Core
+  - OWIN
 
 | Branch  | Build Status | 
 | ------------- | ------------- |
 | Master  | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | 
 | Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop) | 
 
-| Branch  | Dotnettency Core Library | Middleware | Container | EF Core |
+| Branch  | Dotnettency Core Library | AspNetCore | Owin | EF Core |
 | ------------- | ------------- | ----- | ----- | ----- |
-| Master  | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![MiddlewarePipeline](https://img.shields.io/nuget/v/Dotnettency.MiddlewarePipeline.svg)](https://www.nuget.org/packages/Dotnettency.MiddlewarePipeline/) | [![Container](https://img.shields.io/nuget/v/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) | [![EF Core](https://img.shields.io/nuget/v/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
-| Develop | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![MiddlewarePipeline](https://img.shields.io/nuget/vpre/Dotnettency.MiddlewarePipeline.svg)](https://www.nuget.org/packages/Dotnettency.MiddlewarePipeline/) | [![Container](https://img.shields.io/nuget/vpre/Dotnettency.Container.svg)](https://www.nuget.org/packages/Dotnettency.Container/) | [![EF Core](https://img.shields.io/nuget/vpre/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
+| Master  | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/v/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/v/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/v/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
+| Develop | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/vpre/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/vpre/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/vpre/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
 
 | Branch | Autofac | StructureMap |
 | ------------- | ------------- | ------------- |
@@ -28,11 +30,12 @@ Inspired by [saaskit](https://github.com/saaskit/saaskit)
 ## Features
 
 - Tenant resolution
-- Per Tenant Middleware Pipeline
-- Per Tenant Containers
-- Per Tenant HostingEnvironment
-- Modules (Shared and Routed)
-- Multitenant EF Core DbContext
+- Per Tenant Middleware
+- Per Tenant Containers / Services
+- Per Tenant HostingEnvironment (Each tenant can have a virtual File System)
+- Modules (Shared and Routed) (WIP)
+- Multitenant EF Core DbContext (WIP)
+- OWIN support (see Sample.Owin.SelfHost.csproj)
 
 ## Tenant Injection
 

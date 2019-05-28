@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency", "Dotnettency\Dotnettency.csproj", "{27306262-FF3C-4B52-A2CD-ED49F613B200}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Dotnettency.Sample\Sample.csproj", "{4C346402-1A2A-4C65-A95F-8E696EE5CEC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.AspNetCore20", "Dotnettency.Sample\Sample.AspNetCore20.csproj", "{4C346402-1A2A-4C65-A95F-8E696EE5CEC3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Container.StructureMap", "Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj", "{5FDA86A9-0751-409D-9C3E-0BF344FA4CE2}"
 EndProject
@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Mvc", "Sample.Mvc\Sample.Mvc.csproj", "{35717DCE-7CC2-482F-A699-2FF157C2258F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.AspNetCore11.Mvc", "Sample.Mvc\Sample.AspNetCore11.Mvc.csproj", "{35717DCE-7CC2-482F-A699-2FF157C2258F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.AspNetCore", "Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj", "{043BB5D3-63EC-4BD4-8FA6-A5BC62EB7A1E}"
 EndProject
@@ -34,11 +34,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{8A66
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.EFCore", "Dotnettency.EFCore\Dotnettency.EFCore.csproj", "{2A7B6E93-5999-4941-9E59-DC9D0DA977E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.RazorPages", "Sample.RazorPages\Sample.RazorPages.csproj", "{6D653917-8C6C-4F99-9075-421DE246FEF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.AspNetCore20.RazorPages", "Sample.RazorPages\Sample.AspNetCore20.RazorPages.csproj", "{6D653917-8C6C-4F99-9075-421DE246FEF0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Container.Autofac", "Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj", "{EF36475E-8861-4770-8220-D0F6A99FAD8E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.RazorPagesTest", "Sample.RazorPagesTest\Sample.RazorPagesTest.csproj", "{2BBC3858-E1B4-4937-AED9-A591A196E05D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.AspNetCore21.RazorPages", "Sample.RazorPagesTest\Sample.AspNetCore21.RazorPages.csproj", "{2BBC3858-E1B4-4937-AED9-A591A196E05D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.SystemWeb", "Dotnettency.SystemWeb\Dotnettency.SystemWeb.csproj", "{9BD203C9-B699-4A70-99ED-8B9940B436AC}"
 EndProject
@@ -46,11 +46,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Owin", "Dotnett
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Owin.SelfHost", "Sample.Owin.SelfHost\Sample.Owin.SelfHost.csproj", "{FCEAF112-1B55-4DAD-8B2F-33DBB12311A9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", "{725AEBDF-B939-4F7F-91CD-1B5D48E496A5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.WebApi", "Dotnettency.WebApi\Dotnettency.WebApi.csproj", "{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Pages", "Sample.Pages\Sample.Pages.csproj", "{CD9593FD-3961-4F98-B878-7538A47D21BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.AspNetCore30.RazorPages", "Sample.Pages\Sample.AspNetCore30.RazorPages.csproj", "{CD9593FD-3961-4F98-B878-7538A47D21BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -254,18 +250,6 @@ Global
 		{FCEAF112-1B55-4DAD-8B2F-33DBB12311A9}.Release|x64.Build.0 = Release|Any CPU
 		{FCEAF112-1B55-4DAD-8B2F-33DBB12311A9}.Release|x86.ActiveCfg = Release|Any CPU
 		{FCEAF112-1B55-4DAD-8B2F-33DBB12311A9}.Release|x86.Build.0 = Release|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Debug|x64.Build.0 = Debug|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Debug|x86.Build.0 = Debug|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Release|x64.ActiveCfg = Release|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Release|x64.Build.0 = Release|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Release|x86.ActiveCfg = Release|Any CPU
-		{A8FAB9A0-7636-44B7-ACDC-51647D3D16BA}.Release|x86.Build.0 = Release|Any CPU
 		{CD9593FD-3961-4F98-B878-7538A47D21BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CD9593FD-3961-4F98-B878-7538A47D21BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD9593FD-3961-4F98-B878-7538A47D21BC}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -285,9 +269,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4C346402-1A2A-4C65-A95F-8E696EE5CEC3} = {8A66EA6A-F09D-4941-8E92-4DDFDA911D42}
 		{35717DCE-7CC2-482F-A699-2FF157C2258F} = {8A66EA6A-F09D-4941-8E92-4DDFDA911D42}
-		{043BB5D3-63EC-4BD4-8FA6-A5BC62EB7A1E} = {725AEBDF-B939-4F7F-91CD-1B5D48E496A5}
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6} = {725AEBDF-B939-4F7F-91CD-1B5D48E496A5}
-		{05195457-36B8-4D50-A1C8-9CA1FF8BC944} = {725AEBDF-B939-4F7F-91CD-1B5D48E496A5}
 		{6D653917-8C6C-4F99-9075-421DE246FEF0} = {8A66EA6A-F09D-4941-8E92-4DDFDA911D42}
 		{2BBC3858-E1B4-4937-AED9-A591A196E05D} = {8A66EA6A-F09D-4941-8E92-4DDFDA911D42}
 		{FCEAF112-1B55-4DAD-8B2F-33DBB12311A9} = {8A66EA6A-F09D-4941-8E92-4DDFDA911D42}

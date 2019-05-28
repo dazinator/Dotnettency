@@ -108,6 +108,7 @@ namespace Sample.RazorPages
                             // tenantServices.AddSingleton<IActionContextAccessor>(actionContextAccessor);
 
                             var mvcBuilder = tenantServices.AddMvc();
+                          
                          //   mvcBuilder.AddRazorPagesOptions((r) => { r. });
 
                         })
