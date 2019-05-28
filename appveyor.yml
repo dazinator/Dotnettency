@@ -6,6 +6,7 @@ install:
   - choco install gitversion.portable -pre -y
   - cinst gitlink -version 2.4.1 -y
   - cinst dotnetcore-sdk --pre
+  - dotnet new -i Microsoft.AspNetCore.Blazor.Templates
 image: Visual Studio 2019 Preview
 assembly_info:
   patch: false
