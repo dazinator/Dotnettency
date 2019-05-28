@@ -9,6 +9,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Dotnettency;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Sample.AspNetCore30.RazorPages.Internal;
 
 namespace Sample.Pages
 {
@@ -31,6 +36,12 @@ namespace Sample.Pages
                 options.CheckConsentNeeded = context => true;
             });
 
+            ServiceCollectionExtensions.AddRazorPages(services)
+                                //tenantServices
+                                // .AddRazorPages()
+                                .AddNewtonsoftJson();
+
+
             services.AddMultiTenancy<Tenant>((builder) =>
              {
                  builder.IdentifyTenantsWithRequestAuthorityUri()
@@ -40,9 +51,10 @@ namespace Sample.Pages
                         {
                             containerOptions.Autofac((tenant, tenantServices) =>
                             {
-                                tenantServices
-                                 .AddRazorPages()
-                                 .AddNewtonsoftJson();
+                                //ServiceCollectionExtensions.AddRazorPages(tenantServices)
+                                ////tenantServices
+                                //// .AddRazorPages()
+                                // .AddNewtonsoftJson();
                             });
                             //.AddPerTenantMiddlewarePipelineServices();
                         })
@@ -59,7 +71,9 @@ namespace Sample.Pages
                                 tenantAppBuilder.UseAuthorization();
                                 tenantAppBuilder.UseEndpoints(endpoints =>
                                 {
-                                    endpoints.MapRazorPages();
+
+                                    AddMappings(endpoints);
+                                    //  endpoints.MapRazorPages();
                                 });
 
                             });
@@ -71,6 +85,50 @@ namespace Sample.Pages
             //   .AddNewtonsoftJson();
 
 
+        }
+
+        private PageActionEndpointDataSource AddMappings(IEndpointRouteBuilder endpoints)
+        {
+
+            var dataSource = endpoints.DataSources.OfType<PageActionEndpointDataSource>().FirstOrDefault();
+            if (dataSource == null)
+            {
+                dataSource = endpoints.ServiceProvider.GetRequiredService<PageActionEndpointDataSource>();
+                endpoints.DataSources.Add(dataSource);
+            }
+
+            return dataSource;
+
+            ////var marker = endpoints.ServiceProvider.GetService<PageActionEndpointDataSource>();
+            ////if (marker == null)
+            ////{
+            ////    throw new InvalidOperationException(Mvc.Core.Resources.FormatUnableToFindServices(
+            ////        nameof(IServiceCollection),
+            ////        "AddRazorPages",
+            ////        "ConfigureServices(...)"));
+            ////}
+
+            //// Arrange
+            //var actions = new List<ActionDescriptor>
+            //{
+            //    new PageActionDescriptor
+            //    {
+            //        AttributeRouteInfo = new AttributeRouteInfo()
+            //        {
+            //            Template = "/index",
+            //        },
+            //        RouteValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            //        {
+            //            { "action", "Index" },
+            //            { "controller", "Test" },
+            //        },
+            //    },
+            //};
+
+            //var mockDescriptorProvider = new Mock<IActionDescriptorCollectionProvider>();
+            //mockDescriptorProvider.Setup(m => m.ActionDescriptors).Returns(new ActionDescriptorCollection(actions, 0));
+
+            //var dataSource = (PageActionEndpointDataSource)CreateDataSource(mockDescriptorProvider.Object);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
