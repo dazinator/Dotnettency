@@ -5,6 +5,7 @@ skip_tags: true
 install:
   - choco install gitversion.portable -pre -y
   - cinst gitlink -version 2.4.1 -y
+  - cinst dotnetcore-sdk --pre
 image: Visual Studio 2017 Preview
 assembly_info:
   patch: false
