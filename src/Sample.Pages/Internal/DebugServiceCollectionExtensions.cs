@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor.TagHelpers;
@@ -17,8 +18,8 @@ using System.Threading.Tasks;
 
 namespace Sample.AspNetCore30.RazorPages.Internal
 {
-    public static class ServiceCollectionExtensions
-    {
+    public static class DebugServiceCollectionExtensions
+    {       
 
         /// <summary>
         /// Adds services for pages to the specified <see cref="IServiceCollection"/>.
@@ -41,7 +42,7 @@ namespace Sample.AspNetCore30.RazorPages.Internal
         /// To add services for controllers with views call <see cref="AddControllersWithViews(IServiceCollection)"/>.
         /// </para>
         /// </remarks>
-        public static IMvcBuilder AddRazorPages(this IServiceCollection services)
+        public static IMvcBuilder AddRazorPagesDebug(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -116,7 +117,7 @@ namespace Sample.AspNetCore30.RazorPages.Internal
 
             services.TryAddScoped<PageActionEndpointDataSource>();
             services.AddSingleton<IActionDescriptorCollectionProvider, DefaultActionDescriptorCollectionProvider>();
-
+            services.AddSingleton<IPageRouteModelProvider, CompiledPageRouteModelProvider>();
 
 
             AddTagHelpersFrameworkParts(builder.PartManager);

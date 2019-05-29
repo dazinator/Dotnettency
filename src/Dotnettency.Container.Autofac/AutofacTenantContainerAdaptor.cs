@@ -116,7 +116,7 @@ namespace Dotnettency.Container
                 builder.Populate(services);
             });
 
-            _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+            _logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
             return new AutofacTenantContainerAdaptor(_logger, scope, ContainerRole.Scoped, Name);
         }
 

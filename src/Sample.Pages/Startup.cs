@@ -1,18 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Dotnettency;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Sample.AspNetCore30.RazorPages.Internal;
 
 namespace Sample.Pages
@@ -26,20 +21,32 @@ namespace Sample.Pages
 
         public IConfiguration Configuration { get; }
 
+        public bool UseDebugSources { get; set; } = false;
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-            });
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            //    options.CheckConsentNeeded = context => true;
+            //});
 
-            ServiceCollectionExtensions.AddRazorPages(services)
-                                //tenantServices
-                                // .AddRazorPages()
-                                .AddNewtonsoftJson();
+            var defaultServices = services.Clone();
+
+            var sp1 = services.BuildServiceProvider();
+            var partManager1 = sp1.GetService<ApplicationPartManager>();
+
+            bool tenantMode = true;
+            if (!tenantMode)
+            {
+                DebugServiceCollectionExtensions.AddRazorPagesDebug(services)
+                  .AddNewtonsoftJson();
+
+                var serviceProvider = services.BuildServiceProvider();
+                var partManager = serviceProvider.GetService<ApplicationPartManager>();
+            }
 
 
             services.AddMultiTenancy<Tenant>((builder) =>
@@ -49,12 +56,25 @@ namespace Sample.Pages
                         .AddAspNetCore()
                         .ConfigureTenantContainers((containerOptions) =>
                         {
-                            containerOptions.Autofac((tenant, tenantServices) =>
+                            containerOptions
+                            .SetDefaultServices(defaultServices)
+                            .Autofac((tenant, tenantServices) =>
                             {
-                                //ServiceCollectionExtensions.AddRazorPages(tenantServices)
-                                ////tenantServices
-                                //// .AddRazorPages()
-                                // .AddNewtonsoftJson();
+                                if (tenantMode)
+                                {
+                                    // services.Clone();                                  
+                                    if (UseDebugSources)
+                                    {
+                                        tenantServices.AddRazorPagesDebug()
+                                    .AddNewtonsoftJson();
+                                    }
+                                    else
+                                    {
+                                        tenantServices.AddRazorPages()
+                                        .AddNewtonsoftJson();
+                                    }
+                                }
+
                             });
                             //.AddPerTenantMiddlewarePipelineServices();
                         })
@@ -71,19 +91,20 @@ namespace Sample.Pages
                                 tenantAppBuilder.UseAuthorization();
                                 tenantAppBuilder.UseEndpoints(endpoints =>
                                 {
-
-                                    AddMappings(endpoints);
-                                    //  endpoints.MapRazorPages();
+                                    if (UseDebugSources)
+                                    {
+                                        AddMappings(endpoints);
+                                    }
+                                    else
+                                    {
+                                        endpoints.MapRazorPages();
+                                    }
                                 });
 
                             });
                         });
 
              });
-
-            //services.AddRazorPages()
-            //   .AddNewtonsoftJson();
-
 
         }
 
