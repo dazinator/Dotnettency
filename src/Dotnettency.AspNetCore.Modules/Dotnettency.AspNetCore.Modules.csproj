@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
-    <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 

@@ -33,7 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore.HostingEnvironment\Dotnettency.AspNetCore.HostingEnvironment.csproj" />
     <ProjectReference Include="..\Dotnettency.AspNetCore.Modules\Dotnettency.AspNetCore.Modules.csproj" />
-    <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
+    <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 
