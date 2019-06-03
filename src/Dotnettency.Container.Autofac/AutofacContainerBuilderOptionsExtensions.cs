@@ -19,29 +19,26 @@ namespace Dotnettency
                 ContainerBuilder builder = new ContainerBuilder();
                 builder.Populate(options.Builder.Services);
                 builder.AddDotnettencyContainerServices();
-                
-                
 
+
+                // Build the root container.
                 IContainer container = builder.Build();
                 ITenantContainerAdaptor adaptedContainer = container.Resolve<ITenantContainerAdaptor>();
 
-                //  bool containerEventsPublisher =
+                // Get the service that allows us to publish events relating to tenant container events.
                 container.TryResolve<ITenantContainerEventsPublisher<TTenant>>(out ITenantContainerEventsPublisher<TTenant> containerEventsPublisher);
-                // add ITenantContainerBuilder<TTenant> service to the host container
-                // This service can be used to build a child container (adaptor) for a particular tenant, when required.
 
+                // Update the root container with a service that can be used to build per tenant container!
                 ContainerBuilder updateBuilder = new ContainerBuilder();
-                updateBuilder.RegisterInstance(new TenantContainerBuilder<TTenant>(adaptedContainer, configureTenant, containerEventsPublisher)).As<ITenantContainerBuilder<TTenant>>();
+                var defaultServices = options.DefaultServices;
+                updateBuilder.RegisterInstance(new TenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher)).As<ITenantContainerBuilder<TTenant>>();
                 updateBuilder.Update(container);
 
+                return adaptedContainer;
+                //ITenantContainerAdaptor adaptor = container.Resolve<ITenantContainerAdaptor>();
+                //return adaptor;
 
-                //container.Configure(_ =>
-                //    _.For<ITenantContainerBuilder<TTenant>>()
-                //        .Use()
-                //    );
-
-                ITenantContainerAdaptor adaptor = container.Resolve<ITenantContainerAdaptor>();
-                return adaptor;
+                // return adaptedContainer;
             });
 
             AdaptedContainerBuilderOptions<TTenant> adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);

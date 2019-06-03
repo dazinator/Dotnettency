@@ -40,6 +40,7 @@ namespace Sample
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            var platformServices = services.Clone();
             services.AddRouting();
 
             _loggerFactory.AddConsole();
@@ -53,6 +54,7 @@ namespace Sample
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
                    {
+                       containerBuilder.SetDefaultServices(platformServices);
                        containerBuilder.Events((events) =>
                        {
                            // callback invoked after tenant container is created.
@@ -70,7 +72,7 @@ namespace Sample
                        })
                        // Extension methods available here for supported containers. We are using structuremap..
                        // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                       .WithStructureMap((tenant, tenantServices) =>
+                       .Autofac((tenant, tenantServices) =>
                        {
                            tenantServices.AddOptions();
                            tenantServices.Configure<MyOptions>((a) => { a.Foo = true; });
@@ -96,8 +98,7 @@ namespace Sample
 
 
                            });
-                       })
-                       .AddPerTenantMiddlewarePipelineServices(); // allows tenants to have there own middleware pipeline accessor stored in their tenant containers.
+                       });
                        // .WithModuleContainers(); // Creates a child container per IModule.
                    })
                     .ConfigureTenantMiddleware((tenantBuilder) =>
@@ -157,11 +158,7 @@ namespace Sample
 
             app = app.UseMultitenancy<Tenant>((options) =>
             {
-                options.UseTenantContainers();
-                //options.UsePerTenantHostingEnvironment((tenantFileOptions) => {
-                //    tenantFileOptions.UseTenantContentRootFileProvider();
-                //    tenantFileOptions.UseTenantWebRootFileProvider();
-                //});
+                options.UseTenantContainers();               
                 options.UsePerTenantMiddlewarePipeline(app);
 
             });

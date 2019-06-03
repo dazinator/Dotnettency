@@ -14,9 +14,7 @@ namespace Dotnettency.Container
 
             builder.Services.AddSingleton<ITenantContainerFactory<TTenant>, TenantContainerBuilderFactory<TTenant>>();
             builder.Services.AddScoped<ITenantContainerAccessor<TTenant>, TenantContainerAccessor<TTenant>>();
-            builder.Services.AddScoped<ITenantRequestContainerAccessor<TTenant>, TenantRequestContainerAccessor<TTenant>>();
-
-            
+            builder.Services.AddScoped<ITenantRequestContainerAccessor<TTenant>, TenantRequestContainerAccessor<TTenant>>();            
 
             builder.Services.AddSingleton<ITenantContainerEventsPublisher<TTenant>>((sp) =>
             {              
@@ -50,6 +48,25 @@ namespace Dotnettency.Container
             containerLifecycleOptions?.Invoke(ContainerEventsOptions);
             return this;
         }
+
+        public IServiceCollection DefaultServices { get; set; }
+
+        /// <summary>
+        /// Services that will be added to the tenants IServiceCollection by default. Sometimes when an IServiceCollection.AddXYZ() method is called,
+        /// the particular implementation may depend upon other services being already registered in the IServiceCollection for it to behave correctly.
+        /// You can specify these default services here, and they will be added into the tenants IServiceCollection, prior to it then being passed into the tenants Configure() method.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public ContainerBuilderOptions<TTenant> SetDefaultServices(IServiceCollection services)
+        {
+            DefaultServices = services;
+            return this;
+        }
+
+
+
+
 
     }
 }

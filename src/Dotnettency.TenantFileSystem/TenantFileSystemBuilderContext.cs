@@ -5,6 +5,7 @@ using System.IO;
 
 namespace Dotnettency.TenantFileSystem
 {
+
     public class TenantFileSystemBuilderContext<TTenant>
         where TTenant : class
     {

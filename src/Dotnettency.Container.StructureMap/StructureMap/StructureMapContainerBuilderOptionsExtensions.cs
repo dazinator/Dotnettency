@@ -19,16 +19,19 @@ namespace Dotnettency
                 container.Populate(options.Builder.Services);
                 var adaptedContainer = container.GetInstance<ITenantContainerAdaptor>();
 
-                var containerEventsPublisher = container.TryGetInstance<ITenantContainerEventsPublisher<TTenant>>();              
+                var containerEventsPublisher = container.TryGetInstance<ITenantContainerEventsPublisher<TTenant>>();
                 // add ITenantContainerBuilder<TTenant> service to the host container
                 // This service can be used to build a child container (adaptor) for a particular tenant, when required.
+                var defaultServices = options.DefaultServices;
                 container.Configure(_ =>
                     _.For<ITenantContainerBuilder<TTenant>>()
-                        .Use(new TenantContainerBuilder<TTenant>(adaptedContainer, configureTenant, containerEventsPublisher))
+                        .Use(new TenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher))
                     );
 
-                var adaptor = container.GetInstance<ITenantContainerAdaptor>();              
-                return adaptor;
+                // NOTE: Im not sure why I was resolving ITenantContainerAdaptor twice, changed to just return previous instance.
+                //var adaptor = container.GetInstance<ITenantContainerAdaptor>();
+                //return adaptor;
+                return adaptedContainer;
             });
 
             var adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);
