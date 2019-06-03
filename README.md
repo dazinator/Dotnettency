@@ -40,7 +40,7 @@ In your web application (OWIN or ASP.NET Core), when the web server recieves a r
 For example, for one tenant, you may use Facebook Authentication middleware, where as for another you might not want that middleware enabled.
 
 ### Tenant Containers / Services
-In ASP.NET Core applications (Dotnettency also allows you to achieve this in OWIN applications), you configure a global set of services on startup for dependency injection purposes.
+In ASP.NET Core applications (Dotnettency also allows you to achieve this in OWIN applications even though OWIN doesn't cater for this pattern out of the box), you configure a global set of services on startup for dependency injection purposes.
 At the start of a request, ASP.NET Core middleware creates a scoped version of those services to satisfy that request.
 `Dotnettency` goes a step further, by allowing you to register services for each specific tenant. Dotnettency middleware then 
 provides an `IServiceProvider` scoped to the request for the current tenant. This means services that are typically injected into your classes during a request can now be tenant specific.
