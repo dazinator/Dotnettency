@@ -1,31 +1,32 @@
 using System;
-using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Dotnettency;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Sample.AspNetCore30.RazorPages.Internal;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
 
 namespace Sample.Pages
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        [Obsolete]
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
-        public bool UseDebugSources { get; set; } = false;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var defaultServices = services.Clone();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -33,22 +34,7 @@ namespace Sample.Pages
                 options.CheckConsentNeeded = context => true;
             });
 
-            var defaultServices = services.Clone();
-
-            var sp1 = services.BuildServiceProvider();
-            var partManager1 = sp1.GetService<ApplicationPartManager>();
-
-            bool tenantMode = true;
-            if (!tenantMode)
-            {
-                DebugServiceCollectionExtensions.AddRazorPagesDebug(services)
-                  .AddNewtonsoftJson();
-
-                var serviceProvider = services.BuildServiceProvider();
-                var partManager = serviceProvider.GetService<ApplicationPartManager>();
-            }
-
-
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddMultiTenancy<Tenant>((builder) =>
              {
                  builder.IdentifyTenantsWithRequestAuthorityUri()
@@ -60,35 +46,19 @@ namespace Sample.Pages
                             .SetDefaultServices(defaultServices)
                             .Autofac((tenant, tenantServices) =>
                             {
-                                if (tenantMode)
+                                if (tenant != null)
                                 {
-                                    if (UseDebugSources)
+                                    tenantServices.AddRazorPages((o) =>
                                     {
-                                        tenantServices.AddRazorPagesDebug((o) =>
-                                        {
-                                            o.RootDirectory = $"/Pages/{tenant.Name}";
-                                        }).AddNewtonsoftJson();
-                                    }
-                                    else
-                                    {
-                                        if (tenant != null)
-                                        {
-                                            tenantServices.AddRazorPages((o) =>
-                                            {
-
-                                                o.RootDirectory = $"/Pages/{tenant.Name}";
-                                            }).AddNewtonsoftJson();
-                                        }
-                                    }
+                                        o.RootDirectory = $"/Pages/{tenant.Name}";
+                                    }).AddNewtonsoftJson();
                                 }
-
                             });
                         })
                         .ConfigureTenantMiddleware((tenantOptions) =>
                         {
                             tenantOptions.AspNetCorePipeline((context, tenantAppBuilder) =>
                             {
-
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {
                                     Console.WriteLine("Entering tenant pipeline: " + context.Tenant?.Name);
@@ -100,68 +70,46 @@ namespace Sample.Pages
                                 if (context.Tenant != null)
                                 {
                                     tenantAppBuilder.UseAuthorization();
+
+                                    tenantAppBuilder.Use(async (c, next) =>
+                                    {
+                                        // Demonstrates per tenant files.
+                                        // /foo.txt exists for one tenant but not another.
+                                        var webHostEnvironment = c.RequestServices.GetRequiredService<IWebHostEnvironment>();
+                                        var contentFileProvider = webHostEnvironment.ContentRootFileProvider;
+                                        var webFileProvider = webHostEnvironment.WebRootFileProvider;
+
+                                        var fooTextFile = webFileProvider.GetFileInfo("/foo.txt");
+
+                                        Console.WriteLine($"/Foo.txt file exists? {fooTextFile.Exists}");
+                                        await next.Invoke();
+                                    });
+
                                     tenantAppBuilder.UseEndpoints(endpoints =>
                                     {
-                                        if (UseDebugSources)
-                                        {
-                                            AddMappings(endpoints);
-                                        }
-                                        else
-                                        {
-                                            endpoints.MapRazorPages();
-                                        }
+                                        endpoints.MapRazorPages();
                                     });
                                 }
 
                             });
-                        });
+                        })
+                        .ConfigureTenantFiles((hostingOptions) =>
+                        {
+                            var hostWebRootFileProvider = Environment.WebRootFileProvider;
+                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.WebRootPath, (webRootOptions) =>
+                             {
+                                 // WE use the tenant's guid id to partition one tenants files from another on disk.
+                                 Guid tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                                 webRootOptions.TenantPartitionId(tenantGuid)
+                                                    .AllowAccessTo(hostWebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
+                             }, fp =>
+                             {
+                                 Environment.WebRootFileProvider = new CompositeFileProvider(new[] { fp, hostWebRootFileProvider });
+                             });
 
+                        });
              });
 
-        }
-
-        private PageActionEndpointDataSource AddMappings(IEndpointRouteBuilder endpoints)
-        {
-
-            var dataSource = endpoints.DataSources.OfType<PageActionEndpointDataSource>().FirstOrDefault();
-            if (dataSource == null)
-            {
-                dataSource = endpoints.ServiceProvider.GetRequiredService<PageActionEndpointDataSource>();
-                endpoints.DataSources.Add(dataSource);
-            }
-
-            return dataSource;
-
-            ////var marker = endpoints.ServiceProvider.GetService<PageActionEndpointDataSource>();
-            ////if (marker == null)
-            ////{
-            ////    throw new InvalidOperationException(Mvc.Core.Resources.FormatUnableToFindServices(
-            ////        nameof(IServiceCollection),
-            ////        "AddRazorPages",
-            ////        "ConfigureServices(...)"));
-            ////}
-
-            //// Arrange
-            //var actions = new List<ActionDescriptor>
-            //{
-            //    new PageActionDescriptor
-            //    {
-            //        AttributeRouteInfo = new AttributeRouteInfo()
-            //        {
-            //            Template = "/index",
-            //        },
-            //        RouteValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-            //        {
-            //            { "action", "Index" },
-            //            { "controller", "Test" },
-            //        },
-            //    },
-            //};
-
-            //var mockDescriptorProvider = new Mock<IActionDescriptorCollectionProvider>();
-            //mockDescriptorProvider.Setup(m => m.ActionDescriptors).Returns(new ActionDescriptorCollection(actions, 0));
-
-            //var dataSource = (PageActionEndpointDataSource)CreateDataSource(mockDescriptorProvider.Object);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

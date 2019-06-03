@@ -13,6 +13,10 @@ namespace Dotnettency.AspNetCore
         public HttpContextBase GetCurrent()
         {
             var httpContext = _httpContextAccesor.HttpContext;
+            if(httpContext == null)
+            {
+                return null;
+            }
             var context = new AspNetCoreHttpContextWrapper(httpContext);
             return context;
         }

@@ -34,11 +34,11 @@ namespace Dotnettency
                 updateBuilder.RegisterInstance(new TenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher)).As<ITenantContainerBuilder<TTenant>>();
                 updateBuilder.Update(container);
 
-
-                // ITenantContainerAdaptor adaptor = container.Resolve<ITenantContainerAdaptor>();
-                // return adaptor;
-
                 return adaptedContainer;
+                //ITenantContainerAdaptor adaptor = container.Resolve<ITenantContainerAdaptor>();
+                //return adaptor;
+
+                // return adaptedContainer;
             });
 
             AdaptedContainerBuilderOptions<TTenant> adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);

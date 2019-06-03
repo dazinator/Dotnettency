@@ -2,12 +2,12 @@
 using Dotnettency.TenantFileSystem;
 using System;
 
-namespace Dotnettency.AspNetCore.HostingEnvironment
+namespace Dotnettency.TenantFileSystem
 {
     public static class TenantShellHostingEnvironmentFileSystemExtensions
     {
-        private const string ContentRootKey = nameof(TenantShellHostingEnvironmentFileSystemExtensions) + "-ContentRoot";
-        private const string WebRootKey = nameof(TenantShellHostingEnvironmentFileSystemExtensions) + "-WebRoot";
+        public const string ContentRootKey = nameof(TenantShellHostingEnvironmentFileSystemExtensions) + "-ContentRoot";
+        public const string WebRootKey = nameof(TenantShellHostingEnvironmentFileSystemExtensions) + "-WebRoot";
 
         public static Lazy<ICabinet> GetOrAddTenantContentRootFileSystem<TTenant>(this TenantShell<TTenant> tenantShell, Lazy<ICabinet> factory)
             where TTenant : class

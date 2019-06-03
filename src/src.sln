@@ -20,8 +20,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.AspNetCore", "D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.TenantFileSystem", "Dotnettency.TenantFileSystem\Dotnettency.TenantFileSystem.csproj", "{AF9243F7-FE10-45EF-B936-FD790585304A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.AspNetCore.HostingEnvironment", "Dotnettency.AspNetCore.HostingEnvironment\Dotnettency.AspNetCore.HostingEnvironment.csproj", "{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.AspNetCore.Modules", "Dotnettency.AspNetCore.Modules\Dotnettency.AspNetCore.Modules.csproj", "{05195457-36B8-4D50-A1C8-9CA1FF8BC944}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Tests", "Dotnettency.Tests\Dotnettency.Tests.csproj", "{27BFCF41-5919-4DD6-B923-2E5F3D43AC2C}"
@@ -100,18 +98,6 @@ Global
 		{AF9243F7-FE10-45EF-B936-FD790585304A}.Release|x64.Build.0 = Release|Any CPU
 		{AF9243F7-FE10-45EF-B936-FD790585304A}.Release|x86.ActiveCfg = Release|Any CPU
 		{AF9243F7-FE10-45EF-B936-FD790585304A}.Release|x86.Build.0 = Release|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Debug|x64.Build.0 = Debug|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Debug|x86.Build.0 = Debug|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Release|x64.ActiveCfg = Release|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Release|x64.Build.0 = Release|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Release|x86.ActiveCfg = Release|Any CPU
-		{7CB875C0-91D8-48E2-99EE-5D4C479E2AE6}.Release|x86.Build.0 = Release|Any CPU
 		{05195457-36B8-4D50-A1C8-9CA1FF8BC944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05195457-36B8-4D50-A1C8-9CA1FF8BC944}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05195457-36B8-4D50-A1C8-9CA1FF8BC944}.Debug|x64.ActiveCfg = Debug|Any CPU

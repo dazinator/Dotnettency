@@ -54,7 +54,8 @@ namespace Dotnettency
         }
 
         public Func<IServiceProvider> ServiceProviderFactory { get; set; }
-        public IServiceCollection Services { get; set; }
+        public IServiceCollection Services { get; set; }        
+        public IHttpContextProvider HttpContextProvider { get; set; }
 
         /// <summary>
         /// Call this to override the service used to provide a URI for the current request. The URI is used as an identifier
@@ -101,5 +102,6 @@ namespace Dotnettency
             Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);
             return this;
         }
+
     }
 }

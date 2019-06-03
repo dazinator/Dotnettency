@@ -1,5 +1,5 @@
 c# Dotnettency
-Mutlitenancy library for applications running on:
+Dotnettency is a library that provides features to enable Multi-Tenant applications using:
   - ASP.NET Core
   - OWIN
 
@@ -8,10 +8,10 @@ Mutlitenancy library for applications running on:
 | Master  | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | 
 | Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop) | 
 
-| Branch  | Dotnettency Core Library | AspNetCore | Owin | EF Core |
-| ------------- | ------------- | ----- | ----- | ----- |
-| Master  | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/v/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/v/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/v/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
-| Develop | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/vpre/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/vpre/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/vpre/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
+| Branch  | Dotnettency Core Library | AspNetCore | Owin | EF Core | Tenant File System |
+| ------------- | ------------- | ----- | ----- | ----- | ---- |
+| Master  | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/v/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/v/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/v/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) | [![Tenant FileSystem](https://img.shields.io/nuget/v/Dotnettency.TenantFileSystem.svg)](https://www.nuget.org/packages/Dotnettency.TenantFileSystem/) |
+| Develop | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/vpre/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/vpre/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/vpre/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) | [![Tenant FileSystem](https://img.shields.io/nuget/vpre/Dotnettency.TenantFileSystem.svg)](https://www.nuget.org/packages/Dotnettency.TenantFileSystem/) |
 
 | Branch | Autofac | StructureMap |
 | ------------- | ------------- | ------------- |
@@ -29,13 +29,29 @@ Inspired by [saaskit](https://github.com/saaskit/saaskit)
  
 ## Features
 
-- Tenant resolution
-- Per Tenant Middleware
-- Per Tenant Containers / Services
-- Per Tenant HostingEnvironment (Each tenant can have a virtual File System)
-- Modules (Shared and Routed) (WIP)
-- Multitenant EF Core DbContext (WIP)
-- OWIN support (see Sample.Owin.SelfHost.csproj)
+### Tenant resolution
+
+You can define how you want to identify the current tenant, i.e using a url scheme, cookie, or any of your custom logic.
+You can then access the current tenant through dependency injection in your app.
+
+### Tenant Middleware Pipelines
+In your web application (OWIN or ASP.NET Core), when the web server recieves a request, it typically runs it through a single "middleware pipeline".
+`Dotnettency` allows you to have a lazily initialised "Tenant Middleware Pipeline" created for each distinct tenant. In the tenant specific middleware pipeline, you can choose to include middleware conditionally based on current tenant information.
+For example, for one tenant, you may use Facebook Authentication middleware, where as for another you might not want that middleware enabled.
+
+### Tenant Containers / Services
+In ASP.NET Core applications (Dotnettency also allows you to achieve this in OWIN applications), you configure a global set of services on startup for dependency injection purposes.
+At the start of a request, ASP.NET Core middleware creates a scoped version of those services to satisfy that request.
+`Dotnettency` goes a step further, by allowing you to register services for each specific tenant. Dotnettency middleware then 
+provides an `IServiceProvider` scoped to the request for the current tenant. This means services that are typically injected into your classes during a request can now be tenant specific.
+This is useful if, for example, you want one tenant to use a different `IPaymentProvider` etc from another based on tenant settings etc.
+
+### Tenant File System
+Notes: For more in depth details on what Per Tenant File System is, see the [README on the sample](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample).
+
+Allows you to configure an `IFileProvider` that returns files from a virtual directory build for the current tenant.
+For example, tenant `foo` might want to access a file `/bar.txt` which exists for them, but when tenant `bar` tries to access `/bar.txt` it doesn't exist for them - because each tenant has it's own distinct virtual directory.
+Tenant virtual directories can overlap by sharing access to common directories / files.
 
 ## Tenant Injection
 
@@ -52,6 +68,4 @@ The `TenantShell` stores additional context for a Tenant, such as it's `Containe
 - Inject `ITenantShellAccessor<TTenant>` in order to access context for the currnet tenant, which is primarily used by:
   - Extensions (such as Middleware, or Container) - which store things for the tenant in the `ITenantShellAccessor<TTenant>`'s concurrent property bag.
   - Tenant Admin screens - if you need to "Restart" a tenant, then the idea is, you can resolve the `ITenantShellAccessor<TTenant>` and then use extension methods (provided by the dotnettency extensions such as Middleware pipeline, or Container) to allow you to control the state of the running tenant - for example to trigger rebuild of the tenant's container, or pipeline on the next request.
-
-
-Notes: For details on what Per Tenant Hosting Environment does see the [README on the sample](https://github.com/dazinator/Dotnettency/tree/master/src/Dotnettency.Sample).
+   
