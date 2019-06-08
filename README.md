@@ -64,7 +64,11 @@ Once configured in `startup.cs` you can resolve the current tenant in any one of
 ## Tenant Restart (New in v2.0.0)
 
 You can `Restart` a tenant. This does not stop the web application, or interfere with other tenants.
-It will mean that the net request for the tenant, will result in the tenant starting up from scratch again - 
+When you trigger a `Restart` of a tenant, it means the current tenants `TenantShell` (and all state, such as Services, MiddlewarePipeline etc) are disposed of.
+Once the Restart has finished, it means the next http request to that tenant will result in the tenant intialising again from scratch.
+This is useful for example, if you register services or middleware based on some settings, and you want to allow the settings to be changed for the tenant and therefore services  middleware pipeline to be rebuilt based on latest config.
+It is also useful if you have a plugin based architecture, and you want to allow tenants to install plugins whilst the system is running.
+
    - Tenant Container will be re-built (if you are usijng tenant services the method you use to register services for the current tenant will be re-rexecuted.)
    - Tenant Middleware Pipeline will be re-built (if you are using tenant middleware pipeline, it will be rebuilt - you'll have a chance to include additional middlewares etc.)
 
