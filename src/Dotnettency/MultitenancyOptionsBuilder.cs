@@ -22,11 +22,12 @@ namespace Dotnettency
 
             // Tenant shell cache is special in that it houses the tenant shell for each tenant, and each 
             // tenant shell has state that needs to be kept local to the application (i.e the tenant's container or middleware pipeline.)
-            // Therefore it should always be a local / in-memory based cache as will have will have fundamentally non-serialisable state.
+            // Therefore it should always be a local / in-memory based cache as will have fundamentally non-serialisable state.
             Services.AddSingleton<ITenantShellCache<TTenant>, ConcurrentDictionaryTenantShellCache<TTenant>>();
             Services.AddSingleton<ITenantShellResolver<TTenant>, TenantShellResolver<TTenant>>();
             Services.AddScoped<TenantIdentifierAccessor<TTenant>>();
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
+            Services.AddScoped<ITenantShellRestarter<TTenant>, TenantShellRestarter<TTenant>>();           
 
 
 

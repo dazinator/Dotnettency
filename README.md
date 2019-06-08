@@ -61,11 +61,77 @@ Once configured in `startup.cs` you can resolve the current tenant in any one of
 - Inject `Task<TTenant>` - Allows you to `await` the current `Tenant` (so non blocking). `Task<TTenant>` is convenient.
 - Inject `ITenantAccessor<TTenant>`. This is similar to injecting `Task<Tenant>` in that it provides lazy access the current tenant in a non blocking way. For convenience it's now easier to just inject `Task<Tenant>` instead, unless you want a more descriptive API.
 
+## Tenant Restart (New in v2.0.0)
+
+You can `Restart` a tenant. This does not stop the web application, or interfere with other tenants.
+It will mean that the net request for the tenant, will result in the tenant starting up from scratch again - 
+   - Tenant Container will be re-built (if you are usijng tenant services the method you use to register services for the current tenant will be re-rexecuted.)
+   - Tenant Middleware Pipeline will be re-built (if you are using tenant middleware pipeline, it will be rebuilt - you'll have a chance to include additional middlewares etc.)
+
+For sample usage, see the Sample.AspNetCore30.RazorPages sample in this solution, in partcular the Pages/Gicrosoft/Index.cshtml page.
+
+Injext `ITenantShellRestarter<Tenant>` and invoke the `Restart()` method:
+
+```
+    public class IndexModel : PageModel
+    {
+
+        public bool IsRestarted { get; set; }
+
+        public void OnGet()
+        {
+
+        }
+
+        public async Task OnPost([FromServices]ITenantShellRestarter<Tenant> restarter)
+        {
+            await restarter.Restart();
+            IsRestarted = true;
+            this.Redirect("/");
+        }
+    }
+```
+
+and corresponding razor page:
+
+```
+
+@page
+@using Sample.Pages.T1
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1>Tenant Gicrosoft Razor Pages!</h1>
+
+    <form method="post">
+        @{
+            if (!@Model.IsRestarted)
+            {
+                <button asp-page="Index">Restart Tenant</button>
+            }
+            else
+            {
+                <button disabled asp-page="Index">Restart Tenant</button>
+                <p>Tenant has been restarted, the next request will result in Tenant Container being rebuilt, and tenant middleware pipeline being re-initialised.</p>
+            }
+        }
+
+    </form>
+</div>
+
+```
 ## Tenant Shell Injection
 
-The `TenantShell` stores additional context for a Tenant, such as it's `Container` and it's `MiddlewarePipeline`.
+The `TenantShell` stores the context for a Tenant, such as it's `Container` and it's `MiddlewarePipeline`.
+It's stored in a cache, and is evicted if the tenant is Restarted.
+You probably won't need to use it directly, but if you want you can do so.
 
-- Inject `ITenantShellAccessor<TTenant>` in order to access context for the currnet tenant, which is primarily used by:
-  - Extensions (such as Middleware, or Container) - which store things for the tenant in the `ITenantShellAccessor<TTenant>`'s concurrent property bag.
-  - Tenant Admin screens - if you need to "Restart" a tenant, then the idea is, you can resolve the `ITenantShellAccessor<TTenant>` and then use extension methods (provided by the dotnettency extensions such as Middleware pipeline, or Container) to allow you to control the state of the running tenant - for example to trigger rebuild of the tenant's container, or pipeline on the next request.
-   
+  - Inject `ITenantShellAccessor<TTenant>` to access the TenantShell for the current tenant.
+  - Extensions (such as Middleware, or Container) - store things for the tenant in it's concurrent property bag. You can get at these properties if you know the keys.
+  - You can also register callbacks that will be invoked when the TenantShell is disposed of - this happens when the tenant is restarted for example.
+
+  Another way to register code that will run when the tenant is restarted, is to use TenantServices - add a disposable singleton service the tenant's container.
+  When the tenant is disposed of, it's container will be disposed of, and your disposable service will be disposed of - depending upon your needs this hook might suffice.

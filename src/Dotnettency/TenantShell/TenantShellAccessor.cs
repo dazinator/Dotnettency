@@ -26,10 +26,11 @@ namespace Dotnettency
                     return null;
                 }
 
-                return await _tenantResolver.ResolveTenant(identifier, _tenantFactory);
+                return await _tenantResolver.ResolveTenantShell(identifier, _tenantFactory);
             });
         }
 
         public Lazy<Task<TenantShell<TTenant>>> CurrentTenantShell { get; private set; }
+
     }
 }

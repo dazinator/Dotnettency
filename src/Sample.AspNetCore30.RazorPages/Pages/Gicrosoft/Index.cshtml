@@ -6,5 +6,20 @@
 }
 
 <div class="text-center">
-<h1>Tenant Gicrosoft Razor Pages!</h1>
+    <h1>Tenant Gicrosoft Razor Pages!</h1>
+
+    <form method="post">
+        @{
+            if (!@Model.IsRestarted)
+            {
+                <button asp-page="Index">Restart Tenant</button>
+            }
+            else
+            {
+                <button disabled asp-page="Index">Restart Tenant</button>
+                <p>Tenant has been restarted, the next request will result in Tenant Container being rebuilt, and tenant middleware pipeline being re-initialised.</p>
+            }
+        }
+
+    </form>
 </div>

@@ -10,5 +10,7 @@ namespace Dotnettency
         TenantShell<TTenant> AddOrUpdate(TenantIdentifier key, TenantShell<TTenant> addValue, Func<TenantIdentifier, TenantShell<TTenant>, TenantShell<TTenant>> updateValueFactory);
 
         bool TryGetValue(TenantIdentifier key, out TenantShell<TTenant> value);
+
+        bool TryRemove(TenantIdentifier key, out TenantShell<TTenant> value);
     }    
 }

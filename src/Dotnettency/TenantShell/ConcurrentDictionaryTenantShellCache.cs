@@ -31,5 +31,10 @@ namespace Dotnettency
         {
             return _mappings.TryGetValue(key, out value);
         }
+
+        public bool TryRemove(TenantIdentifier key, out TenantShell<TTenant> value)
+        {
+            return _mappings.TryRemove(key, out value);
+        }
     }
 }

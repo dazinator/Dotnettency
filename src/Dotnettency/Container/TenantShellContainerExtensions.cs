@@ -9,9 +9,17 @@ namespace Dotnettency
         public static Lazy<Task<ITenantContainerAdaptor>> GetOrAddContainer<TTenant>(this TenantShell<TTenant> tenantShell, Func<Task<ITenantContainerAdaptor>> containerAdaptorFactory)
             where TTenant : class
         {
-            return tenantShell.Properties.GetOrAdd(nameof(TenantShellContainerExtensions), (a) =>
+            return tenantShell.GetOrAddProperty(nameof(TenantShellContainerExtensions), (a) =>
             {
-                return new Lazy<Task<ITenantContainerAdaptor>>(containerAdaptorFactory);
+                var newItem = new Lazy<Task<ITenantContainerAdaptor>>(containerAdaptorFactory);
+                tenantShell.RegisterCallbackOnDispose(() => {
+                    if(newItem.IsValueCreated)
+                    {
+                        var result = newItem.Value.Result;
+                        result?.Dispose();
+                    }
+                });
+                return newItem;
             }) as Lazy<Task<ITenantContainerAdaptor>>;
         }
     }

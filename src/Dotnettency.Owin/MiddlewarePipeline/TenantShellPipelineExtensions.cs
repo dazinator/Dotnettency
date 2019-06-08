@@ -9,7 +9,15 @@ namespace Dotnettency.Owin.MiddlewarePipeline
         public static Lazy<Task<AppFunc>> GetOrAddMiddlewarePipeline<TTenant>(this TenantShell<TTenant> tenantShell, Lazy<Task<AppFunc>> requestDelegateFactory)
             where TTenant : class
         {
-            return tenantShell.Properties.GetOrAdd(nameof(TenantShellPipelineExtensions), requestDelegateFactory) as Lazy<Task<AppFunc>>;
+            var property = tenantShell.GetOrAddProperty(nameof(TenantShellPipelineExtensions), requestDelegateFactory);
+            tenantShell.RegisterCallbackOnDispose(() =>
+            {
+                if (requestDelegateFactory.IsValueCreated)
+                {
+                    requestDelegateFactory.Value?.Dispose();
+                }
+            });
+            return property;
         }
     }
 }
