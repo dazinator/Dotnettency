@@ -1,91 +1,42 @@
 ﻿using Dotnettency.Container;
+using Dotnettency.Container.StructureMap;
 using Microsoft.Extensions.DependencyInjection;
-using StructureMap;
 using System;
-
 
 namespace Dotnettency
 {
     public static class StructureMapContainerBuilderOptionsExtensions
     {
-        public static ContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(this ContainerBuilderOptions<TTenant> options,
-          Action<TTenant, ConfigurationExpression> configureTenant)
-          where TTenant : class
-        {
-
-
-            // Set a func, that is only invoked when the ServiceProvider is required. This ensures it runs after all other configuration methods
-            // which is important as other methods can still add new services to the servicecollection after this one is invoked and we
-            // dont want them to be missed when populating the container.
-            options.Builder.BuildServiceProvider = new Func<IServiceProvider>(() =>
-            {
-                var container = new StructureMap.Container();
-                container.Populate(options.Builder.Services);
-                container.Configure(_ =>
-                    _.For<ITenantContainerBuilder<TTenant>>()
-                        .Use(new StructureMapTenantContainerBuilder<TTenant>(container, configureTenant))
-                );
-                return container.GetInstance<IServiceProvider>();
-            });
-
-            return options;
-        }
-
-        public static ContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(this ContainerBuilderOptions<TTenant> options,
-            Action<ConfigurationExpression> configureTenant)
+        public static AdaptedContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(
+            this ContainerBuilderOptions<TTenant> options,
+            Action<TTenant, IServiceCollection> configureTenant)
             where TTenant : class
         {
-
-            // Set a func, that is only invoked when the ServiceProvider is required. This ensures it runs after all other configuration methods
-            // which is important as other methods can still add new services to the servicecollection after this one is invoked and we
-            // dont want them to be missed when populating the container.
-            options.Builder.BuildServiceProvider = new Func<IServiceProvider>(() =>
+            var adaptorFactory = new Func<ITenantContainerAdaptor>(() =>
             {
+                // host level container.
                 var container = new StructureMap.Container();
                 container.Populate(options.Builder.Services);
+                var adaptedContainer = container.GetInstance<ITenantContainerAdaptor>();
 
-                container.Configure(_ =>
-                  _.For<ITenantContainerBuilder<TTenant>>()
-                      .Use(new StructureMapTenantContainerBuilder<TTenant>(container, (tenant, config) => configureTenant(config)))
-              );
-                return container.GetInstance<IServiceProvider>();
-            });
-
-            return options;
-
-        }
-
-        public static ContainerBuilderOptions<TTenant> WithStructureMapServiceCollection<TTenant>(this ContainerBuilderOptions<TTenant> options,
-        Action<TTenant, IServiceCollection> configureTenant)
-        where TTenant : class
-        {
-
-            // Set a func, that is only invoked when the ServiceProvider is required. This ensures it runs after all other configuration methods
-            // which is important as other methods can still add new services to the servicecollection after this one is invoked and we
-            // dont want them to be missed when populating the container.
-            options.Builder.BuildServiceProvider = new Func<IServiceProvider>(() =>
-            {
-                var container = new StructureMap.Container();
-                container.Populate(options.Builder.Services);
-
+                var containerEventsPublisher = container.TryGetInstance<ITenantContainerEventsPublisher<TTenant>>();
+                // add ITenantContainerBuilder<TTenant> service to the host container
+                // This service can be used to build a child container (adaptor) for a particular tenant, when required.
+                var defaultServices = options.DefaultServices;
                 container.Configure(_ =>
                     _.For<ITenantContainerBuilder<TTenant>>()
-                        .Use(new StructureMapTenantContainerBuilder<TTenant>(container, (tenant, configurationExpression) =>
-                        {
-                            var tenantServices = new ServiceCollection();
-                            configureTenant(tenant, tenantServices);
-                            configurationExpression.Populate(tenantServices);
-                        }))
+                        .Use(new TenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher))
                     );
 
-                // now configure nested container per tenant.
-                return container.GetInstance<IServiceProvider>();
+                // NOTE: Im not sure why I was resolving ITenantContainerAdaptor twice, changed to just return previous instance.
+                //var adaptor = container.GetInstance<ITenantContainerAdaptor>();
+                //return adaptor;
+                return adaptedContainer;
             });
 
-            return options;
+            var adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);
+
+            return adapted;
         }
-
     }
-
-
 }

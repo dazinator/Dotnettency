@@ -5,18 +5,20 @@ skip_tags: true
 install:
   - choco install gitversion.portable -pre -y
   - cinst gitlink -version 2.4.1 -y
-image: Visual Studio 2017 
+  - cinst dotnetcore-sdk --pre
+  - dotnet new -i Microsoft.AspNetCore.Blazor.Templates
+image: Visual Studio 2019 Preview
 assembly_info:
   patch: false
 before_build:
 - ps: gitversion /l console /output buildserver
-- cmd: msbuild %path_to_sln% /t:restore /p:PackageVersion=%GitVersion_NuGetVersion%
+- cmd: msbuild %path_to_sln% /t:restore /p:PackageVersion=%GitVersion_FullSemVer%
 build:
   project: '%path_to_sln%'
   verbosity: minimal
 after_build:
 - cmd: gitlink . -u https://github.com/%APPVEYOR_REPO_NAME% -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f %path_to_sln%
-- cmd: msbuild %path_to_sln% /t:Pack /p:PackageVersion=%GitVersion_NuGetVersion%
+- cmd: msbuild %path_to_sln% /t:Pack /p:PackageVersion=%GitVersion_FullSemVer%
 artifacts:
 - path: /src/**/*.nupkg
 deploy:

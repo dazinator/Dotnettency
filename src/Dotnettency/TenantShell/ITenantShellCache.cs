@@ -5,12 +5,12 @@ namespace Dotnettency
     public interface ITenantShellCache<TTenant>
         where TTenant : class
     {
+        TenantShell<TTenant> AddOrUpdate(TenantIdentifier key, Func<TenantIdentifier, TenantShell<TTenant>> addValueFactory, Func<TenantIdentifier, TenantShell<TTenant>, TenantShell<TTenant>> updateValueFactory);
 
-        TenantShell<TTenant> AddOrUpdate(TenantDistinguisher key, Func<TenantDistinguisher, TenantShell<TTenant>> addValueFactory, Func<TenantDistinguisher, TenantShell<TTenant>, TenantShell<TTenant>> updateValueFactory);
+        TenantShell<TTenant> AddOrUpdate(TenantIdentifier key, TenantShell<TTenant> addValue, Func<TenantIdentifier, TenantShell<TTenant>, TenantShell<TTenant>> updateValueFactory);
 
-        TenantShell<TTenant> AddOrUpdate(TenantDistinguisher key, TenantShell<TTenant> addValue, Func<TenantDistinguisher, TenantShell<TTenant>, TenantShell<TTenant>> updateValueFactory);
+        bool TryGetValue(TenantIdentifier key, out TenantShell<TTenant> value);
 
-        bool TryGetValue(TenantDistinguisher key, out TenantShell<TTenant> value);
-
+        bool TryRemove(TenantIdentifier key, out TenantShell<TTenant> value);
     }    
 }

@@ -3,28 +3,26 @@ using System;
 
 namespace Dotnettency
 {
+
     public static class MultitenancyServiceCollectionExtensions
     {
-
-        public static IServiceProvider AddMultiTenancy<TTenant>(this IServiceCollection serviceCollection, Action<MultitenancyOptionsBuilder<TTenant>> configure)
+        public static Func<IServiceProvider> ServiceProviderFactory;
+        public static IServiceProvider AddMultiTenancy<TTenant>(
+            this IServiceCollection serviceCollection,
+            Action<MultitenancyOptionsBuilder<TTenant>> configure)
             where TTenant : class
         {
             var optionsBuilder = new MultitenancyOptionsBuilder<TTenant>(serviceCollection);
-            if (configure != null)
-            {
-                configure(optionsBuilder);
-            }
-            //   var serviceProvider = optionsBuilder.Build();
+            configure?.Invoke(optionsBuilder);
 
-            Func<IServiceProvider> serviceProviderBuilder = optionsBuilder.BuildServiceProvider;
-            if (serviceProviderBuilder != null)
-            {
-                IServiceProvider sp = serviceProviderBuilder();
-                return sp;
-            }
+            ServiceProviderFactory = optionsBuilder.ServiceProviderFactory;
 
-            return null;
-            //return optionsBuilder.ServiceProvider;
+            // Cheat and feels like hack but best I can do at this time.
+            TenantServiceProviderFactory<TTenant>.Factory = ServiceProviderFactory;           
+
+            return (optionsBuilder.ServiceProviderFactory != null)
+                ? optionsBuilder.ServiceProviderFactory()
+                : null;
         }
     }
 }

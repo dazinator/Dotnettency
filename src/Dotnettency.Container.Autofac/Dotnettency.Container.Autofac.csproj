@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard1.3</TargetFramework>
+		<!--Nuspec Metadata-->
+		<Description>Autofac container support, for the dotnettency Mutlitenancy library for dotnet standard compatible applications.</Description>
+		<Authors>Darrell Tunnell</Authors>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/dazinator/Dotnettency</PackageProjectUrl>
+		<PackageTags>Multitenancy,tenant,container,autofac</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="4.9.2" />
+		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
+	</ItemGroup>
+
+</Project>
