@@ -21,9 +21,20 @@ namespace Dotnettency.EFCore.Identity
         private static List<Action<DbContext>> _setTenantIdOnSaveCallbacks = new List<Action<DbContext>>();
 
 
-        public MultitenantIdentityDbContext(DbContextOptions<MultitenantIdentityDbContext<TDbContext, TTenant, TIdType, TUser, TRole, TKey>> options)
+        public MultitenantIdentityDbContext(DbContextOptions<MultitenantIdentityDbContext<TDbContext, TTenant, TIdType, TUser, TRole, TKey>> options, Task<TTenant> tenant)
        : base(options)
         {
+            _tenant = tenant;
+            _tenantId = new Lazy<TIdType>(() =>
+            {
+                var t = _tenant.Result;
+                return GetTenantId(t);
+            });
+        }
+
+        protected virtual TIdType GetTenantId(TTenant tenant)
+        {
+            return default(TIdType);
         }
 
         private TIdType TenantId

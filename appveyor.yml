@@ -13,6 +13,7 @@ assembly_info:
 before_build:
 - ps: gitversion /l console /output buildserver
 - cmd: msbuild %path_to_sln% /t:restore /p:PackageVersion=%GitVersion_FullSemVer%
+- cmd: dotnet restore %path_to_sln%
 build:
   project: '%path_to_sln%'
   verbosity: minimal
