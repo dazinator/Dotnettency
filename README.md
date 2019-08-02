@@ -139,3 +139,24 @@ You probably won't need to use it directly, but if you want you can do so.
 
   Another way to register code that will run when the tenant is restarted, is to use TenantServices - add a disposable singleton service the tenant's container.
   When the tenant is disposed of, it's container will be disposed of, and your disposable service will be disposed of - depending upon your needs this hook might suffice.
+
+  ### Tenant IConfiguration (New in v2.1.0)
+
+ASP.NET Core hosting model allows you to build an `IConfiguration` for your application settings.
+Dotnettency takes this further, by allowing each tenant to have it's own `IConfiguration` lazily constructed when the tenant is initialised (first request to the tenant).
+You can access the current tenant's `IConfiguration` by injecting `Task<IConfiguration>` into your Controllers. The snippet below shows how to configure tenant specific configuration, notice how it uses the current tenant's name to find the JSON file:
+
+```
+ .ConfigureTenantConfiguration((a) =>
+                        {
+                            var tenantConfig = new ConfigurationBuilder();
+                            tenantConfig.AddJsonFile(Environment.ContentRootFileProvider, $"/appsettings.{a.Tenant?.Name}.json", true, true);
+                            return tenantConfig;
+                        })
+						
+```
+
+You can now inject `Task<IConfiguration>` into your controllers etc, and `await` the result to obtain the tenants `IConfiguration`.
+Note: if you inject `IConfiguration` rather than `Task<IConfiguration>` you will get the usual application wide `IConfiguration` like normal (currently).
+
+You can access the Tenant's `IConfiguration' when building the Tenant's middleware pipeline, or Container - this is designed such that you could use tenant specific configuration to decide how to configure that tenants middleware or services.

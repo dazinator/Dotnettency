@@ -5,7 +5,7 @@ namespace Dotnettency
 {
     public static class MultitenancyServicesExtensions
     {
-        public static MultitenancyOptionsBuilder<TTenant> ConfigureTenantFiles<TTenant>(
+        public static MultitenancyOptionsBuilder<TTenant> ConfigureTenantFileProviders<TTenant>(
             this MultitenancyOptionsBuilder<TTenant> optionsBuilder,
             Action<TenantFileProviderOptionsBuilder<TTenant>> configure)
             where TTenant : class
