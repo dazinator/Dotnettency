@@ -82,6 +82,7 @@ namespace Sample.Pages
                             .SetDefaultServices(defaultServices)
                             .Autofac((tenant, tenantServices) =>
                             {
+                                // todo: should be able to access the IServiceProvider here also so can do stuff like resolve IConfiguration etc.
                                 if (tenant != null)
                                 {
                                     tenantServices.AddRazorPages((o) =>
