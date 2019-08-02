@@ -25,7 +25,7 @@ namespace Dotnettency
                 var defaultServices = options.DefaultServices;
                 container.Configure(_ =>
                     _.For<ITenantContainerBuilder<TTenant>>()
-                        .Use(new TenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher))
+                        .Use(new DelegateActionTenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher))
                     );
 
                 // NOTE: Im not sure why I was resolving ITenantContainerAdaptor twice, changed to just return previous instance.

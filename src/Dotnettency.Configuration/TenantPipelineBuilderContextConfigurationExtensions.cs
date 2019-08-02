@@ -18,5 +18,5 @@ namespace Dotnettency
             return config;
         }
     }
-    
+
 }

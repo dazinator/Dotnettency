@@ -80,14 +80,21 @@ namespace Sample.Pages
                         {
                             containerOptions
                             .SetDefaultServices(defaultServices)
-                            .Autofac((tenant, tenantServices) =>
+                            .AutofacAsync(async (tenantContext, tenantServices) =>
                             {
-                                // todo: should be able to access the IServiceProvider here also so can do stuff like resolve IConfiguration etc.
-                                if (tenant != null)
+                                // Can now use tenant level configuration to decide how to bootstrap the tenants services here..
+                                var currentTenantConfig = await tenantContext.GetConfiguration();
+                                var someTenantConfigSetting = currentTenantConfig.GetValue<bool>("SomeSetting");
+                                if(someTenantConfigSetting)
+                                {
+                                    // register services certain way for this tenant. 
+                                }
+
+                                if (tenantContext.Tenant != null)
                                 {
                                     tenantServices.AddRazorPages((o) =>
                                     {
-                                        o.RootDirectory = $"/Pages/{tenant.Name}";
+                                        o.RootDirectory = $"/Pages/{tenantContext.Tenant.Name}";
                                     }).AddNewtonsoftJson();
                                 }
                             });
@@ -96,7 +103,15 @@ namespace Sample.Pages
                         {
                             tenantOptions.AspNetCorePipelineTask(async (context, tenantAppBuilder) =>
                             {
+                                // Shows how you can access the current tenants configuration and use that when deciding
+                                // how to configure the middleware pipeline for this particular tenant
                                 var tenantConfig = await context.GetConfiguration(tenantAppBuilder.ApplicationServices);
+                                var someTenantConfigSetting = tenantConfig.GetValue<bool>("SomeSetting");
+                                if (someTenantConfigSetting)
+                                {
+                                    // register services certain way for this tenant. 
+                                }
+
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {
                                     Console.WriteLine("Entering tenant pipeline: " + context.Tenant?.Name);
@@ -122,9 +137,8 @@ namespace Sample.Pages
                                         Console.WriteLine($"/Foo.txt file exists? {fooTextFile.Exists}");
 
                                         // Demonstrates per tenant config.
-                                        // SomeSetting is true for Moogle tenant but not other tenants.
-                                        var someTenantConfigSetting = tenantConfig["SomeSetting"];
-                                        Console.WriteLine($"Tenant config setting: {someTenantConfigSetting ?? "NULL"}");
+                                        // SomeSetting is true for Moogle tenant but not other tenants.                                       
+                                        Console.WriteLine($"Tenant config setting: {someTenantConfigSetting}");
 
                                         await next.Invoke();
                                     });

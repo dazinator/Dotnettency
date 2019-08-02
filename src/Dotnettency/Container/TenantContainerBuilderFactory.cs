@@ -16,7 +16,7 @@ namespace Dotnettency.Container
 
         protected override async Task<ITenantContainerAdaptor> BuildContainer(TTenant currentTenant)
         {
-            var builder = _serviceProvider.GetRequiredService<ITenantContainerBuilder<TTenant>>();
+            var builder = _serviceProvider.GetRequiredService<ITenantContainerBuilder<TTenant>>();           
             return await builder.BuildAsync(currentTenant);
         }
     }

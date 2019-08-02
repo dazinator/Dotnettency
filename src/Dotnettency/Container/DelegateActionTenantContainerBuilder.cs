@@ -1,21 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Dotnettency.Container
 {
-    public class TenantContainerBuilder<TTenant> : ITenantContainerBuilder<TTenant>
+    public class DelegateActionTenantContainerBuilder<TTenant> : ITenantContainerBuilder<TTenant>
         where TTenant : class
     {
         private readonly IServiceCollection _defaultServices;
         private readonly ITenantContainerAdaptor _parentContainer;
-        private readonly Action<TTenant, IServiceCollection> _configureTenant;
+        private readonly Action<TenantContainerBuilderContext<TTenant>, IServiceCollection> _configureTenant;
         private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
-        public TenantContainerBuilder(IServiceCollection defaultServices,
+        public DelegateActionTenantContainerBuilder(IServiceCollection defaultServices,
             ITenantContainerAdaptor parentContainer,
-            Action<TTenant, IServiceCollection> configureTenant,
+            Action<TenantContainerBuilderContext<TTenant>, IServiceCollection> configureTenant,
             ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
         {
             _defaultServices = defaultServices;
@@ -37,8 +36,14 @@ namespace Dotnettency.Container
                          config.Add(item);
                      }
                  }
-                
-                 _configureTenant(tenant, config);
+
+                 var buildContext = new TenantContainerBuilderContext<TTenant>()
+                 {
+                     ApplicationServices = _parentContainer,
+                     Tenant = tenant
+                 };
+
+                 _configureTenant(buildContext, config);
              });
 
             // tenantContainer.Configure();
@@ -48,4 +53,5 @@ namespace Dotnettency.Container
             return Task.FromResult(tenantContainer);
         }
     }
+
 }

@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency.Container
 {
@@ -105,6 +106,21 @@ namespace Dotnettency.Container
 
              _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
              return new AutofacTenantContainerAdaptor(_logger, scope, ContainerRole.Child, Name);
+        }
+
+        public async Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, Func<IServiceCollection, Task> configure)
+        {
+
+            ServiceCollection services = new ServiceCollection();
+            await configure(services);
+
+            var scope = _container.BeginLifetimeScope(TenantLifetimeScopeTag, (builder) =>
+            {
+                builder.Populate(services);
+            });
+
+            _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+            return new AutofacTenantContainerAdaptor(_logger, scope, ContainerRole.Child, Name);
         }
 
         public ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure)

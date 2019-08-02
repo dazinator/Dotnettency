@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency.Container
 {
@@ -9,6 +10,8 @@ namespace Dotnettency.Container
         ITenantContainerAdaptor CreateChildContainer(string Name);
 
         ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, Action<IServiceCollection> configure);
+        Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, Func<IServiceCollection, Task> configure);
+
         ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure);
 
         /// <summary>

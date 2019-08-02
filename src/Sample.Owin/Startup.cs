@@ -77,9 +77,9 @@ namespace Sample.Owin.SelfHost
                         .InitialiseTenant<TenantShellFactory>()
                         .ConfigureTenantContainers((containerOptions) =>
                         {
-                            containerOptions.Autofac((tenant, tenantServices) =>
+                            containerOptions.Autofac((tenantContext, tenantServices) =>
                             {
-                                tenantServices.AddSingleton<SomeTenantService>(new SomeTenantService(tenant));
+                                tenantServices.AddSingleton<SomeTenantService>(new SomeTenantService(tenantContext.Tenant));
                             });
                         })
                         .ConfigureTenantMiddleware((b) =>

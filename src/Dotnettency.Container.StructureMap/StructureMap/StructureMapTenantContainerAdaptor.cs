@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StructureMap;
 using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency.Container
 {
@@ -47,16 +48,18 @@ namespace Dotnettency.Container
 
         public void Configure(Action<IServiceCollection> configure)
         {
+            ServiceCollection services = new ServiceCollection();
+            configure(services);
+            Populate(services);            
+        }
+
+        public void Populate(IServiceCollection services)
+        {
             _container.Configure(_ =>
             {
                 _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
-                ServiceCollection services = new ServiceCollection();
-                configure(services);
                 _.Populate(services);
-
                 _logger.LogDebug("Root Container Adaptor Created: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
-
-
             });
         }
 
@@ -81,20 +84,29 @@ namespace Dotnettency.Container
         public ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, Action<IServiceCollection> configure)
         {
             ITenantContainerAdaptor container = CreateChildContainer(Name);
-            Configure(configure);
+            Configure(configure); 
             return container;
         }
 
-        public ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure)
+        public async Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, Func<IServiceCollection, Task> configure)
         {
-            ITenantContainerAdaptor container = CreateNestedContainer(Name);
-            Configure(configure);
-            return container;
+            ServiceCollection services = new ServiceCollection();
+            await configure(services);
+            Populate(services);
+            ITenantContainerAdaptor container = CreateChildContainer(Name);           
+            return container;         
         }
 
-        public void AddServices(Action<IServiceCollection> configure)
-        {
-             Configure(configure);
-        }
+    public ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure)
+    {
+        ITenantContainerAdaptor container = CreateNestedContainer(Name);
+        Configure(configure);
+        return container;
     }
+
+    public void AddServices(Action<IServiceCollection> configure)
+    {
+        Configure(configure);
+    }
+}
 }

@@ -33,16 +33,16 @@ namespace Sample.RazorPagesTest
                          {
                              containerOptions
                              .SetDefaultServices(defaultServices)
-                             .Autofac((tenant, tenantServices) =>
+                             .Autofac((tenantContext, tenantServices) =>
                              {
-                                 if (tenant != null)
+                                 if (tenantContext.Tenant != null)
                                  {
                                      tenantServices.AddMvc((o) =>
                                      {
 
                                      }).AddRazorPagesOptions((o) =>
                                      {
-                                         o.RootDirectory = $"/Pages/{tenant.Name}";
+                                         o.RootDirectory = $"/Pages/{tenantContext.Tenant.Name}";
                                      }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
                                  }
                              });

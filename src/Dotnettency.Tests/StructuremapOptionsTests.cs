@@ -226,7 +226,7 @@ namespace Dotnettency.Tests
 
             container.Configure(_ =>
                        _.For<ITenantContainerBuilder<MyTenant>>()
-                           .Use(new TenantContainerBuilder<MyTenant>(services, adaptedContainer, (s, t)=> {
+                           .Use(new DelegateActionTenantContainerBuilder<MyTenant>(services, adaptedContainer, (s, t)=> {
 
                                t.AddOptions();
                                t.Configure<MyOptions>((a) =>
