@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.Configuration
 {
-    public class DelegateTenantConfigurationFactory<TTenant> : ITenantConfigurationFactory<TTenant, IConfigurationBuilder, IConfiguration>
+    public class DelegateTenantConfigurationFactory<TTenant> : ITenantConfigurationFactory<TTenant, IConfiguration>
         where TTenant : class
     {
         private readonly Func<TenantConfigurationBuilderContext<TTenant>, IConfigurationBuilder> _buildTenantConfigurationAction;
@@ -14,18 +14,19 @@ namespace Dotnettency.Configuration
             _buildTenantConfigurationAction = buildTenantConfigurationAction;
         }
 
-        public async Task<IConfiguration> Create(IConfigurationBuilder appBuilder, IServiceProvider serviceProviderOverride, TTenant tenant)
+        public async Task<IConfiguration> Create(IServiceProvider serviceProviderOverride, TTenant tenant)
         {
-            return await CreateTenantConfiguration(appBuilder, serviceProviderOverride, tenant);
+            return await CreateTenantConfiguration(serviceProviderOverride, tenant);
         }
 
-        protected virtual Task<IConfigurationRoot> CreateTenantConfiguration(IConfigurationBuilder rootApp, IServiceProvider serviceProviderOverride, TTenant tenant)
+        protected virtual Task<IConfigurationRoot> CreateTenantConfiguration(IServiceProvider applicationServices, TTenant tenant)
         {
             return Task.Run(() =>
             {
                 var builderContext = new TenantConfigurationBuilderContext<TTenant>
                 {
-                    Tenant = tenant
+                    Tenant = tenant,
+                    ApplicationServices = applicationServices
                 };
              
                 var tenantConfiguBuilder =_buildTenantConfigurationAction(builderContext);

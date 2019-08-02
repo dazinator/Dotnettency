@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.Configuration
 {
-    public interface ITenantConfigurationFactory<TTenant, TConfigurationBuilder, TConfiguration>
+    public interface ITenantConfigurationFactory<TTenant, TConfiguration>
     where TTenant : class
     {
-        Task<TConfiguration> Create(TConfigurationBuilder builder, IServiceProvider serviceProviderOverride, TTenant tenant);
+        Task<TConfiguration> Create(IServiceProvider serviceProviderOverride, TTenant tenant);
     }
 
 }

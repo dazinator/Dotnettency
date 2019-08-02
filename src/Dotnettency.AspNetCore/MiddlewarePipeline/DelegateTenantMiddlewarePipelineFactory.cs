@@ -21,7 +21,7 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
             return await UseTenantPipeline(appBuilder, serviceProviderOverride, tenant, next, reJoin);
         }
 
-        protected virtual Task<RequestDelegate> UseTenantPipeline(IApplicationBuilder rootApp,  IServiceProvider serviceProviderOverride, TTenant tenant, RequestDelegate next, bool reJoin)
+        protected virtual Task<RequestDelegate> UseTenantPipeline(IApplicationBuilder rootApp, IServiceProvider serviceProviderOverride, TTenant tenant, RequestDelegate next, bool reJoin)
         {
             return Task.Run(() =>
             {
@@ -35,12 +35,13 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
                 _configuration(builderContext, branchBuilder);
 
                 // register root pipeline at the end of the tenant branch
-                if(next!=null && reJoin)
+                if (next != null && reJoin)
                 {
                     branchBuilder.Run(next);
-                }              
+                }
                 return branchBuilder.Build();
             });
         }
     }
+
 }

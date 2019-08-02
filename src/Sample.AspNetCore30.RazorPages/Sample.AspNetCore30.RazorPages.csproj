@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include=".tenants\b17fcd22-0db1-47c0-9fef-1aa1cb09605e\appsettings.Moogle.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="wwwroot\.tenants\b17fcd22-0db1-47c0-9fef-1aa1cb09605e\foo.txt" />
   </ItemGroup>
 
@@ -18,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
+    <ProjectReference Include="..\Dotnettency.Configuration\Dotnettency.Configuration.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
     <ProjectReference Include="..\Dotnettency.TenantFileSystem\Dotnettency.TenantFileSystem.csproj" />
   </ItemGroup>

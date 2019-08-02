@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.Configuration
 {
-    public interface ITenantConfigurationAccessor<TTenant, TConfigBuilder, TConfiguration>
+    public interface ITenantConfigurationAccessor<TTenant, TConfiguration>
       where TTenant : class
     {
-        Func<TConfigBuilder, IServiceProvider, ITenantConfigurationFactory<TTenant, TConfigBuilder, TConfiguration>, Lazy<Task<IConfiguration>>> BuildTenantConfigDelegate { get; }
+        Func<IServiceProvider, Lazy<Task<IConfiguration>>> ConfigFactory { get; }
     }
 
 }

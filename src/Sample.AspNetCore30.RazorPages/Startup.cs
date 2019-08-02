@@ -7,6 +7,7 @@ using Dotnettency;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Sample.Pages
 {
@@ -40,6 +41,41 @@ namespace Sample.Pages
                  builder.IdentifyTenantsWithRequestAuthorityUri()
                         .InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
+                        .ConfigureTenantFileProviders((hostingOptions) =>
+                        {
+                            var hostWebRootFileProvider = Environment.WebRootFileProvider;
+                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.WebRootPath, (webRootOptions) =>
+                            {
+                                // WE use the tenant's guid id to partition one tenants files from another on disk.
+                                Guid tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                                webRootOptions.TenantPartitionId(tenantGuid)
+                                                   .AllowAccessTo(hostWebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
+                            }, fp =>
+                            {
+                                // The file provider we add here, is one that dynamically switches based on the active tenant partition configuration above.
+                                Environment.WebRootFileProvider = new CompositeFileProvider(new[] { fp, hostWebRootFileProvider });
+                            });
+
+                            var hostContentRootFileProvider = Environment.ContentRootFileProvider;
+                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.ContentRootPath, (contentRootOptions) =>
+                            {
+                                // WE use the tenant's guid id to partition one tenants files from another on disk.
+                                Guid tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
+                                contentRootOptions.TenantPartitionId(tenantGuid)
+                                                   .AllowAccessTo(hostContentRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
+                            }, fp =>
+                            {
+                                // The file provider we add here, is one that dynamically switches based on the active tenant partition configuration above.
+                                Environment.ContentRootFileProvider = new CompositeFileProvider(new[] { fp, hostContentRootFileProvider });
+                            });
+
+                        })
+                        .ConfigureTenantConfiguration((a) =>
+                        {
+                            var tenantConfig = new ConfigurationBuilder();
+                            tenantConfig.AddJsonFile(Environment.ContentRootFileProvider, $"/appsettings.{a.Tenant?.Name}.json", true, true);
+                            return tenantConfig;
+                        })
                         .ConfigureTenantContainers((containerOptions) =>
                         {
                             containerOptions
@@ -57,8 +93,9 @@ namespace Sample.Pages
                         })
                         .ConfigureTenantMiddleware((tenantOptions) =>
                         {
-                            tenantOptions.AspNetCorePipeline((context, tenantAppBuilder) =>
+                            tenantOptions.AspNetCorePipelineTask(async (context, tenantAppBuilder) =>
                             {
+                                var tenantConfig = await context.GetConfiguration(tenantAppBuilder.ApplicationServices);
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {
                                     Console.WriteLine("Entering tenant pipeline: " + context.Tenant?.Name);
@@ -82,6 +119,12 @@ namespace Sample.Pages
                                         var fooTextFile = webFileProvider.GetFileInfo("/foo.txt");
 
                                         Console.WriteLine($"/Foo.txt file exists? {fooTextFile.Exists}");
+
+                                        // Demonstrates per tenant config.
+                                        // SomeSetting is true for Moogle tenant but not other tenants.
+                                        var someTenantConfigSetting = tenantConfig["SomeSetting"];
+                                        Console.WriteLine($"Tenant config setting: {someTenantConfigSetting ?? "NULL"}");
+
                                         await next.Invoke();
                                     });
 
@@ -90,24 +133,9 @@ namespace Sample.Pages
                                         endpoints.MapRazorPages();
                                     });
                                 }
-
                             });
-                        })
-                        .ConfigureTenantFiles((hostingOptions) =>
-                        {
-                            var hostWebRootFileProvider = Environment.WebRootFileProvider;
-                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.WebRootPath, (webRootOptions) =>
-                             {
-                                 // WE use the tenant's guid id to partition one tenants files from another on disk.
-                                 Guid tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
-                                 webRootOptions.TenantPartitionId(tenantGuid)
-                                                    .AllowAccessTo(hostWebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
-                             }, fp =>
-                             {
-                                 Environment.WebRootFileProvider = new CompositeFileProvider(new[] { fp, hostWebRootFileProvider });
-                             });
-
                         });
+
              });
 
         }

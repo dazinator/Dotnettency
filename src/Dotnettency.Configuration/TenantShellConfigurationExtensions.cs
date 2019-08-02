@@ -12,4 +12,7 @@ namespace Dotnettency.Configuration
             return tenantShell.GetOrAddProperty<Lazy<Task<IConfiguration>>>(nameof(TenantShellConfigurationExtensions), requestDelegateFactory);
         }
     }
+
+
+    
 }
