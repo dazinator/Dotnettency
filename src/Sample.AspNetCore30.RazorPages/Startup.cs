@@ -57,7 +57,7 @@ namespace Sample.Pages
                             });
 
                             var hostContentRootFileProvider = Environment.ContentRootFileProvider;
-                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.ContentRootPath, (contentRootOptions) =>
+                            hostingOptions.ConfigureTenantContentFileProvider(Environment.ContentRootPath, (contentRootOptions) =>
                             {
                                 // WE use the tenant's guid id to partition one tenants files from another on disk.
                                 Guid tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
