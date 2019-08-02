@@ -11,6 +11,12 @@ namespace Dotnettency.TenantFileSystem
             return tenantShell.GetOrAddProperty(key, factory) as Lazy<ICabinet>;
         }
 
+        public static Lazy<ICabinet> GetOrAddTenantFileSystem<TTenant>(this TenantShell<TTenant> tenantShell, string key, Func<string, Lazy<ICabinet>> factory)
+           where TTenant : class
+        {
+            return tenantShell.GetOrAddProperty(key, factory) as Lazy<ICabinet>;
+        }
+
         public static Lazy<ICabinet> TryGetTenantFileSystem<TTenant>(this TenantShell<TTenant> tenantShell, string key)
             where TTenant : class
         {

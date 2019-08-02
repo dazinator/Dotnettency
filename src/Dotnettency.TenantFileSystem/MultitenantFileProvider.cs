@@ -79,12 +79,12 @@ namespace Dotnettency.TenantFileSystem
             {
                 return null;
             }
-            //todo: store this factory in tenant shell so it can be reused until tenant is reset..
-            var lazyFactory = new Lazy<ICabinet>(() =>
-            {
-                return _rootFactory.GetRoot(tenantShell.Tenant);
-            });
-            var cabinet = tenantShell?.GetOrAddTenantFileSystem(_key, lazyFactory)?.Value;
+            var cabinet = tenantShell?.GetOrAddTenantFileSystem(_key, (key)=> {
+                return new Lazy<ICabinet>(() =>
+                {
+                    return _rootFactory.GetCabinet(tenantShell.Tenant);
+                });
+            })?.Value;
             return cabinet;
         }
     }

@@ -4,13 +4,13 @@ using System.IO;
 
 namespace Dotnettency.TenantFileSystem
 {
-    public class DelegateTenantFileSystemProviderFactory<TTenant> : ITenantFileSystemProviderFactory<TTenant>
+    public class DelegateActionTenantFileSystemProviderFactory<TTenant> : ITenantFileSystemProviderFactory<TTenant>
         where TTenant : class
     {
         private readonly Action<TenantFileSystemBuilderContext<TTenant>> _configureRoot;
         private readonly string _basePath;
 
-        public DelegateTenantFileSystemProviderFactory(
+        public DelegateActionTenantFileSystemProviderFactory(
             string basePath,
             Action<TenantFileSystemBuilderContext<TTenant>> configureRoot)
         {
@@ -31,9 +31,8 @@ namespace Dotnettency.TenantFileSystem
                 return _basePath;
             }
         }
-        public ICabinet GetRoot(TTenant tenant)
+        public ICabinet GetCabinet(TTenant tenant)
         {
-
             var defaultTenantsBaseFolderPath = GetBasePath();
             var builder = new TenantFileSystemBuilderContext<TTenant>(tenant, defaultTenantsBaseFolderPath);
             _configureRoot(builder);

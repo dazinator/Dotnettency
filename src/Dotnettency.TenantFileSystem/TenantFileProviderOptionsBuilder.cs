@@ -47,7 +47,7 @@ namespace Dotnettency.TenantFileSystem
            Action<IFileProvider> useFileProvider,
            string subFolderName = DefaultSubFolderName)
         {
-            var factory = new DelegateTenantFileSystemProviderFactory<TTenant>(basePath, configureRoot);
+            var factory = new DelegateActionTenantFileSystemProviderFactory<TTenant>(basePath, configureRoot);
             factory.SubfolderName = subFolderName;
             var contextProvider = this.Builder.HttpContextProvider;
 
