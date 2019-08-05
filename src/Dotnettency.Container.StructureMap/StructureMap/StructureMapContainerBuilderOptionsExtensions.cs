@@ -9,7 +9,7 @@ namespace Dotnettency
     {
         public static AdaptedContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(
             this ContainerBuilderOptions<TTenant> options,
-            Action<TTenant, IServiceCollection> configureTenant)
+            Action<TenantContainerBuilderContext<TTenant>, IServiceCollection> configureTenant)
             where TTenant : class
         {
             var adaptorFactory = new Func<ITenantContainerAdaptor>(() =>
