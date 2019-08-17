@@ -1,5 +1,5 @@
 c# Dotnettency
-Dotnettency is a library that provides features to enable Multi-Tenant applications using:
+Dotnettency is a library that provides features to enable Multi-Tenant applications using either:
   - ASP.NET Core
   - OWIN
 
