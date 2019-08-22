@@ -13,22 +13,25 @@ namespace Dotnettency.EFCore
         where TTenant : class
     {
         private readonly Task<TTenant> _tenant;
-        private Lazy<TIdType> _tenantId;
+        private AsyncLocal<Lazy<TIdType>> _tenantId;
 
         private TIdType TenantId
         {
             get
             {
-                return _tenantId.Value;
+                return _tenantId.Value.Value;
             }
         }
+
+        public Guid InstanceId { get; set; } = Guid.NewGuid();
 
         private static List<Action<DbContext>> _setTenantIdOnSaveCallbacks = new List<Action<DbContext>>();
 
         public MultitenantDbContext(DbContextOptions<TDbContext> options, Task<TTenant> tenant) : base(options)
         {
-            _tenant = tenant;
-            _tenantId = new Lazy<TIdType>(() =>
+            _tenant = tenant;           
+            _tenantId = new AsyncLocal<Lazy<TIdType>>();
+            _tenantId.Value = new Lazy<TIdType>(() =>
             {
                 var t = _tenant.Result;
                 return GetTenantId(t);
@@ -39,7 +42,6 @@ namespace Dotnettency.EFCore
         {
             return default(TIdType);
         }
-
 
         protected void HasTenantIdFilter<T>(ModelBuilder modelBuilder, string tenantIdPropertyName, Expression<Func<T, TIdType>> idExpression)
           where T : class
