@@ -3,21 +3,22 @@ Dotnettency is a library that provides features to enable Multi-Tenant applicati
   - ASP.NET Core
   - OWIN
 
-| Branch  | Build Status | 
-| ------------- | ------------- |
-| Master  | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) | 
-| Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop) | 
+| Branch  | AppVeyor | DevOps |
+| ------------- | ------------- | --- |
+| Master  | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/master) |  |
+| Develop | [![Build status](https://ci.appveyor.com/api/projects/status/2xi1nts54u2hamv3/branch/develop?svg=true)](https://ci.appveyor.com/project/dazinator/dotnettency/branch/develop) | [![Build Status](https://dev.azure.com/darrelltunnell/Public%20Projects/_apis/build/status/dazinator.Dotnettency?branchName=develop)](https://dev.azure.com/darrelltunnell/Public%20Projects/_build/latest?definitionId=5&branchName=develop) |
 
-| Branch  | Dotnettency Core Library | AspNetCore | Owin | EF Core | Tenant File System |
-| ------------- | ------------- | ----- | ----- | ----- | ---- |
-| Master  | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/v/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/v/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/v/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) | [![Tenant FileSystem](https://img.shields.io/nuget/v/Dotnettency.TenantFileSystem.svg)](https://www.nuget.org/packages/Dotnettency.TenantFileSystem/) |
-| Develop | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![AspNetCore](https://img.shields.io/nuget/vpre/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![Owin](https://img.shields.io/nuget/vpre/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) | [![EF Core](https://img.shields.io/nuget/vpre/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) | [![Tenant FileSystem](https://img.shields.io/nuget/vpre/Dotnettency.TenantFileSystem.svg)](https://www.nuget.org/packages/Dotnettency.TenantFileSystem/) |
 
-| Branch | Autofac | StructureMap |
-| ------------- | ------------- | ------------- |
-| Master | [![Autofac](https://img.shields.io/nuget/v/Dotnettency.Container.Autofac.svg)](https://www.nuget.org/packages/Dotnettency.Container.Autofac/) | [![StructureMap](https://img.shields.io/nuget/v/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) |
-| Develop |  [![Autofac](https://img.shields.io/nuget/vpre/Dotnettency.Container.Autofac.svg)](https://www.nuget.org/packages/Dotnettency.Container.Autofac/) | [![StructureMap](https://img.shields.io/nuget/vpre/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) |
-
+| Package  | Stable | Pre-release |
+| ------------- | --- | --- |
+| Dotnettency Core  | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.svg)](https://www.nuget.org/packages/Dotnettency/) | 
+| AspNetCore | [![AspNetCore](https://img.shields.io/nuget/v/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | [![AspNetCore](https://img.shields.io/nuget/vpre/Dotnettency.AspNetCore.svg)](https://www.nuget.org/packages/Dotnettency.AspNetCore/) | 
+| Owin |  [![Owin](https://img.shields.io/nuget/v/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/)  |  [![Owin](https://img.shields.io/nuget/vpre/Dotnettency.Owin.svg)](https://www.nuget.org/packages/Dotnettency.Owin/) |
+| EF Core |  [![EF Core](https://img.shields.io/nuget/v/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/)  | [![EF Core](https://img.shields.io/nuget/vpre/Dotnettency.EFCore.svg)](https://www.nuget.org/packages/Dotnettency.EFCore/) |
+| Tenant File System | [![Tenant FileSystem](https://img.shields.io/nuget/v/Dotnettency.TenantFileSystem.svg)](https://www.nuget.org/packages/Dotnettency.TenantFileSystem/) | [![Tenant FileSystem](https://img.shields.io/nuget/vpre/Dotnettency.TenantFileSystem.svg)](https://www.nuget.org/packages/Dotnettency.TenantFileSystem/) |
+| Autofac  |  [![Autofac](https://img.shields.io/nuget/v/Dotnettency.Container.Autofac.svg)](https://www.nuget.org/packages/Dotnettency.Container.Autofac/) | [![Autofac](https://img.shields.io/nuget/vpre/Dotnettency.Container.Autofac.svg)](https://www.nuget.org/packages/Dotnettency.Container.Autofac/)  |
+| StructureMap | [![StructureMap](https://img.shields.io/nuget/v/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) | [![StructureMap](https://img.shields.io/nuget/vpre/Dotnettency.Container.StructureMap.svg)](https://www.nuget.org/packages/Dotnettency.Container.StructureMap/) |
+| Configuration | [![Dotnettency](https://img.shields.io/nuget/v/Dotnettency.Configuration.svg)](https://www.nuget.org/packages/Dotnettency.Configuration/) | [![Dotnettency](https://img.shields.io/nuget/vpre/Dotnettency.Configuration.svg)](https://www.nuget.org/packages/Dotnettency.Configuration/) | 
 
 Inspired by [saaskit](https://github.com/saaskit/saaskit)
 
