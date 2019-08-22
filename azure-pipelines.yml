@@ -37,11 +37,14 @@ steps:
     command: restore
     projects: '$(solution)'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
+  displayName: Build
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
+    command: build
+    projects: '$(solution)'
     configuration: '$(buildConfiguration)'
+    versioningScheme: byEnvVar
+    versionEnvVar: 'GitVersion.SemVer'
 
 - task: DotNetCoreCLI@2
   inputs: 
