@@ -14,13 +14,13 @@ namespace Dotnettency.EFCore
         where TTenant : class
     {
         private readonly Task<TTenant> _tenant;
-        private AsyncLocal<Lazy<TIdType>> _tenantId;
+        private Lazy<TIdType> _tenantId;
 
         public TIdType TenantId
         {
             get
             {
-                return _tenantId.Value.Value;
+                return _tenantId.Value;
             }
         }
 
@@ -31,8 +31,7 @@ namespace Dotnettency.EFCore
         public MultitenantDbContext(DbContextOptions<TDbContext> options, Task<TTenant> tenant) : base(options)
         {
             _tenant = tenant;
-            _tenantId = new AsyncLocal<Lazy<TIdType>>();
-            _tenantId.Value = new Lazy<TIdType>(() =>
+            _tenantId = new Lazy<TIdType>(() =>
             {
                 var t = _tenant.Result;
                 return GetTenantId(t);
