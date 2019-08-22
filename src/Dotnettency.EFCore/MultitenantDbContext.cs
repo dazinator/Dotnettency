@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.EFCore
 {
-    public abstract class MultitenantDbContext<TDbContext, TTenant, TIdType> : DbContext
-        where TDbContext : DbContext
+
+    public abstract class MultitenantDbContext<TDbContext, TTenant, TIdType> : DbContext, IMultitenantDbContext<TIdType>
+        where TDbContext : DbContext, IMultitenantDbContext<TIdType>
         where TTenant : class
     {
         private readonly Task<TTenant> _tenant;
         private AsyncLocal<Lazy<TIdType>> _tenantId;
 
-        private TIdType TenantId
+        public TIdType TenantId
         {
             get
             {
@@ -25,11 +26,11 @@ namespace Dotnettency.EFCore
 
         public Guid InstanceId { get; set; } = Guid.NewGuid();
 
-        private static List<Action<DbContext>> _setTenantIdOnSaveCallbacks = new List<Action<DbContext>>();
+        private static List<Action<IMultitenantDbContext<TIdType>>> _setTenantIdOnSaveCallbacks = new List<Action<IMultitenantDbContext<TIdType>>>();
 
         public MultitenantDbContext(DbContextOptions<TDbContext> options, Task<TTenant> tenant) : base(options)
         {
-            _tenant = tenant;           
+            _tenant = tenant;
             _tenantId = new AsyncLocal<Lazy<TIdType>>();
             _tenantId.Value = new Lazy<TIdType>(() =>
             {
@@ -56,10 +57,18 @@ namespace Dotnettency.EFCore
 
             modelBuilder.Entity<T>().HasQueryFilter(newExp);
 
-            Action<DbContext> action = (db) =>
+            Action<IMultitenantDbContext<TIdType>> action = (db) =>
             {
-                SetTenantIdProperty<T>(tenantIdPropertyName, TenantId, db);
+                foreach (var item in db.ChangeTracker.Entries<T>())
+                {
+                    if (item.State == EntityState.Added)
+                    {
+                        var id = db.TenantId;
+                        SetTenantIdProperty(tenantIdPropertyName, item, id);
+                    }
+                }
             };
+
             _setTenantIdOnSaveCallbacks.Add(action);
 
         }
@@ -78,7 +87,7 @@ namespace Dotnettency.EFCore
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            SetTenantIdOnSave();
+           // SetTenantIdOnSave();
             return await base.SaveChangesAsync(cancellationToken);
         }
 
@@ -88,16 +97,9 @@ namespace Dotnettency.EFCore
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
-        private static void SetTenantIdProperty<TEntity>(string propertyName, TIdType id, DbContext db)
-            where TEntity : class
+        private static void SetTenantIdProperty(string propertyName, EntityEntry entity, TIdType id)
         {
-            foreach (var item in db.ChangeTracker.Entries<TEntity>())
-            {
-                if (item.State == EntityState.Added)
-                {
-                    item.Property(propertyName).CurrentValue = id;
-                }
-            }
+            entity.Property(propertyName).CurrentValue = id;
         }
 
         private void SetTenantIdOnSave()

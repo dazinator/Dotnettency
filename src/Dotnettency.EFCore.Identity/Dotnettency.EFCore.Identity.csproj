@@ -13,4 +13,8 @@
 
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Dotnettency.EFCore\Dotnettency.EFCore.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿namespace Dotnettency.Tests
 {
-    internal class Tenant
+    public class Tenant
     {
+        public int Id { get; set; }
     }
 }
