@@ -1,0 +1,58 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+- develop
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  GitVersion.SemVer: ''
+
+steps:
+- task: gittools.gitversion.gitversion-task.GitVersion@5
+  displayName: gitversion
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk'
+  inputs:
+    packageType: sdk    
+    useGlobalJson: true
+    installationPath: $(Agent.ToolsDirectory)/dotnet  
+
+- task: NuGetToolInstaller@1
+  inputs:
+    versionSpec: '5.1.0' 
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  inputs: 
+    command: 'pack'    
+    versioningScheme: byEnvVar
+    versionEnvVar: 'GitVersion.SemVer'
+    
+- task: NuGetCommand@2
+  inputs:
+    command: push
+    nuGetFeedType: external
+    publishFeedCredentials: 'NuGet'
+    versioningScheme: byEnvVar
+    versionEnvVar: 'GitVersion.SemVer'
