@@ -17,13 +17,12 @@ before_build:
 build:
   project: '%path_to_sln%'
   verbosity: minimal
-  publish_nuget_symbols: true
-  use_snupkg_format: true
 after_build:
 - cmd: gitlink . -u https://github.com/%APPVEYOR_REPO_NAME% -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f %path_to_sln%
 - cmd: msbuild %path_to_sln% /t:Pack /p:PackageVersion=%GitVersion_FullSemVer%
 artifacts:
 - path: /src/**/*.nupkg
+- path: /src/**/*.snupkg
 deploy:
   provider: NuGet
   server:
