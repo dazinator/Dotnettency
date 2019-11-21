@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>   
+    <ProjectReference Include="..\Dotnettency.VirtualFileSystem\Dotnettency.VirtualFileSystem.csproj" />   
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 

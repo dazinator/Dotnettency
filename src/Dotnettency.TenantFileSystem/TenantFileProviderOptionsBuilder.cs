@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using Dotnettency.VirtualFileSystem;
+using Microsoft.Extensions.FileProviders;
 using System;
 
 namespace Dotnettency.TenantFileSystem
@@ -25,7 +26,7 @@ namespace Dotnettency.TenantFileSystem
 
         public MultitenancyOptionsBuilder<TTenant> ConfigureTenantContentFileProvider(
             string basePath,
-            Action<TenantFileSystemBuilderContext<TTenant>> configureRoot,
+            Action<TenantShellItemBuilderContext<TTenant>, PhysicalStorageCabinetBuilder> configureRoot,
             Action<IFileProvider> useFileProvider)
         {
             return ConfigureTenantFileProvider(TenantShellHostingEnvironmentFileSystemExtensions.ContentRootKey, basePath, configureRoot, useFileProvider);
@@ -34,7 +35,7 @@ namespace Dotnettency.TenantFileSystem
 
         public MultitenancyOptionsBuilder<TTenant> ConfigureTenantWebRootFileProvider(
             string basePath,
-            Action<TenantFileSystemBuilderContext<TTenant>> configureRoot,
+            Action<TenantShellItemBuilderContext<TTenant>, PhysicalStorageCabinetBuilder> configureRoot,
             Action<IFileProvider> useFileProvider)
         {
             return ConfigureTenantFileProvider(TenantShellHostingEnvironmentFileSystemExtensions.WebRootKey, basePath, configureRoot, useFileProvider);
@@ -43,7 +44,7 @@ namespace Dotnettency.TenantFileSystem
         public MultitenancyOptionsBuilder<TTenant> ConfigureTenantFileProvider(
             string key,
             string basePath,
-           Action<TenantFileSystemBuilderContext<TTenant>> configureRoot,
+           Action<TenantShellItemBuilderContext<TTenant>, PhysicalStorageCabinetBuilder> configureRoot,
            Action<IFileProvider> useFileProvider,
            string subFolderName = DefaultSubFolderName)
         {

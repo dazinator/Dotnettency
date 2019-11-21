@@ -41,14 +41,21 @@ namespace Sample.Pages
                  builder.IdentifyTenantsWithRequestAuthorityUri()
                         .InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
+                        .ConfigureTenantFileSystem(Environment.ContentRootPath, (ctx, fs) =>
+                        {
+                            Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
+                            fs.SetPartitionId(tenantGuid)
+                              .SetSubDirectory(".tenants\\")
+                              .AllowAccessTo(Environment.ContentRootFileProvider);
+                        })
                         .ConfigureTenantFileProviders((hostingOptions) =>
                         {
                             var hostWebRootFileProvider = Environment.WebRootFileProvider;
-                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.WebRootPath, (webRootOptions) =>
+                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.WebRootPath, (t, webRootOptions) =>
                             {
                                 // WE use the tenant's guid id to partition one tenants files from another on disk.
-                                Guid tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
-                                webRootOptions.TenantPartitionId(tenantGuid)
+                                Guid tenantGuid = (t.Tenant?.TenantGuid).GetValueOrDefault();
+                                webRootOptions.SetPartitionId(tenantGuid)
                                                    .AllowAccessTo(hostWebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
                             }, fp =>
                             {
@@ -57,12 +64,12 @@ namespace Sample.Pages
                             });
 
                             var hostContentRootFileProvider = Environment.ContentRootFileProvider;
-                            hostingOptions.ConfigureTenantContentFileProvider(Environment.ContentRootPath, (contentRootOptions) =>
+                            hostingOptions.ConfigureTenantContentFileProvider(Environment.ContentRootPath, (t, contentRootOptions) =>
                             {
                                 // WE use the tenant's guid id to partition one tenants files from another on disk.
-                                Guid tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
-                                contentRootOptions.TenantPartitionId(tenantGuid)
-                                                   .AllowAccessTo(hostContentRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
+                                Guid tenantGuid = (t.Tenant?.TenantGuid).GetValueOrDefault();
+                                contentRootOptions.SetPartitionId(tenantGuid)
+                                                  .AllowAccessTo(hostContentRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
                             }, fp =>
                             {
                                 // The file provider we add here, is one that dynamically switches based on the active tenant partition configuration above.

@@ -14,7 +14,7 @@ namespace Dotnettency
         
         public static AdaptedContainerBuilderOptions<TTenant> Autofac<TTenant>(
             this ContainerBuilderOptions<TTenant> options,
-            Action<TenantContainerBuilderContext<TTenant>, IServiceCollection> configureTenant)
+            Action<TenantShellItemBuilderContext<TTenant>, IServiceCollection> configureTenant)
             where TTenant : class
         {
             Func<ITenantContainerAdaptor> adaptorFactory = new Func<ITenantContainerAdaptor>(() =>
@@ -51,7 +51,7 @@ namespace Dotnettency
 
         public static AdaptedContainerBuilderOptions<TTenant> AutofacAsync<TTenant>(
           this ContainerBuilderOptions<TTenant> options,
-          Func<TenantContainerBuilderContext<TTenant>, IServiceCollection, Task> configureTenant)
+          Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> configureTenant)
           where TTenant : class
         {
             Func<ITenantContainerAdaptor> adaptorFactory = new Func<ITenantContainerAdaptor>(() =>

@@ -13,18 +13,26 @@ namespace Dotnettency
         /// <param name="optionsBuilder"></param>
         /// <param name="configureItem"></param>
         /// <returns></returns>
-        public static MultitenancyOptionsBuilder<TTenant> ConfigureTenantShellItem<TTenant, TTItem>(this MultitenancyOptionsBuilder<TTenant> optionsBuilder, Func<TenantShellItemBuilderContext<TTenant>, TTItem> configureItem)
+        public static MultitenancyOptionsBuilder<TTenant> ConfigureTenantShellItem<TTenant, TTItem>(this MultitenancyOptionsBuilder<TTenant> optionsBuilder, Func<TenantShellItemBuilderContext<TTenant>, TTItem> configureItem, string name = "")
              where TTenant : class
         {
             var factory = new DelegateTenantShellItemFactory<TTenant, TTItem>(configureItem);
-            optionsBuilder.Services.AddSingleton<ITenantShellItemFactory<TTenant, TTItem>>(factory);
-            optionsBuilder.Services.AddScoped<ITenantShellItemAccessor<TTenant, TTItem>, TenantShellItemAccessor<TTenant, TTItem>>();
+
+            // optionsBuilder.Services.AddSingleton<ITenantShellItemFactory<TTenant, TTItem>>(factory);
+
+            optionsBuilder.Services.AddScoped<ITenantShellItemAccessor<TTenant, TTItem>>((sp) =>
+            {
+                var shellAccessor = sp.GetRequiredService<ITenantShellAccessor<TTenant>>();
+                var fact = factory;
+                return new TenantShellItemAccessor<TTenant, TTItem>(shellAccessor, fact);
+            });
 
             // allow Task<IConfiguration> to be resolved for getting the current tenants IConfiguration in a non-blocking mannor;
 
             // Support injection of Task<TItem> - a convenience that allows non blocking access to this shell item for the tenant.
             // when required - minor contention on Lazy<>
-            optionsBuilder.Services.AddScoped(sp => {
+            optionsBuilder.Services.AddScoped(sp =>
+            {
                 return sp.GetRequiredService<ITenantShellItemAccessor<TTenant, TTItem>>().Factory(sp).Value;
             });
 

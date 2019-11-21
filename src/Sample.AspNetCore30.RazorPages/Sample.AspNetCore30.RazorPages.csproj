@@ -25,6 +25,7 @@
     <ProjectReference Include="..\Dotnettency.Configuration\Dotnettency.Configuration.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
     <ProjectReference Include="..\Dotnettency.TenantFileSystem\Dotnettency.TenantFileSystem.csproj" />
+    <ProjectReference Include="..\Dotnettency.VirtualFileSystem\Dotnettency.VirtualFileSystem.csproj" />
   </ItemGroup>
 
 
