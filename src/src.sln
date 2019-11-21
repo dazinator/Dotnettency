@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.EFCore.Identity
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.Configuration", "Dotnettency.Configuration\Dotnettency.Configuration.csproj", "{94AB3A57-CD5A-4CFD-81AF-31CAB5744928}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.VirtualFileSystem", "Dotnettency.VirtualFileSystem\Dotnettency.VirtualFileSystem.csproj", "{780513F1-1182-46AA-829C-A451CD0A8DA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -237,6 +239,18 @@ Global
 		{94AB3A57-CD5A-4CFD-81AF-31CAB5744928}.Release|x64.Build.0 = Release|Any CPU
 		{94AB3A57-CD5A-4CFD-81AF-31CAB5744928}.Release|x86.ActiveCfg = Release|Any CPU
 		{94AB3A57-CD5A-4CFD-81AF-31CAB5744928}.Release|x86.Build.0 = Release|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Debug|x64.Build.0 = Debug|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Debug|x86.Build.0 = Debug|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Release|x64.ActiveCfg = Release|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Release|x64.Build.0 = Release|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Release|x86.ActiveCfg = Release|Any CPU
+		{780513F1-1182-46AA-829C-A451CD0A8DA4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,9 +9,9 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
     public class DelegateTenantMiddlewarePipelineFactory<TTenant> : ITenantMiddlewarePipelineFactory<TTenant, IApplicationBuilder, RequestDelegate>
         where TTenant : class
     {
-        private readonly Action<TenantPipelineBuilderContext<TTenant>, IApplicationBuilder> _configuration;
+        private readonly Action<TenantShellItemBuilderContext<TTenant>, IApplicationBuilder> _configuration;
 
-        public DelegateTenantMiddlewarePipelineFactory(Action<TenantPipelineBuilderContext<TTenant>, IApplicationBuilder> configuration)
+        public DelegateTenantMiddlewarePipelineFactory(Action<TenantShellItemBuilderContext<TTenant>, IApplicationBuilder> configuration)
         {
             _configuration = configuration;
         }
@@ -27,9 +27,10 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
             {
                 var branchBuilder = rootApp.New();
                 branchBuilder.ApplicationServices = serviceProviderOverride;
-                var builderContext = new TenantPipelineBuilderContext<TTenant>
+                var builderContext = new TenantShellItemBuilderContext<TTenant>
                 {
-                    Tenant = tenant
+                    Tenant = tenant,
+                    Services = serviceProviderOverride
                 };
 
                 _configuration(builderContext, branchBuilder);
