@@ -41,42 +41,28 @@ namespace Sample.Pages
                  builder.IdentifyTenantsWithRequestAuthorityUri()
                         .InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
-                        .ConfigureTenantFileSystem(Environment.ContentRootPath, (ctx, fs) =>
+                        .ConfigureNamedTenantFileSystems((namedItems) =>
                         {
-                            Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
-                            fs.SetPartitionId(tenantGuid)
-                              .SetSubDirectory(".tenants\\")
-                              .AllowAccessTo(Environment.ContentRootFileProvider);
-                        })
-                        .ConfigureTenantFileProviders((hostingOptions) =>
-                        {
-                            var hostWebRootFileProvider = Environment.WebRootFileProvider;
-                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.WebRootPath, (t, webRootOptions) =>
-                            {
-                                // WE use the tenant's guid id to partition one tenants files from another on disk.
-                                Guid tenantGuid = (t.Tenant?.TenantGuid).GetValueOrDefault();
-                                webRootOptions.SetPartitionId(tenantGuid)
-                                                   .AllowAccessTo(hostWebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
-                            }, fp =>
-                            {
-                                // The file provider we add here, is one that dynamically switches based on the active tenant partition configuration above.
-                                Environment.WebRootFileProvider = new CompositeFileProvider(new[] { fp, hostWebRootFileProvider });
-                            });
+                            var contentFileProvider = Environment.ContentRootFileProvider;
+                            var webFileProvider = Environment.WebRootFileProvider;
 
-                            var hostContentRootFileProvider = Environment.ContentRootFileProvider;
-                            hostingOptions.ConfigureTenantContentFileProvider(Environment.ContentRootPath, (t, contentRootOptions) =>
-                            {
-                                // WE use the tenant's guid id to partition one tenants files from another on disk.
-                                Guid tenantGuid = (t.Tenant?.TenantGuid).GetValueOrDefault();
-                                contentRootOptions.SetPartitionId(tenantGuid)
-                                                  .AllowAccessTo(hostContentRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
-                            }, fp =>
-                            {
-                                // The file provider we add here, is one that dynamically switches based on the active tenant partition configuration above.
-                                Environment.ContentRootFileProvider = new CompositeFileProvider(new[] { fp, hostContentRootFileProvider });
-                            });
-
-                        })
+                            namedItems.AddWebFileSystem(Environment.WebRootPath, (ctx, fs) =>
+                                      {
+                                          Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
+                                          fs.SetPartitionId(tenantGuid)
+                                            .SetSubDirectory(".tenants\\")
+                                           .AllowAccessTo(webFileProvider);
+                                      })
+                                      .UseAsEnvironmentWebRootFileProvider(Environment)
+                                      .AddContentFileSystem(Environment.ContentRootPath, (ctx, fs) =>
+                                      {
+                                          Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
+                                          fs.SetPartitionId(tenantGuid)
+                                            .SetSubDirectory(".tenants\\")
+                                            .AllowAccessTo(contentFileProvider);
+                                      })
+                                      .UseAsEnvironmentContentRootFileProvider(Environment);
+                        })                        
                         .ConfigureTenantConfiguration((a, tenantConfig) =>
                         {
                             tenantConfig.AddJsonFile(Environment.ContentRootFileProvider, $"/appsettings.{a.Tenant?.Name}.json", true, true);
@@ -108,7 +94,6 @@ namespace Sample.Pages
                         {
                             tenantOptions.AspNetCorePipelineTask(async (context, tenantAppBuilder) =>
                             {
-
                                 var tenantConfig = await context.GetConfiguration();
                                 var someTenantConfigSetting = tenantConfig.GetValue<bool>("SomeSetting");
                                 if (someTenantConfigSetting)
@@ -121,7 +106,22 @@ namespace Sample.Pages
                                 // You can also inject Task<ExampleShellItem> into controllers etc.
                                 // ExampleShellItem will be lazily constructed only per tenant, or once after a tenant restart.
                                 var exampleShellItem = await context.GetShellItemAsync<ExampleShellItem>();
-                                Console.WriteLine("Got tenant shell item for tenant: " + exampleShellItem.TenantName);
+                                if (exampleShellItem.Colour != "indigo")
+                                {
+                                    throw new Exception("wrong named item was retrieved..");
+                                }
+
+                                var redShellItem = await context.GetShellItemAsync<ExampleShellItem>("red");
+                                if (redShellItem.Colour != "red")
+                                {
+                                    throw new Exception("wrong named item was retrieved..");
+                                }
+
+                                var blueShellItem = await context.GetShellItemAsync<ExampleShellItem>("blue");
+                                if (blueShellItem.Colour != "blue")
+                                {
+                                    throw new Exception("wrong named item was retrieved..");
+                                }
 
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {
@@ -167,7 +167,7 @@ namespace Sample.Pages
                             // Example - you can configure your own arbitrary shell items
                             // This item will be lazily constructed once per tenant, and stored in tenant shell, and 
                             // optionally disposed of if tenant is restarted (if implements IDisposable).
-                            return new ExampleShellItem(b.Tenant?.Name ?? "NULL TENANT");
+                            return new ExampleShellItem(b.Tenant?.Name ?? "NULL TENANT") { Colour = "indigo" };
 
 
                             // To access this item, you can do either / all of:
@@ -183,7 +183,12 @@ namespace Sample.Pages
                             // (That's the convention for any item stored in Tenant Shell)
 
 
-                        });
+                        })
+                        .ConfigureNamedTenantShellItems<Tenant, ExampleShellItem>((b) =>
+                         {
+                             b.Add("red", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "red" });
+                             b.Add("blue", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "blue" });
+                         });
 
              });
 
@@ -198,6 +203,9 @@ namespace Sample.Pages
             }
 
             public string TenantName { get; set; }
+
+            public string Colour { get; set; }
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

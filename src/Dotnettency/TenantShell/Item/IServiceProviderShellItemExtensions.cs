@@ -6,14 +6,25 @@ namespace Dotnettency
 {
     public static class IServiceProviderShellItemExtensions
     {
-        public static async Task<TItem> GetShellItemAsync<TTenant, TItem>(this IServiceProvider serviceProvider)
+        public static async Task<TItem> GetShellItemAsync<TTenant, TItem>(this IServiceProvider serviceProvider, string name = "")
             where TTenant : class
         {
-            var accessor = serviceProvider.GetRequiredService<ITenantShellItemAccessor<TTenant, TItem>>();
-            var accessDelegate = accessor.Factory(serviceProvider);
-            var item = await accessDelegate.Value;
-            return item;
-        }
-    }
+            Lazy<Task<TItem>> lazyFactory = null;
+            if (string.IsNullOrEmpty(name))
+            {
+                var accessor = serviceProvider.GetRequiredService<ITenantShellItemAccessor<TTenant, TItem>>();
+                lazyFactory = accessor.Factory(serviceProvider);
+            }
+            else
+            {
+                var accessor = serviceProvider.GetRequiredService<ITenantShellNamedItemAccessor<TTenant, TItem>>();
+                lazyFactory = accessor.NamedFactory(serviceProvider, name);
+            }
 
+            var item = await lazyFactory.Value;
+            return item;
+
+        }
+
+    }
 }

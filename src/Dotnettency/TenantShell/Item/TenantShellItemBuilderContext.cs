@@ -16,12 +16,9 @@ namespace Dotnettency
         
         public IServiceProvider Services { get; set; }
 
-        public async Task<TItem> GetShellItemAsync<TItem>()
+        public Task<TItem> GetShellItemAsync<TItem>(string name = "")
         {
-            var accessor = Services.GetRequiredService<ITenantShellItemAccessor<TTenant, TItem>>();
-            var accessDelegate = accessor.Factory(Services);
-            var item = await accessDelegate.Value;
-            return item;
+            return Services.GetShellItemAsync<TTenant, TItem>(name);
         }
     }
 }

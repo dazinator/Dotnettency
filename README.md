@@ -161,3 +161,103 @@ You can now inject `Task<IConfiguration>` into your controllers etc, and `await`
 Note: if you inject `IConfiguration` rather than `Task<IConfiguration>` you will get the usual application wide `IConfiguration` like normal (currently).
 
 You can access the Tenant's `IConfiguration' when building the Tenant's middleware pipeline, or Container - this is designed such that you could use tenant specific configuration to decide how to configure that tenants middleware or services.
+
+## Tenant Shell Items
+
+Tenant Shell Items are special kind of item that have a lifetime tied to the current tenant, and are stored in the tenant's `TenantShell`. 
+They are:
+
+1. Lazily initialised on first access, per tenant.
+2. Stored in the tenant's `TenantShell` for the lifetime of that tenant.
+3. If the tenant is restarted, the value is cleared from the tenant's shell, and lazily re-initialised on next access again.
+4. If your `TItem` implements `IDisposable` it will be disposed of when the it is removed from the `TenantShell` (typically on a tenant restart) accessed asynchronously.
+5. It will be registered for DI as `Task<TItem>` so you can inject it and then await the `Task` to get the value. The await is necessary as the value will
+   be asynchronously created only on first access for that tenant. On subsequent accesses, the same cached task (already completed) is used to return the value immediately.
+
+You can register a tenant shell item during dotnettency fluent configuration like:
+
+```csharp
+
+             services.AddMultiTenancy<Tenant>((builder) =>
+             {
+                 builder.IdentifyTenantsWithRequestAuthorityUri()
+                         // .. shortened for brevity
+                        .ConfigureTenantShellItem((tenantInfo) =>
+                        {
+                            return new ExampleShellItem { TenantName = tenantInfo.Tenant?.Name };
+                        })
+
+```
+
+You can now access this through DI:
+
+```
+
+public class MyController
+{
+      public MyController(Task<ExampleShellItem> shellItem)
+	  {
+	  
+	  }
+
+}
+
+```
+Note: If you don't like injecting `Task<T>` you can also inject `ITenantShellItemAccessor<TTenant, TItem>` and use that to get access to the shell item
+
+You can also access the shell item during most fluent configuration of a tenant, for example most fluent configuration methods expose a context object with a `GetShellItemAsync` extension method:
+
+```
+ var exampleShellItem = await context.GetShellItemAsync<ExampleShellItem>();
+
+```
+
+
+## Named Shell Items?
+
+Suppose you want to register multiple of your Shell Item instances, with different names. You can use the `ConfigureNamedTenantShellItems` instead.
+
+```
+             services.AddMultiTenancy<Tenant>((builder) =>
+             {
+                 builder.IdentifyTenantsWithRequestAuthorityUri()
+                         // .. shortened for brevity
+                         .ConfigureNamedTenantShellItems<Tenant, ExampleShellItem>((b) =>
+                         {
+                             b.Add("red", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "red" });
+                             b.Add("blue", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "blue" });
+                         });
+
+
+```
+
+To access a named shell item through DI, rather than injecting `Task<T>`, you can inject `Func<string, `Task<T>`:
+
+
+```csharp
+
+public class MyController
+{
+      private readonly Func<string, Task<T>> _namedShellItemFactory
+     
+	  public MyController(Func<string, Task<T>> namedShellItemFactory)
+	  {
+	     _namedShellItemFactory = namedShellItemFactory;
+	  }
+
+	  public async Task<T> GetRedItem()
+	  {
+	      return await _namedShellItemFactory("red");
+	  }
+
+}
+
+```      
+
+Or during fluent configuration of the tenant, for exmaple whilst configuring the tenant's middleware pipeline or services:
+
+```csharp 
+
+ var redShellItem = await context.GetShellItemAsync<ExampleShellItem>("red");
+
+```

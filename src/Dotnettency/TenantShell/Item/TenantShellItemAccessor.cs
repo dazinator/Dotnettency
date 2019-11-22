@@ -9,9 +9,8 @@ namespace Dotnettency
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
         private readonly ITenantShellItemFactory<TTenant, TItem> _tenantItemFactory;
 
-
         public TenantShellItemAccessor(ITenantShellAccessor<TTenant> tenantShellAccessor, ITenantShellItemFactory<TTenant, TItem> tenantItemFactory)
-        {
+        {           
             _tenantShellAccessor = tenantShellAccessor;
             _tenantItemFactory = tenantItemFactory;
 
@@ -23,15 +22,6 @@ namespace Dotnettency
                     if (tenantShell == null)
                     {
                         throw new InvalidOperationException("No tenant shell was available to resolve a tenant shell item from. Type: " + typeof(TItem).Name);
-
-                        //// no tenant shell - return application level service.
-                        //if (string.IsNullOrWhiteSpace(_name))
-                        //{
-                        //    return (TItem)sp.GetService(typeof(TItem));
-                        //}
-                        //else
-                        //{
-                        //}
                     }
 
                     Func<Lazy<Task<TItem>>> createLazyFactoryFunc = () =>
@@ -39,7 +29,7 @@ namespace Dotnettency
                         return new Lazy<Task<TItem>>(() =>
                         {
                             var tenant = tenantShell?.Tenant;
-                            return _tenantItemFactory.Create(sp, tenant);
+                            return _tenantItemFactory?.Create(sp, tenant);
                         });
                     };
 
@@ -47,9 +37,11 @@ namespace Dotnettency
                     return await tenantPipeline.Value;
                 });
             });
+
         }
 
         public Func<IServiceProvider, Lazy<Task<TItem>>> Factory { get; private set; }
+
     }
 
 }
