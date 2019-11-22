@@ -22,7 +22,7 @@ namespace Dotnettency
             return builder;
         }       
 
-        public static MultitenancyOptionsBuilder<TTenant> OwinPipeline<TTenant>(this TenantPipelineOptionsBuilder<TTenant> builder, Action<TenantPipelineBuilderContext<TTenant>, IAppBuilder> configuration)
+        public static MultitenancyOptionsBuilder<TTenant> OwinPipeline<TTenant>(this TenantPipelineOptionsBuilder<TTenant> builder, Action<TenantShellItemBuilderContext<TTenant>, IAppBuilder> configuration)
            where TTenant : class
         {
             var factory = new DelegateTenantMiddlewarePipelineFactory<TTenant>(configuration);

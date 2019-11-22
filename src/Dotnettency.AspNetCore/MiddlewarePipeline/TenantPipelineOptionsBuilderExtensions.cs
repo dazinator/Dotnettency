@@ -10,7 +10,7 @@ namespace Dotnettency
 {
     public static class TenantPipelineOptionsBuilderExtensions
     {
-        public static MultitenancyOptionsBuilder<TTenant> AspNetCorePipeline<TTenant>(this TenantPipelineOptionsBuilder<TTenant> builder, Action<TenantPipelineBuilderContext<TTenant>, IApplicationBuilder> configuration)
+        public static MultitenancyOptionsBuilder<TTenant> AspNetCorePipeline<TTenant>(this TenantPipelineOptionsBuilder<TTenant> builder, Action<TenantShellItemBuilderContext<TTenant>, IApplicationBuilder> configuration)
             where TTenant : class
         {
             var factory = new DelegateTenantMiddlewarePipelineFactory<TTenant>(configuration);
@@ -20,7 +20,7 @@ namespace Dotnettency
             return builder.MultitenancyOptions;
         }
 
-        public static MultitenancyOptionsBuilder<TTenant> AspNetCorePipelineTask<TTenant>(this TenantPipelineOptionsBuilder<TTenant> builder, Func<TenantPipelineBuilderContext<TTenant>, IApplicationBuilder, Task> configuration)
+        public static MultitenancyOptionsBuilder<TTenant> AspNetCorePipelineTask<TTenant>(this TenantPipelineOptionsBuilder<TTenant> builder, Func<TenantShellItemBuilderContext<TTenant>, IApplicationBuilder, Task> configuration)
           where TTenant : class
         {
             var factory = new DelegateTaskTenantMiddlewarePipelineFactory<TTenant>(configuration);

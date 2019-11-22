@@ -41,40 +41,31 @@ namespace Sample.Pages
                  builder.IdentifyTenantsWithRequestAuthorityUri()
                         .InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
-                        .ConfigureTenantFileProviders((hostingOptions) =>
+                        .ConfigureNamedTenantFileSystems((namedItems) =>
                         {
-                            var hostWebRootFileProvider = Environment.WebRootFileProvider;
-                            hostingOptions.ConfigureTenantWebRootFileProvider(Environment.WebRootPath, (webRootOptions) =>
-                            {
-                                // WE use the tenant's guid id to partition one tenants files from another on disk.
-                                Guid tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
-                                webRootOptions.TenantPartitionId(tenantGuid)
-                                                   .AllowAccessTo(hostWebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
-                            }, fp =>
-                            {
-                                // The file provider we add here, is one that dynamically switches based on the active tenant partition configuration above.
-                                Environment.WebRootFileProvider = new CompositeFileProvider(new[] { fp, hostWebRootFileProvider });
-                            });
+                            var contentFileProvider = Environment.ContentRootFileProvider;
+                            var webFileProvider = Environment.WebRootFileProvider;
 
-                            var hostContentRootFileProvider = Environment.ContentRootFileProvider;
-                            hostingOptions.ConfigureTenantContentFileProvider(Environment.ContentRootPath, (contentRootOptions) =>
-                            {
-                                // WE use the tenant's guid id to partition one tenants files from another on disk.
-                                Guid tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
-                                contentRootOptions.TenantPartitionId(tenantGuid)
-                                                   .AllowAccessTo(hostContentRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
-                            }, fp =>
-                            {
-                                // The file provider we add here, is one that dynamically switches based on the active tenant partition configuration above.
-                                Environment.ContentRootFileProvider = new CompositeFileProvider(new[] { fp, hostContentRootFileProvider });
-                            });
-
-                        })
-                        .ConfigureTenantConfiguration((a) =>
+                            namedItems.AddWebFileSystem(Environment.WebRootPath, (ctx, fs) =>
+                                      {
+                                          Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
+                                          fs.SetPartitionId(tenantGuid)
+                                            .SetSubDirectory(".tenants\\")
+                                           .AllowAccessTo(webFileProvider);
+                                      })
+                                      .UseAsEnvironmentWebRootFileProvider(Environment)
+                                      .AddContentFileSystem(Environment.ContentRootPath, (ctx, fs) =>
+                                      {
+                                          Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
+                                          fs.SetPartitionId(tenantGuid)
+                                            .SetSubDirectory(".tenants\\")
+                                            .AllowAccessTo(contentFileProvider);
+                                      })
+                                      .UseAsEnvironmentContentRootFileProvider(Environment);
+                        })                        
+                        .ConfigureTenantConfiguration((a, tenantConfig) =>
                         {
-                            var tenantConfig = new ConfigurationBuilder();
                             tenantConfig.AddJsonFile(Environment.ContentRootFileProvider, $"/appsettings.{a.Tenant?.Name}.json", true, true);
-                            return tenantConfig;
                         })
                         .ConfigureTenantContainers((containerOptions) =>
                         {
@@ -83,9 +74,9 @@ namespace Sample.Pages
                             .AutofacAsync(async (tenantContext, tenantServices) =>
                             {
                                 // Can now use tenant level configuration to decide how to bootstrap the tenants services here..
-                                var currentTenantConfig = await tenantContext.GetConfiguration();
+                                var currentTenantConfig = await tenantContext.GetConfigurationAsync();
                                 var someTenantConfigSetting = currentTenantConfig.GetValue<bool>("SomeSetting");
-                                if(someTenantConfigSetting)
+                                if (someTenantConfigSetting)
                                 {
                                     // register services certain way for this tenant. 
                                 }
@@ -103,18 +94,39 @@ namespace Sample.Pages
                         {
                             tenantOptions.AspNetCorePipelineTask(async (context, tenantAppBuilder) =>
                             {
-                                // Shows how you can access the current tenants configuration and use that when deciding
-                                // how to configure the middleware pipeline for this particular tenant
-                                var tenantConfig = await context.GetConfiguration(tenantAppBuilder.ApplicationServices);
+                                var tenantConfig = await context.GetConfiguration();
                                 var someTenantConfigSetting = tenantConfig.GetValue<bool>("SomeSetting");
                                 if (someTenantConfigSetting)
                                 {
                                     // register services certain way for this tenant. 
                                 }
 
+                                // Example of using your own custom tenant shell items. 
+                                // Check out the ConfigureTenantShellItem<> below.
+                                // You can also inject Task<ExampleShellItem> into controllers etc.
+                                // ExampleShellItem will be lazily constructed only per tenant, or once after a tenant restart.
+                                var exampleShellItem = await context.GetShellItemAsync<ExampleShellItem>();
+                                if (exampleShellItem.Colour != "indigo")
+                                {
+                                    throw new Exception("wrong named item was retrieved..");
+                                }
+
+                                var redShellItem = await context.GetShellItemAsync<ExampleShellItem>("red");
+                                if (redShellItem.Colour != "red")
+                                {
+                                    throw new Exception("wrong named item was retrieved..");
+                                }
+
+                                var blueShellItem = await context.GetShellItemAsync<ExampleShellItem>("blue");
+                                if (blueShellItem.Colour != "blue")
+                                {
+                                    throw new Exception("wrong named item was retrieved..");
+                                }
+
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {
-                                    Console.WriteLine("Entering tenant pipeline: " + context.Tenant?.Name);
+                                    // This is some middleware running in the tenant pipeline.
+                                    Console.WriteLine("Running in tenant pipeline: " + context.Tenant?.Name);
                                     await next.Invoke();
                                 });
 
@@ -149,9 +161,50 @@ namespace Sample.Pages
                                     });
                                 }
                             });
-                        });
+                        })
+                        .ConfigureTenantShellItem((b) =>
+                        {
+                            // Example - you can configure your own arbitrary shell items
+                            // This item will be lazily constructed once per tenant, and stored in tenant shell, and 
+                            // optionally disposed of if tenant is restarted (if implements IDisposable).
+                            return new ExampleShellItem(b.Tenant?.Name ?? "NULL TENANT") { Colour = "indigo" };
+
+
+                            // To access this item, you can do either / all of:
+                            // 1. Inject Task<ExampleShellItem> into your controllers etc, then await that task where needed.
+                            // 2. Inject ITenantShellItemAccessor<ExampleShellItem> then await it's lazy factory task.
+                            // 3. Use IServiceProvider extension method e.g:  await ApplicationServices.GetShellItemAsync<Tenant, ExampleShellItem>();
+                            // 4. In startup methods above, use "await context.GetShellItemAsync<ExampleShellItem>()" as shown in the middleware example.
+
+                            // Note: Tenant shell items are removed from the Tenant Shell if the tenant is restarted.
+                            //        and then lazily re-initialised again when first consumed after the tenant restart
+
+                            // Another Note: If your service implements IDisposable, it will also be disposed of, when the tenant is restarted.
+                            // (That's the convention for any item stored in Tenant Shell)
+
+
+                        })
+                        .ConfigureNamedTenantShellItems<Tenant, ExampleShellItem>((b) =>
+                         {
+                             b.Add("red", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "red" });
+                             b.Add("blue", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "blue" });
+                         });
 
              });
+
+        }
+
+        public class ExampleShellItem
+        {
+            public ExampleShellItem(string tenantName)
+            {
+                TenantName = tenantName;
+                Console.WriteLine($"ExampleShellItem constructed for tenant: {tenantName}");
+            }
+
+            public string TenantName { get; set; }
+
+            public string Colour { get; set; }
 
         }
 

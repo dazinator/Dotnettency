@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.TenantFileSystem
 {
-    public class CurrentTenantFileProvider<TTenant> : IFileProvider
+    public class MultitenantFileProvider<TTenant> : IFileProvider
         where TTenant : class
     {
         private readonly IHttpContextProvider _contextprovider;
-        private readonly ITenantFileSystemProviderFactory<TTenant> _rootFactory;
-        private readonly string _key;
+        private readonly string _name;
 
 
         public IFileProvider GetActiveFileProvider()
@@ -26,14 +25,13 @@ namespace Dotnettency.TenantFileSystem
             return fileProvider;
         }
 
-        public CurrentTenantFileProvider(
+        public MultitenantFileProvider(
             IHttpContextProvider contextprovider,
-            ITenantFileSystemProviderFactory<TTenant> rootFactory,
-            string key)
+            // ITenantFileSystemProviderFactory<TTenant> rootFactory,
+            string name = "")
         {
             _contextprovider = contextprovider;
-            _rootFactory = rootFactory;
-            _key = key;
+            _name = name;
         }
 
         public IDirectoryContents GetDirectoryContents(string subpath)
@@ -74,17 +72,13 @@ namespace Dotnettency.TenantFileSystem
 
         protected async Task<ICabinet> GetCabinet(HttpContextBase context)
         {
-            var tenantShell = await GetTenantShell(context);
-            if(tenantShell == null)
+            var services = context.GetRequestServices();
+            if(services == null)
             {
                 return null;
             }
-            var cabinet = tenantShell?.GetOrAddTenantFileSystem(_key, (key)=> {
-                return new Lazy<ICabinet>(() =>
-                {
-                    return _rootFactory.GetCabinet(tenantShell.Tenant);
-                });
-            })?.Value;
+
+            var cabinet = await services.GetShellItemAsync<TTenant, ICabinet>(_name);
             return cabinet;
         }
     }

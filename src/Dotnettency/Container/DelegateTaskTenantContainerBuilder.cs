@@ -9,12 +9,12 @@ namespace Dotnettency.Container
     {
         private readonly IServiceCollection _defaultServices;
         private readonly ITenantContainerAdaptor _parentContainer;
-        private readonly Func<TenantContainerBuilderContext<TTenant>, IServiceCollection, Task> _configureTenant;
+        private readonly Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> _configureTenant;
         private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
         public DelegateTaskTenantContainerBuilder(IServiceCollection defaultServices,
             ITenantContainerAdaptor parentContainer,
-            Func<TenantContainerBuilderContext<TTenant>, IServiceCollection, Task> configureTenant,
+            Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> configureTenant,
             ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
         {
             _defaultServices = defaultServices;
@@ -38,9 +38,9 @@ namespace Dotnettency.Container
                     }
                 }
 
-                var buildContext = new TenantContainerBuilderContext<TTenant>()
+                var buildContext = new TenantShellItemBuilderContext<TTenant>()
                 {
-                    ApplicationServices = _parentContainer,
+                    Services = _parentContainer,
                     Tenant = tenant
                 };
 

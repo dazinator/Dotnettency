@@ -10,9 +10,9 @@ namespace Dotnettency.Owin.MiddlewarePipeline
     public class DelegateTenantMiddlewarePipelineFactory<TTenant> : ITenantMiddlewarePipelineFactory<TTenant, IAppBuilder, AppFunc>
         where TTenant : class
     {
-        private readonly Action<TenantPipelineBuilderContext<TTenant>, IAppBuilder> _configuration;
+        private readonly Action<TenantShellItemBuilderContext<TTenant>, IAppBuilder> _configuration;
 
-        public DelegateTenantMiddlewarePipelineFactory(Action<TenantPipelineBuilderContext<TTenant>, IAppBuilder> configuration)
+        public DelegateTenantMiddlewarePipelineFactory(Action<TenantShellItemBuilderContext<TTenant>, IAppBuilder> configuration)
         {
             _configuration = configuration;
         }
@@ -29,9 +29,10 @@ namespace Dotnettency.Owin.MiddlewarePipeline
                 var branchBuilder = rootApp.New();
                 branchBuilder.Properties["ApplicationServices"] = serviceProviderOverride;
                 //branchBuilder.ApplicationServices = serviceProviderOverride;
-                var builderContext = new TenantPipelineBuilderContext<TTenant>
+                var builderContext = new TenantShellItemBuilderContext<TTenant>
                 {
-                    Tenant = tenant
+                    Tenant = tenant,
+                    Services = serviceProviderOverride
                 };
 
                 _configuration(builderContext, branchBuilder);
