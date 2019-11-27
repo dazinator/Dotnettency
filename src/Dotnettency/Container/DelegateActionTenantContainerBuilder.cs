@@ -12,7 +12,8 @@ namespace Dotnettency.Container
         private readonly Action<TenantShellItemBuilderContext<TTenant>, IServiceCollection> _configureTenant;
         private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
-        public DelegateActionTenantContainerBuilder(IServiceCollection defaultServices,
+        public DelegateActionTenantContainerBuilder(
+            IServiceCollection defaultServices,
             ITenantContainerAdaptor parentContainer,
             Action<TenantShellItemBuilderContext<TTenant>, IServiceCollection> configureTenant,
             ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
@@ -23,13 +24,14 @@ namespace Dotnettency.Container
             _containerEventsPublisher = containerEventsPublisher;
         }
 
-        public Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
+        public Task<ITenantContainerAdaptor> BuildAsync(TenantShellItemBuilderContext<TTenant> tenantContext)
         {
-            var tenantContainer = _parentContainer.CreateChildContainerAndConfigure("Tenant: " + (tenant?.ToString() ?? "NULL").ToString(), config =>
+            var name = tenantContext.Tenant?.ToString();
+            var tenantContainer = _parentContainer.CreateChildContainerAndConfigure("Tenant: " + (name ?? "NULL"), config =>
              {
                  // add default services to tenant container.
                  // see https://github.com/aspnet/AspNetCore/issues/10469 and issues linked with that.
-                 if(_defaultServices!=null)
+                 if (_defaultServices != null)
                  {
                      foreach (var item in _defaultServices)
                      {
@@ -37,16 +39,16 @@ namespace Dotnettency.Container
                      }
                  }
 
-                 var buildContext = new TenantShellItemBuilderContext<TTenant>()
+                 // As tenantContext.Services is provided from current scope, we prefer that.
+                 // otherwise fallback to parent scope (i.e this could mean falling back to application services from current scoped services etc).
+                 // Note: Not sure if this is necessary as current scope will possiblly always match _parentContainer anyway when no more specific scope in use.
+                 if (tenantContext.Services == null)
                  {
-                     Services = _parentContainer,
-                     Tenant = tenant
-                 };
+                     tenantContext.Services = _parentContainer;
+                 }
 
-                 _configureTenant(buildContext, config);
+                 _configureTenant(tenantContext, config);
              });
-
-            // tenantContainer.Configure();
 
             _containerEventsPublisher?.PublishTenantContainerCreated(tenantContainer);
 

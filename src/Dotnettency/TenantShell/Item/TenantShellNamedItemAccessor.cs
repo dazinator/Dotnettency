@@ -8,17 +8,14 @@ namespace Dotnettency
    where TTenant : class
     {
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
-       // private readonly ITenantShellItemFactory<TTenant, TItem> _tenantItemFactory;
         private readonly Dictionary<string, ITenantShellItemFactory<TTenant, TItem>> _namedFactories;
-
-
+        
         public TenantShellNamedItemAccessor(
             ITenantShellAccessor<TTenant> tenantShellAccessor,
             Dictionary<string, ITenantShellItemFactory<TTenant, TItem>> namedFactories)
         {
             _tenantShellAccessor = tenantShellAccessor;
             _namedFactories = namedFactories;
-            //_tenantItemFactory = tenantItemFactory;
 
             NamedFactory = new Func<IServiceProvider, string, Lazy<Task<TItem>>>((sp, name) =>
             {

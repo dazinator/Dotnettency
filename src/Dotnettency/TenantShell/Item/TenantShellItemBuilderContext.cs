@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Dotnettency
@@ -12,8 +11,12 @@ namespace Dotnettency
 
         }
 
-        public TTenant Tenant { get; set; }
-        
+        public TTenant Tenant
+        {
+            get;
+            set;
+        }
+
         public IServiceProvider Services { get; set; }
 
         public Task<TItem> GetShellItemAsync<TItem>(string name = "")

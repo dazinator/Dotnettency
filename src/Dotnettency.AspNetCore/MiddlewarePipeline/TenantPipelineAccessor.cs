@@ -9,11 +9,13 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
     public class TenantPipelineAccessor<TTenant> : ITenantPipelineAccessor<TTenant, IApplicationBuilder, RequestDelegate>
         where TTenant : class
     {
+        private readonly IServiceProvider _currentScopeServiceProvider;
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
 
-        public TenantPipelineAccessor(
+        public TenantPipelineAccessor(IServiceProvider currentScopeServiceProvider,
             ITenantShellAccessor<TTenant> tenantShellAccessor)
         {
+            _currentScopeServiceProvider = currentScopeServiceProvider;
             _tenantShellAccessor = tenantShellAccessor;
 
             TenantPipeline = new Func<IApplicationBuilder, IServiceProvider, RequestDelegate, ITenantMiddlewarePipelineFactory<TTenant, IApplicationBuilder, RequestDelegate>, bool, Lazy<Task<RequestDelegate>>>((appBuilder, sp, next, factory, reJoin) =>
@@ -29,7 +31,15 @@ namespace Dotnettency.AspNetCore.MiddlewarePipeline
 
                 var tenantPipeline = tenantShell.GetOrAddMiddlewarePipeline(() =>
                     new Lazy<Task<RequestDelegate>>(() =>
-                        factory.Create(appBuilder, sp, tenant, next, reJoin)));
+                    {
+                        TenantShellItemBuilderContext<TTenant> context = new TenantShellItemBuilderContext<TTenant>()
+                        {
+                            Services = _currentScopeServiceProvider,
+                            Tenant = tenant
+                        };
+                        return factory.Create(appBuilder, context, next, reJoin);
+                    }));
+
 
                 return await tenantPipeline.Value;
             }));

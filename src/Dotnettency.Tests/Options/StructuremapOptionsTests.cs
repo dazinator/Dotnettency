@@ -11,8 +11,14 @@ namespace Dotnettency.Tests
 
     public class MyOptions
     {
-        public bool Prop { get; set; }
-        public bool Foo { get; internal set; }
+        public MyOptions()
+        {
+
+        }
+        // public bool Prop { get; set; }
+        public bool Foo { get; set; }
+
+        // public string TenantName { get; internal set; }
     }
     public class StructuremapOptionsTests
     {
@@ -20,16 +26,17 @@ namespace Dotnettency.Tests
 
         [Fact]
         public void Options_Configure_Root_Resolve_Root()
-        {           
+        {
             // ServiceProvider serviceProvider = services.BuildServiceProvider();
             StructureMap.Container container = new StructureMap.Container();
-            container.Configure((a)=> {
+            container.Configure((a) =>
+            {
 
                 ServiceCollection services = new ServiceCollection();
                 services.AddOptions();
                 services.Configure<MyOptions>((b) =>
                 {
-                    b.Prop = true;
+                    b.Foo = true;
                 });
                 a.Populate(services);
             });
@@ -38,7 +45,7 @@ namespace Dotnettency.Tests
 
             IServiceProvider sp = container.GetInstance<IServiceProvider>();
             IOptions<MyOptions> options = sp.GetRequiredService<IOptions<MyOptions>>();
-            Assert.True(options.Value?.Prop);
+            Assert.True(options.Value?.Foo);
 
         }
 
@@ -51,9 +58,9 @@ namespace Dotnettency.Tests
             services.AddOptions();
             services.Configure<MyOptions>((a) =>
             {
-                a.Prop = true;
+                a.Foo = true;
             });
-           // ServiceProvider serviceProvider = services.BuildServiceProvider();
+            // ServiceProvider serviceProvider = services.BuildServiceProvider();
 
 
             StructureMap.Container container = new StructureMap.Container();
@@ -63,7 +70,7 @@ namespace Dotnettency.Tests
 
             IServiceProvider sp = container.GetInstance<IServiceProvider>();
             IOptions<MyOptions> options = sp.GetRequiredService<IOptions<MyOptions>>();
-            Assert.True(options.Value?.Prop);
+            Assert.True(options.Value?.Foo);
 
         }
 
@@ -72,7 +79,7 @@ namespace Dotnettency.Tests
         //{
 
         //    ServiceCollection services = new ServiceCollection();         
-          
+
         //    StructureMap.Container container = new StructureMap.Container();
         //    container.Populate(services);
 
@@ -133,7 +140,7 @@ namespace Dotnettency.Tests
             services.AddLogging();
             services.Configure<MyOptions>((a) =>
             {
-                a.Prop = true;
+                a.Foo = true;
             });
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -145,7 +152,7 @@ namespace Dotnettency.Tests
 
             ITenantContainerAdaptor sp = container.GetInstance<ITenantContainerAdaptor>();
             IOptions<MyOptions> options = sp.GetRequiredService<IOptions<MyOptions>>();
-            Assert.True(options.Value?.Prop);
+            Assert.True(options.Value?.Foo);
 
         }
 
@@ -158,7 +165,7 @@ namespace Dotnettency.Tests
             services.AddLogging();
             services.Configure<MyOptions>((a) =>
             {
-                a.Prop = true;
+                a.Foo = true;
             });
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -173,7 +180,7 @@ namespace Dotnettency.Tests
             ITenantContainerAdaptor childSp = sp.CreateChildContainer("Child");
 
             IOptions<MyOptions> options = childSp.GetRequiredService<IOptions<MyOptions>>();
-            Assert.True(options.Value?.Prop);
+            Assert.True(options.Value?.Foo);
 
 
         }
@@ -187,7 +194,7 @@ namespace Dotnettency.Tests
             services.AddLogging();
             services.Configure<MyOptions>((a) =>
             {
-                a.Prop = true;
+                a.Foo = true;
             });
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -204,7 +211,7 @@ namespace Dotnettency.Tests
 
 
             IOptions<MyOptions> options = nestedSp.GetRequiredService<IOptions<MyOptions>>();
-            Assert.True(options.Value?.Prop);
+            Assert.True(options.Value?.Foo);
 
         }
 
@@ -215,7 +222,7 @@ namespace Dotnettency.Tests
             ServiceCollection services = new ServiceCollection();
             services.AddLogging();
 
-          //  ServiceProvider serviceProvider = services.BuildServiceProvider();
+            //  ServiceProvider serviceProvider = services.BuildServiceProvider();
 
 
             StructureMap.Container container = new StructureMap.Container();
@@ -226,12 +233,13 @@ namespace Dotnettency.Tests
 
             container.Configure(_ =>
                        _.For<ITenantContainerBuilder<MyTenant>>()
-                           .Use(new DelegateActionTenantContainerBuilder<MyTenant>(services, adaptedContainer, (s, t)=> {
+                           .Use(new DelegateActionTenantContainerBuilder<MyTenant>(services, adaptedContainer, (s, t) =>
+                           {
 
                                t.AddOptions();
                                t.Configure<MyOptions>((a) =>
                                {
-                                   a.Prop = true;
+                                   a.Foo = true;
                                });
 
                            }, containerEventsPublisher))
@@ -240,14 +248,14 @@ namespace Dotnettency.Tests
             // container.Populate(services);
 
             var tenantContainerBuilder = adaptedContainer.GetRequiredService<ITenantContainerBuilder<MyTenant>>();
-            var tenantContainer = await tenantContainerBuilder.BuildAsync(new MyTenant());
+            var tenantContainer = await tenantContainerBuilder.BuildAsync(new TenantShellItemBuilderContext<MyTenant>() { Tenant = new MyTenant(), Services = adaptedContainer });
 
-            IOptions<MyOptions> options = tenantContainer.GetRequiredService<IOptions<MyOptions>>();        
-            Assert.True(options.Value?.Prop);
+            IOptions<MyOptions> options = tenantContainer.GetRequiredService<IOptions<MyOptions>>();
+            Assert.True(options.Value?.Foo);
 
         }
 
-     
+
     }
 
     public class MyTenant

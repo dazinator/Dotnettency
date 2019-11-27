@@ -17,25 +17,20 @@ namespace Dotnettency.Owin.MiddlewarePipeline
             _configuration = configuration;
         }
 
-        public async Task<AppFunc> Create(IAppBuilder appBuilder, IServiceProvider serviceProviderOverride, TTenant tenant, AppFunc next, bool reJoin)
+        public async Task<AppFunc> Create(IAppBuilder appBuilder, TenantShellItemBuilderContext<TTenant> context, AppFunc next, bool reJoin)
         {
-            return await UseTenantPipeline(appBuilder, serviceProviderOverride, tenant, next, reJoin);
+            return await UseTenantPipeline(appBuilder, context, next, reJoin);
         }
 
-        protected virtual Task<AppFunc> UseTenantPipeline(IAppBuilder rootApp,  IServiceProvider serviceProviderOverride, TTenant tenant, AppFunc next, bool reJoin)
+        protected virtual Task<AppFunc> UseTenantPipeline(IAppBuilder rootApp, TenantShellItemBuilderContext<TTenant> context, AppFunc next, bool reJoin)
         {
             return Task.Run(() =>
             {
                 var branchBuilder = rootApp.New();
-                branchBuilder.Properties["ApplicationServices"] = serviceProviderOverride;
+                branchBuilder.Properties["ApplicationServices"] = context.Services;
                 //branchBuilder.ApplicationServices = serviceProviderOverride;
-                var builderContext = new TenantShellItemBuilderContext<TTenant>
-                {
-                    Tenant = tenant,
-                    Services = serviceProviderOverride
-                };
-
-                _configuration(builderContext, branchBuilder);
+               
+                _configuration(context, branchBuilder);
 
                 // register root pipeline at the end of the tenant branch
                 if(next!=null && reJoin)

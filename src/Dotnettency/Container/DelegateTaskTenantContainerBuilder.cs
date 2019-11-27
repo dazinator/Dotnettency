@@ -23,9 +23,9 @@ namespace Dotnettency.Container
             _containerEventsPublisher = containerEventsPublisher;
         }
 
-        public async Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
+        public async Task<ITenantContainerAdaptor> BuildAsync(TenantShellItemBuilderContext<TTenant> tenantContext)
         {
-            var tenantContainer = await _parentContainer.CreateChildContainerAndConfigureAsync("Tenant: " + (tenant?.ToString() ?? "NULL").ToString(),
+            var tenantContainer = await _parentContainer.CreateChildContainerAndConfigureAsync("Tenant: " + (tenantContext?.Tenant?.ToString() ?? "NULL").ToString(),
                 async config =>
             {
                 // add default services to tenant container.
@@ -38,13 +38,16 @@ namespace Dotnettency.Container
                     }
                 }
 
-                var buildContext = new TenantShellItemBuilderContext<TTenant>()
-                {
-                    Services = _parentContainer,
-                    Tenant = tenant
-                };
+                // As tenantContext.Services is provided from current scope, we prefer that.
+                // otherwise fallback to parent scope (i.e this could mean falling back to application services from current scoped services etc).
+                // Note: Not sure if this is necessary as current scope will possiblly always match _parentContainer anyway when no more specific scope in use.
 
-                await _configureTenant(buildContext, config);
+                if (tenantContext.Services == null)
+                {
+                    tenantContext.Services = _parentContainer;
+                }
+               
+                await _configureTenant(tenantContext, config);
             });
 
             _containerEventsPublisher?.PublishTenantContainerCreated(tenantContainer);

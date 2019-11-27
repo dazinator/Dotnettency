@@ -5,12 +5,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appsettings-tenanta.json" />
+    <None Remove="appsettings-tenantb.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings-tenanta.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings-tenantb.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.6" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
+
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="StructureMap.AspNetCore" Version="1.4.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -22,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
+    <ProjectReference Include="..\Dotnettency.Configuration\Dotnettency.Configuration.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
     <ProjectReference Include="..\Dotnettency.EFCore.Identity\Dotnettency.EFCore.Identity.csproj" />

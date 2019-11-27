@@ -6,11 +6,13 @@ namespace Dotnettency.Container
     public class TenantContainerAccessor<TTenant> : ITenantContainerAccessor<TTenant>
         where TTenant : class
     {
+        private readonly IServiceProvider _currentScopeServiceProvider;
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
         private readonly ITenantContainerFactory<TTenant> _containerFactory;
 
-        public TenantContainerAccessor(ITenantShellAccessor<TTenant> tenantShellAccessor, ITenantContainerFactory<TTenant> factory)
+        public TenantContainerAccessor(IServiceProvider currentScopeServiceProvider, ITenantShellAccessor<TTenant> tenantShellAccessor, ITenantContainerFactory<TTenant> factory)
         {
+            _currentScopeServiceProvider = currentScopeServiceProvider;
             _tenantShellAccessor = tenantShellAccessor;
             _containerFactory = factory;
 
@@ -24,9 +26,18 @@ namespace Dotnettency.Container
                 }
 
                 var tenant = tenantShell?.Tenant;
+               
+                
                 var lazy = tenantShell.GetOrAddContainer(() =>
                 {
-                    return factory.Get(tenant);
+                    var services = _currentScopeServiceProvider;
+                    var context = new TenantShellItemBuilderContext<TTenant>()
+                    {
+                        Tenant = tenant,
+                        Services = services
+                    };
+
+                    return factory.Get(context);
                 });
 
                 return await lazy.Value;
