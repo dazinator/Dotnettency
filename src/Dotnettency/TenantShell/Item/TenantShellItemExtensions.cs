@@ -38,6 +38,13 @@ namespace Dotnettency
             return tenantShell.GetOrAddProperty<Lazy<Task<TItem>>>(key, (s) => createLazyAsyncFactory());
         }
 
+        public static bool TryGetItem<TTenant, TItem>(this TenantShell<TTenant> tenantShell, out Lazy<Task<TItem>> item)
+            where TTenant : class
+        {
+            string key = GetKey<TItem>();
+            return tenantShell.TryGetProperty<Lazy<Task<TItem>>>(key, out item);
+        }
+
         private static string GetKey<TItem>(string name = "")
         {
             var key = $"{nameof(TenantShellItemExtensions)}-{typeof(TItem).Name}:{name}";
