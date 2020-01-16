@@ -261,3 +261,17 @@ Or during fluent configuration of the tenant, for exmaple whilst configuring the
  var redShellItem = await context.GetShellItemAsync<ExampleShellItem>("red");
 
 ```
+## Notes
+
+### Serilog
+
+When configuring serilog, there is [an issue to be aware of](https://github.com/serilog/serilog-extensions-logging/issues/163)
+Instead of calling `UseSerilog` on the HostBuilder, you need to do this:
+
+```
+  webhostBuilder.ConfigureLogging((logging) =>
+                {
+                    logging.ClearProviders();// clears microsoft providers registered by default like console.
+                    logging.AddSerilog(Logger);
+                });
+```
