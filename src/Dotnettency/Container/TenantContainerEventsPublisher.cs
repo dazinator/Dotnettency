@@ -27,18 +27,19 @@ namespace Dotnettency.Container
                 var accessor = serviceProvider.GetRequiredService<Task<TTenant>>();
                 NestedTenantContainerCreated?.Invoke(accessor, serviceProvider);
             }
-           
+
         }
 
         public void PublishTenantContainerCreated(IServiceProvider serviceProvider)
         {
-            if(TenantContainerCreated != null)
+            if (TenantContainerCreated != null)
             {
-                var accessor = serviceProvider.GetRequiredService<Task<TTenant>>();
+                //tenantShell.CurrentTenantShell.Value.Result.
+                 var accessor = serviceProvider.GetRequiredService<Task<TTenant>>();
                 TenantContainerCreated?.Invoke(accessor, serviceProvider);
             }
             // var tenant = _tenantAccessor.CurrentTenant?.Value;
-           
+
         }
     }
 }

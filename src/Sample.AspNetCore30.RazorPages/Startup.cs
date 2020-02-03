@@ -7,10 +7,11 @@ using Dotnettency;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace Sample.Pages
 {
+
     public class Startup
     {
         [Obsolete]
@@ -62,7 +63,7 @@ namespace Sample.Pages
                                             .AllowAccessTo(contentFileProvider);
                                       })
                                       .UseAsEnvironmentContentRootFileProvider(Environment);
-                        })                        
+                        })
                         .ConfigureTenantConfiguration((a, tenantConfig) =>
                         {
                             tenantConfig.AddJsonFile(Environment.ContentRootFileProvider, $"/appsettings.{a.Tenant?.Name}.json", true, true);
@@ -71,6 +72,12 @@ namespace Sample.Pages
                         {
                             containerOptions
                             .SetDefaultServices(defaultServices)
+                            .UseTenantHostedServices((m)=> {
+                                // If you have registered IHostedService's at application level
+                                // each tenant will also have access to them, to
+                                // avoid each tenant from also running them you can exclude them here.
+                                //m.Remove<MyGlobalHostedService>().Remove<MyOtherGlobalHostedService>();
+                            }) // Can now regiser IHostedService in tenant level.
                             .AutofacAsync(async (tenantContext, tenantServices) =>
                             {
                                 // Can now use tenant level configuration to decide how to bootstrap the tenants services here..
@@ -87,6 +94,10 @@ namespace Sample.Pages
                                     {
                                         o.RootDirectory = $"/Pages/{tenantContext.Tenant.Name}";
                                     }).AddNewtonsoftJson();
+
+                                    // shows tenant IHostedService
+                                    tenantServices.ClearHostedServices();                                   
+                                    tenantServices.AddHostedService<TimedTenantHostedService>();
                                 }
                             });
                         })
@@ -189,7 +200,6 @@ namespace Sample.Pages
                              b.Add("red", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "red" });
                              b.Add("blue", (c) => new ExampleShellItem(c.Tenant?.Name ?? "NULL TENANT") { Colour = "blue" });
                          });
-
              });
 
         }

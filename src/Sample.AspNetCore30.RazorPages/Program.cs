@@ -22,8 +22,9 @@ namespace Sample.Pages
                 .UseServiceProviderFactory(builder)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();                   
+                    webBuilder.UseStartup<Startup>();
                 });
+                
         }
     }
 

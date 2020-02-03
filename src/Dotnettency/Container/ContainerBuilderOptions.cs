@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 
 namespace Dotnettency.Container
 {
@@ -59,7 +60,7 @@ namespace Dotnettency.Container
         /// <param name="services"></param>
         /// <returns></returns>
         public ContainerBuilderOptions<TTenant> SetDefaultServices(IServiceCollection services)
-        {
+        {            
             DefaultServices = services;
             return this;
         }
