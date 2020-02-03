@@ -19,7 +19,6 @@ namespace Dotnettency
         public static ContainerBuilderOptions<TTenant> UseTenantHostedServices<TTenant>(this ContainerBuilderOptions<TTenant> optionsBuilder, Action<TenantHostedServiceManager<TTenant>> configure = null, CancellationToken cancellationToken = default(CancellationToken))
              where TTenant : class
         {
-            optionsBuilder.DefaultServices?.ClearHostedServices();
             optionsBuilder.ContainerEventsOptions.TenantContainerCreatedCallbacks.Add(async (a, sp) =>
             {
                 var tenantShell = await a;
@@ -35,25 +34,5 @@ namespace Dotnettency
             });
             return optionsBuilder;
         }
-
-        /// <summary>
-        /// Removes any registrations for <see cref="IHostedService"/>.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        /// <remarks>When building tenant level container, you want to be sure that you don't include any host level <see cref="IHostedService"/> registrations.</remarks>
-        public static IServiceCollection ClearHostedServices(this IServiceCollection services)
-        {
-            var serviceDescriptors = services.Where(descriptor => descriptor.ServiceType == typeof(IHostedService)).ToList();
-            if (serviceDescriptors != null)
-            {
-                foreach (var item in serviceDescriptors)
-                {
-                    services.Remove(item);
-                }
-            }
-            return services;
-        }
-
     }
 }

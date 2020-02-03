@@ -95,8 +95,7 @@ namespace Sample.Pages
                                         o.RootDirectory = $"/Pages/{tenantContext.Tenant.Name}";
                                     }).AddNewtonsoftJson();
 
-                                    // shows tenant IHostedService
-                                    tenantServices.ClearHostedServices();                                   
+                                    // demonstrates registering IHostedService at per tenant level
                                     tenantServices.AddHostedService<TimedTenantHostedService>();
                                 }
                             });
