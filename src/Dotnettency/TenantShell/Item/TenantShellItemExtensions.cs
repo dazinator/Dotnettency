@@ -18,7 +18,7 @@ namespace Dotnettency
             where TTenant : class
         {
             string key = GetKey<TItem>(name);
-            return tenantShell.GetOrAddProperty<Lazy<Task<TItem>>>(key, lazyAsyncFactory);
+            return tenantShell.GetOrAddProperty<Lazy<Task<TItem>>>(key, lazyAsyncFactory, true);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Dotnettency
            where TTenant : class
         {
             string key = GetKey<TItem>(name);
-            return tenantShell.GetOrAddProperty<Lazy<Task<TItem>>>(key, (s) => createLazyAsyncFactory());
+            return tenantShell.GetOrAddProperty<Lazy<Task<TItem>>>(key, (s) => createLazyAsyncFactory(), true);
         }
 
         public static bool TryGetItem<TTenant, TItem>(this TenantShell<TTenant> tenantShell, out Lazy<Task<TItem>> item)

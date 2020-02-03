@@ -74,7 +74,7 @@ namespace Dotnettency
             return (T)getOrAddItem;
         }
 
-        private void EnsureDisposableRegistered<T>(T item)
+        public void EnsureDisposableRegistered<T>(T item)
         {
             var disposable = item as IDisposable;
             if (disposable != null)

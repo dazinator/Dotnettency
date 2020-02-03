@@ -170,7 +170,7 @@ They are:
 1. Lazily initialised on first access, per tenant.
 2. Stored in the tenant's `TenantShell` for the lifetime of that tenant.
 3. If the tenant is restarted, the value is cleared from the tenant's shell, and lazily re-initialised on next access again.
-4. If your `TItem` implements `IDisposable` it will be disposed of when the it is removed from the `TenantShell` (typically on a tenant restart) accessed asynchronously.
+4. ~~If your `TItem` implements `IDisposable` it will be disposed of when the it is removed from the `TenantShell` (typically on a tenant restart) accessed asynchronously.~~ Not currently implemented.
 5. It will be registered for DI as `Task<TItem>` so you can inject it and then await the `Task` to get the value. The await is necessary as the value will
    be asynchronously created only on first access for that tenant. On subsequent accesses, the same cached task (already completed) is used to return the value immediately.
 
