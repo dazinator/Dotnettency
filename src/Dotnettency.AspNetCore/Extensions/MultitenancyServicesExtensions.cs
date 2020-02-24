@@ -20,8 +20,7 @@ namespace Dotnettency
             }
 
             var provider = new HttpContextProvider(httpContextAccesser);
-            builder.HttpContextProvider = provider;
-            builder.Services.AddSingleton<IHttpContextProvider>(provider);
+            builder.SetHttpContextProvider(provider);           
             return builder;
         }
     }

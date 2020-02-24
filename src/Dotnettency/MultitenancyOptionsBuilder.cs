@@ -58,6 +58,13 @@ namespace Dotnettency
         public IServiceCollection Services { get; set; }        
         public IHttpContextProvider HttpContextProvider { get; set; }
 
+        public MultitenancyOptionsBuilder<TTenant> SetHttpContextProvider(IHttpContextProvider provider)
+        {
+            HttpContextProvider = provider;
+            Services.AddSingleton<IHttpContextProvider>(provider);
+            return this;
+        }
+
         /// <summary>
         /// Call this to override the service used to provide a URI for the current request. The URI is used as an identifier
         /// for a tenant to be loaded.    

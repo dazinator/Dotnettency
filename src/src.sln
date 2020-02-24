@@ -49,7 +49,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.VirtualFileSyst
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.VirtualFileSystem.Hosting", "Dotnettency.VirtualFileSystem.Hosting\Dotnettency.VirtualFileSystem.Hosting.csproj", "{D54ED835-6906-4456-95F9-2C5A18B3A3FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.HostedService", "Dotnettency.HostedService\Dotnettency.HostedService.csproj", "{84C1996D-E3AA-4772-9D6E-3A9CE06A19CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.HostedService", "Dotnettency.HostedService\Dotnettency.HostedService.csproj", "{84C1996D-E3AA-4772-9D6E-3A9CE06A19CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Extensions.MappedTenants", "Dotnettency.Extensions.MappedTenants\Dotnettency.Extensions.MappedTenants.csproj", "{DC0E97B1-CFD1-47BD-9FCF-642147521469}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -265,6 +267,18 @@ Global
 		{84C1996D-E3AA-4772-9D6E-3A9CE06A19CA}.Release|x64.Build.0 = Release|Any CPU
 		{84C1996D-E3AA-4772-9D6E-3A9CE06A19CA}.Release|x86.ActiveCfg = Release|Any CPU
 		{84C1996D-E3AA-4772-9D6E-3A9CE06A19CA}.Release|x86.Build.0 = Release|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Debug|x64.Build.0 = Debug|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Debug|x86.Build.0 = Debug|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Release|x64.ActiveCfg = Release|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Release|x64.Build.0 = Release|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Release|x86.ActiveCfg = Release|Any CPU
+		{DC0E97B1-CFD1-47BD-9FCF-642147521469}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
