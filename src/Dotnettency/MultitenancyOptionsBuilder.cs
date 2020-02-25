@@ -27,9 +27,7 @@ namespace Dotnettency
             Services.AddSingleton<ITenantShellResolver<TTenant>, TenantShellResolver<TTenant>>();
             Services.AddScoped<TenantIdentifierAccessor<TTenant>>();
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
-            Services.AddScoped<ITenantShellRestarter<TTenant>, TenantShellRestarter<TTenant>>();           
-
-
+            Services.AddScoped<ITenantShellRestarter<TTenant>, TenantShellRestarter<TTenant>>();      
 
             // By default, we use a URI from the request to identify tenants.
             // Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
@@ -62,6 +60,25 @@ namespace Dotnettency
         {
             HttpContextProvider = provider;
             Services.AddSingleton<IHttpContextProvider>(provider);
+            return this;
+        }
+
+        /// <summary>
+        /// Call this to set an options provider. Typically this is set up per platform.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public MultitenancyOptionsBuilder<TTenant> SetGenericOptionsProvider(Type optionsProviderOpenGenericType)
+        {
+            Services.AddSingleton(typeof(IOptionsProvider<>), optionsProviderOpenGenericType);
+            return this;
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
+        {
+            var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(Services);
+            configureOptions?.Invoke(optionsBuilder);
+            IdentifyTenantsWith<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
             return this;
         }
 

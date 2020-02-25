@@ -51,7 +51,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.VirtualFileSyst
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnettency.HostedService", "Dotnettency.HostedService\Dotnettency.HostedService.csproj", "{84C1996D-E3AA-4772-9D6E-3A9CE06A19CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.Extensions.MappedTenants", "Dotnettency.Extensions.MappedTenants\Dotnettency.Extensions.MappedTenants.csproj", "{DC0E97B1-CFD1-47BD-9FCF-642147521469}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnettency.DotNetGlob", "Dotnettency.Extensions.MappedTenants\Dotnettency.DotNetGlob.csproj", "{DC0E97B1-CFD1-47BD-9FCF-642147521469}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

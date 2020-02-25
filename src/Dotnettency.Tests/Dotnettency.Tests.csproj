@@ -46,7 +46,7 @@
     <ProjectReference Include="..\Dotnettency.Container.StructureMap\Dotnettency.Container.StructureMap.csproj" />
     <ProjectReference Include="..\Dotnettency.EFCore.Identity\Dotnettency.EFCore.Identity.csproj" />
     <ProjectReference Include="..\Dotnettency.EFCore\Dotnettency.EFCore.csproj" />
-    <ProjectReference Include="..\Dotnettency.Extensions.MappedTenants\Dotnettency.Extensions.MappedTenants.csproj" />
+    <ProjectReference Include="..\Dotnettency.Extensions.MappedTenants\Dotnettency.DotNetGlob.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 

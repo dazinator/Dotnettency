@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Dotnettency
 {
-    public class TenantMatcherFactory<TKey>
+    public class DotNetGlobTenantMatcherFactory<TKey> : ITenantMatcherFactory<TKey>
     {
-        public virtual IEnumerable<TenantPatternMatcher<TKey>> Load(TenantMappingOptions<TKey> options)
+        public virtual IEnumerable<TenantPatternMatcher<TKey>> LoadPaternMatchers(TenantMappingOptions<TKey> options)
         {
             var caseInsensitiveGlobOptions = new GlobOptions();
             caseInsensitiveGlobOptions.Evaluation.CaseInsensitive = true;

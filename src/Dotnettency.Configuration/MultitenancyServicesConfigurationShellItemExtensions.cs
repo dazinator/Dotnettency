@@ -40,7 +40,6 @@ namespace Dotnettency
 
             optionsBuilder.ConfigureTenantShellItem<TTenant, IConfiguration>(factory);
             return optionsBuilder;
-        }
-
-    }
+        }   
+    }  
 }

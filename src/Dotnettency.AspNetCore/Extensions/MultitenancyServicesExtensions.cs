@@ -1,7 +1,6 @@
 ﻿using Dotnettency.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Linq;
 
 namespace Dotnettency
@@ -11,7 +10,6 @@ namespace Dotnettency
         public static MultitenancyOptionsBuilder<TTenant> AddAspNetCore<TTenant>(this MultitenancyOptionsBuilder<TTenant> builder)
            where TTenant : class
         {
-
             var httpContextAccesser = builder.Services.FindServiceInstance<IHttpContextAccessor>();
             if (httpContextAccesser == null)
             {
@@ -19,8 +17,9 @@ namespace Dotnettency
                 builder.Services.AddSingleton<IHttpContextAccessor>(httpContextAccesser);
             }
 
+            builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>));
             var provider = new HttpContextProvider(httpContextAccesser);
-            builder.SetHttpContextProvider(provider);           
+            builder.SetHttpContextProvider(provider);
             return builder;
         }
     }
