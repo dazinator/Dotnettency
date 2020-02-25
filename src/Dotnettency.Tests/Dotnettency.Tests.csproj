@@ -7,9 +7,13 @@
   <ItemGroup>
     <None Remove="appsettings-tenanta.json" />
     <None Remove="appsettings-tenantb.json" />
+    <None Remove="tenant-mappings.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="tenant-mappings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="appsettings-tenanta.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

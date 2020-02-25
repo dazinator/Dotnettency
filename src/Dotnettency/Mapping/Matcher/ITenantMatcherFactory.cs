@@ -1,4 +1,4 @@
-﻿using Dotnettency.Extensions.MappedTenants;
+﻿using Dotnettency.Mapping;
 using System.Collections.Generic;
 
 namespace Dotnettency

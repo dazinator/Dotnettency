@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using Dotnettency.Mapping;
 
 namespace Sample.Pages
 {
@@ -37,11 +38,21 @@ namespace Sample.Pages
             });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            IConfigurationSection configSection = Configuration.GetSection("Tenants");
+            services.Configure<TenantMappingOptions<int>>(configSection);
+
             services.AddMultiTenancy<Tenant>((builder) =>
              {
-                 builder.IdentifyTenantsWithRequestAuthorityUri()
-                        .InitialiseTenant<TenantShellFactory>()
+                 builder
+                        //.IdentifyTenantsWithRequestAuthorityUri()
+                        //.InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
+                        .MapFromHttpContext<int>((m) =>
+                           {
+                               m.MapValue(http => http.Request.GetUri().Port.ToString())
+                                .UsingDotNetGlobPatternMatching();
+                           })
                         .ConfigureNamedTenantFileSystems((namedItems) =>
                         {
                             var contentFileProvider = Environment.ContentRootFileProvider;
@@ -72,7 +83,8 @@ namespace Sample.Pages
                         {
                             containerOptions
                             .SetDefaultServices(defaultServices)
-                            .UseTenantHostedServices((m)=> {
+                            .UseTenantHostedServices((m) =>
+                            {
                                 // If you have registered IHostedService's at application level
                                 // each tenant will also have access to them, to
                                 // avoid each tenant from also running them you can exclude them here.

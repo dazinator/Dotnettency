@@ -1,7 +1,9 @@
-﻿namespace Dotnettency.Extensions.MappedTenants
+﻿using Dotnettency.Mapping;
+
+namespace Dotnettency
 {
     public class TenantMappingOptions<TKey>
     {
-        public TenantMapping<TKey>[] TenantMappings { get; set; }
+        public TenantMapping<TKey>[] Mappings { get; set; }
     }
 }

@@ -8,7 +8,6 @@ namespace Dotnettency.SystemWeb
             where TTenant : class
         {
             builder.Services.AddSingleton<IHttpContextProvider, HttpContextProvider>();
-            builder.SetGenericOptionsProvider(typeof(BasicOptionsProvider<>));
             return builder;           
         }
     }

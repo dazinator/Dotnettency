@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Dotnettency.Mapping;
+using System;
 
-namespace Dotnettency.Extensions.MappedTenants
+namespace Dotnettency
 {
     public static class TenantMappingOptionsExtensions
     {
@@ -8,7 +9,7 @@ namespace Dotnettency.Extensions.MappedTenants
         {
             var mappingBuilder = new TenantMappingArrayBuilder<TKey>();
             configure?.Invoke(mappingBuilder);
-            options.TenantMappings = mappingBuilder.Build();
+            options.Mappings = mappingBuilder.Build();
             return options;
         }
     }

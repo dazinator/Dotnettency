@@ -1,5 +1,5 @@
 ﻿using DotNet.Globbing;
-using Dotnettency.Extensions.MappedTenants;
+using Dotnettency.Mapping;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +13,7 @@ namespace Dotnettency
             caseInsensitiveGlobOptions.Evaluation.CaseInsensitive = true;
 
             var matchers = new List<TenantPatternMatcher<TKey>>();
-            foreach (var item in options?.TenantMappings)
+            foreach (var item in options?.Mappings)
             {
                 var key = item.Key;
                 //if(key==null)

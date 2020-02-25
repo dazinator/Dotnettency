@@ -1,7 +1,4 @@
-﻿using Dotnettency.Extensions.MappedTenants;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Dotnettency
+﻿namespace Dotnettency
 {
     public static class MappingBuilderExtensions
     {

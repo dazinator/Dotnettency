@@ -1,4 +1,4 @@
-﻿using Dotnettency.Extensions.MappedTenants;
+﻿using Dotnettency.Mapping;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -25,7 +25,8 @@ namespace Dotnettency.Tests
             services.AddOptions();
             services.AddMultiTenancy<Tenant>((builder) =>
             {
-                builder.SetMockHttpContextProvider(new System.Uri("http://t1.foo.com"))
+                builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
+                       .SetMockHttpContextProvider(new System.Uri("http://t1.foo.com"))
                        .IdentifyTenantTask(() =>
                        {
                            // note: we append a key "/1" to the Uri here which is used as an "identifier" for the tenant.
@@ -42,7 +43,7 @@ namespace Dotnettency.Tests
 
             services.Configure<TenantMappingOptions<int>>((b) =>
                 {
-                    b.TenantMappings = new TenantMapping<int>[] {
+                    b.Mappings = new TenantMapping<int>[] {
                         new TenantMapping<int>()
                         {
                             Key = 1,
@@ -72,35 +73,25 @@ namespace Dotnettency.Tests
             services.AddOptions();
             services.AddMultiTenancy<Tenant>((builder) =>
             {
-                builder.SetMockHttpContextProvider(new System.Uri("http://unknown.foo.com"))                       
+                builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
+                       .SetMockHttpContextProvider(new System.Uri("http://unknown.foo.com"))
                        .MapFromHttpContext<int>((m) =>
                        {
                            m.MapRequestHost()
-                            .ToTenants((tenants) =>
+                            .WithMapping((tenants) =>
                             {
                                 tenants.Add(1, "t1.foo.com", "t1.foo.uk");
                             })
-                            .UsingDotNetGlobPatternMatching();
-                       });
-
-                       //.IdentifyTenantsUsingRequestAuthorityMapping<Tenant, int, TenantMappingOptions<int>>()
-                       //.InitialiseTenant<TestMappedTenantShellFactory>();
-            });
-
-
-            services.Configure<TenantMappingOptions<int>>((b) =>
-            {
-                b.TenantMappings = new TenantMapping<int>[] {
-                        new TenantMapping<int>()
-                        {
-                            Key = 1,
-                            Patterns = new string[]
+                            .UsingDotNetGlobPatternMatching()
+                            .Initialise((key) =>
                             {
-                                "t1.foo.com", // requests matching either of these url patterns should resolve to tenant key 1.
-                                "t1.foo.uk"
-                            }
-                       }
-                    };
+                                if (key == 1)
+                                {
+                                    return Task.FromResult(new Tenant() { Id = key, Name = "Test Tenant" });
+                                }
+                                return Task.FromResult<Tenant>(null); // key does not match a recognised tenant.
+                            });
+                       });
             });
 
             var sp = services.BuildServiceProvider();

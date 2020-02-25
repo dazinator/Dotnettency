@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Dotnettency
 {
+
     public abstract class MappedTenantShellFactory<TTenant, TKey> : ITenantShellFactory<TTenant>
         where TTenant : class
     {

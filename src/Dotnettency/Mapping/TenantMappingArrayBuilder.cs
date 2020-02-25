@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Dotnettency.Extensions.MappedTenants
+namespace Dotnettency.Mapping
 {
     public class TenantMappingArrayBuilder<TKey>
     {

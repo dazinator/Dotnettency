@@ -1,4 +1,4 @@
-﻿using Dotnettency.Extensions.MappedTenants;
+﻿using Dotnettency.Mapping;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -15,7 +15,7 @@ namespace Dotnettency
             return builder;
         }
 
-        public static MapRequestOptionsBuilder<TTenant, TKey> ToTenants<TTenant, TKey>(this MapRequestOptionsBuilder<TTenant, TKey> builder, Action<TenantMappingArrayBuilder<TKey>> configure)
+        public static MapRequestOptionsBuilder<TTenant, TKey> WithMapping<TTenant, TKey>(this MapRequestOptionsBuilder<TTenant, TKey> builder, Action<TenantMappingArrayBuilder<TKey>> configure)
            where TTenant : class
         {
             builder.Services.Configure<TenantMappingOptions<TKey>>((a)=>a.Build(configure));

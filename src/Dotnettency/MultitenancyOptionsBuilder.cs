@@ -50,6 +50,11 @@ namespace Dotnettency
             // As OWIN doesn't have a mechanism / concept for RequestServices of its own, unlike ASP.NET Core.
             Services.AddScoped<RequestServicesSwapper<TTenant>>();
 
+            // Default options provider primarily used for tenant mappings.
+            // When using AddAspNetCore this gets overridden with a superior implemenations based on the 
+            // aspnet core options system, that can do things like change notifications etc.
+            SetGenericOptionsProvider(typeof(BasicOptionsProvider<>));
+
         }
 
         public Func<IServiceProvider> ServiceProviderFactory { get; set; }
@@ -76,7 +81,7 @@ namespace Dotnettency
 
         public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
         {
-            var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(Services);
+            var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(this);
             configureOptions?.Invoke(optionsBuilder);
             IdentifyTenantsWith<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
             return this;
@@ -118,6 +123,13 @@ namespace Dotnettency
             where T : class, ITenantShellFactory<TTenant>
         {
             Services.AddSingleton<ITenantShellFactory<TTenant>, T>();
+            return this;
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>(T factory)
+           where T : class, ITenantShellFactory<TTenant>
+        {
+            Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);
             return this;
         }
 

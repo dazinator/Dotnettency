@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Dotnettency.Extensions.MappedTenants
+namespace Dotnettency
 {
     public class TenantMapping<TKey>
     {

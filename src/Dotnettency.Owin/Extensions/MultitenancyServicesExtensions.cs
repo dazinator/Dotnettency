@@ -18,8 +18,6 @@ namespace Dotnettency
             var provider = new HttpContextProvider();
             builder.HttpContextProvider = provider;
             builder.Services.AddSingleton<IHttpContextProvider>(provider);
-            // use basic options provider by default owin. This means if using tenant mapping, 
-            builder.SetGenericOptionsProvider(typeof(BasicOptionsProvider<>));
             return builder;
         }
 
