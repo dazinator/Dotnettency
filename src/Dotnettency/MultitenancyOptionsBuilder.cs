@@ -121,7 +121,7 @@ namespace Dotnettency
         public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>()
             where T : class, ITenantShellFactory<TTenant>
         {
-            Services.AddSingleton<ITenantShellFactory<TTenant>, T>();
+            Services.AddScoped<ITenantShellFactory<TTenant>, T>();
             return this;
         }
 
@@ -135,8 +135,7 @@ namespace Dotnettency
         public MultitenancyOptionsBuilder<TTenant> InitialiseTenant(Func<TenantIdentifier, TenantShell<TTenant>> factoryMethod)
         {
             var factory = new DelegateTenantShellFactory<TTenant>(factoryMethod);
-            Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);
-            return this;
+            return InitialiseTenant(factory);
         }
 
     }

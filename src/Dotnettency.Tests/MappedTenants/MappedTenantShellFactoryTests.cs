@@ -18,7 +18,7 @@ namespace Dotnettency.Tests
         }
 
         [Fact]
-        public async Task Can_Get_Tenant()
+        public async Task Can_Get_IdentifiedTenant()
         {
 
             ServiceCollection services = new ServiceCollection();
@@ -66,7 +66,7 @@ namespace Dotnettency.Tests
         }
 
         [Fact]
-        public async Task Can_Get_DefaultTenant()
+        public async Task Cannot_Get_UnidentifiedTenant()
         {
 
             ServiceCollection services = new ServiceCollection();
@@ -97,11 +97,58 @@ namespace Dotnettency.Tests
 
             var sp = services.BuildServiceProvider();
             var sut = sp.GetRequiredService<Task<Tenant>>();
-
-            var tenant = await sut;
+           
+            var tenant = await sut;            
             Assert.Null(tenant);
 
+            var tenantShellAccessor = sp.GetRequiredService <ITenantShellAccessor<Tenant>>();
+            Assert.Null(await tenantShellAccessor.CurrentTenantShell.Value);
+
         }
+
+        [Fact]
+        public async Task Can_Get_IdentifiedTenant_WithInjectedServices()
+        {
+
+            ServiceCollection services = new ServiceCollection();
+            services.AddOptions();
+            services.AddLogging();
+            services.AddMultiTenancy<Tenant>((builder) =>
+            {
+                builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
+                       .SetMockHttpContextProvider(new System.Uri("http://t1.foo.com"))
+                       .IdentifyTenantTask(() =>
+                       {
+                           return Task.FromResult(new TenantIdentifier(new System.Uri("key://int32/1")));
+
+                       })
+                       .InitialiseTenant<TestInjectedMappedTenantShellFactory>();
+            });
+
+
+            services.Configure<TenantMappingOptions<int>>((b) =>
+            {
+                b.Mappings = new TenantMapping<int>[] {
+                        new TenantMapping<int>()
+                        {
+                            Key = 1,
+                            Patterns = new string[]
+                            {
+                                "*.foo.com", // requests matching either of these url patterns should resolve to tenant key 1.                               
+                            }
+                       }
+                    };
+            });
+
+            var sp = services.BuildServiceProvider();
+            var sut = sp.GetRequiredService<Task<Tenant>>();
+
+            var tenant = await sut;
+            Assert.NotNull(tenant);
+            Assert.Equal(1, tenant.Id);
+
+        }
+
 
     }
 }

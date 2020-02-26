@@ -1,9 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace Dotnettency.Tests
 {
-    public class TestMappedTenantShellFactory : MappedTenantShellFactory<Tenant, int>
+    public class TestInjectedMappedTenantShellFactory : MappedTenantShellFactory<Tenant, int>
     {
+
+        public TestInjectedMappedTenantShellFactory(ILogger<TestInjectedMappedTenantShellFactory> someDependency)
+        {
+            if(someDependency == null)
+            {
+                throw new ArgumentNullException(nameof(someDependency));
+            }
+        }
+
         protected override Task<Tenant> GetTenant(int key)
         {
 
