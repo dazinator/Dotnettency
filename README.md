@@ -273,6 +273,7 @@ So this is the new way to configure dotnettency on startup (the old api's still 
 ```csharp
             ServiceCollection services = new ServiceCollection();
             services.AddOptions();
+            services.AddLogging();
             services.AddMultiTenancy<Tenant>((builder) =>
             {
                 builder.AddAspNetCore()                      
@@ -287,13 +288,13 @@ So this is the new way to configure dotnettency on startup (the old api's still 
                             .UsingDotNetGlobPatternMatching(); // add the Dotnettency.DotNetGlob package for this extension method.
                             .Initialise((key) =>
                             {
-                                // e.g load tenant info async from database etc.
+                                // e.g return Tenant info that you need for the mapped key.
                                 if (key == 1)
                                 {
                                     var tenant = new Tenant() { Id = key, Name = "Test Tenant" };
                                     return Task.FromResult(tenant);
                                 }
-                                return Task.FromResult<Tenant>(null); // key does not match a recognised tenant.
+                                return null; // we somehow mapped an invalid key - return null.
                             });                            
                       });                       
             });
@@ -306,6 +307,7 @@ You can also configure the Map from IConfiguration, rather than using `.WithMapp
 ```
             ServiceCollection services = new ServiceCollection();
             services.AddOptions();
+            services.AddLogging();
             services.AddMultiTenancy<Tenant>((builder) =>
             {
                 builder.AddAspNetCore()                      
@@ -315,17 +317,18 @@ You can also configure the Map from IConfiguration, rather than using `.WithMapp
                             .UsingDotNetGlobPatternMatching(); // add the Dotnettency.DotNetGlob package for this extension method.
                             .Initialise((key) =>
                             {
-                                // e.g load tenant info async from database etc.
+                                // e.g load tenant info for mapped key.
                                 if (key == 1)
                                 {
                                     var tenant = new Tenant() { Id = key, Name = "Test Tenant" };
                                     return Task.FromResult(tenant);
                                 }
-                                return Task.FromResult<Tenant>(null); // key does not match a recognised tenant.
+                                return Task.FromResult<Tenant>(null); // we must have mapped an invalid key.
                             });                            
                       });                       
             });
 
+            // Let's put our mapping in configuration - then it will reload if we make config changes!
             IConfigurationSection configSection = Configuration.GetSection("Tenants");
             services.Configure<TenantMappingOptions<int>>(configSection);
 ```
