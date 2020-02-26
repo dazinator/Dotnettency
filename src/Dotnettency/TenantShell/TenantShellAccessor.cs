@@ -6,15 +6,15 @@ namespace Dotnettency
     public class TenantShellAccessor<TTenant> : ITenantShellAccessor<TTenant>
         where TTenant : class
     {
-        private readonly ITenantShellFactory<TTenant> _tenantFactory;
+        private readonly ITenantShellFactoryStrategy<TTenant> _tenantFactoryStrategy;
         private readonly TenantIdentifierAccessor<TTenant> _tenantDistinguisherAccessor;
         private readonly ITenantShellResolver<TTenant> _tenantResolver;
 
-        public TenantShellAccessor(ITenantShellFactory<TTenant> tenantFactory,
+        public TenantShellAccessor(ITenantShellFactoryStrategy<TTenant> tenantFactoryStrategy,
             TenantIdentifierAccessor<TTenant> tenantDistinguisherAccessor,
             ITenantShellResolver<TTenant> tenantResolver)
         {
-            _tenantFactory = tenantFactory;
+            _tenantFactoryStrategy = tenantFactoryStrategy;
             _tenantDistinguisherAccessor = tenantDistinguisherAccessor;
             _tenantResolver = tenantResolver;
 
@@ -25,8 +25,8 @@ namespace Dotnettency
                 {
                     return null;
                 }
-
-                return await _tenantResolver.ResolveTenantShell(identifier, _tenantFactory);
+                var tenantShellFactory = _tenantFactoryStrategy.GetTenantShellFactory();
+                return await _tenantResolver.ResolveTenantShell(identifier, tenantShellFactory);
             });
         }
 

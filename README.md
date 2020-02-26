@@ -333,6 +333,110 @@ You can also configure the Map from IConfiguration, rather than using `.WithMapp
             services.Configure<TenantMappingOptions<int>>(configSection);
 ```
 
+Sometimes, whilst your system is in "Setup Mode" for example, you may want disregard the mapping and always map to an absolute KEY - for example that can then be used to 
+identify a special "system setup" tenant. You can achieve this kind of logic by using the overload to pass your custom derived implemenation:
+
+```
+
+  .MapFromHttpContext<int, SystemSetupIdentifierFactory>((m) =>
+                        {
+                            m.MapRequestHost()
+                             .WithMapping((tenants) =>
+                             {
+                                 tenants.Add(1, "t1.foo.com", "t1.foo.uk");
+                             })
+                             .UsingDotNetGlobPatternMatching()
+                             .Initialise((key) =>
+                             {
+                                 var tenant = new Tenant() { Id = key, Name = "Test" };
+                                 if (key == -1)
+                                 {
+                                     // our custom SystemSetupIdentifierFactory always overrides the mapped tenant key and sets it to -1 when the system is in setup mode.
+                                     tenant.IsSystemSetup = true;
+                                 }
+                                 return Task.FromResult(tenant);
+                             });
+                        });
+
+```
+
+
+.. and you could implement `SystemSetupIdentifierFactory` like this:
+
+```
+     public class SystemSetupIdentifierFactory : MappedHttpContextTenantIdentifierFactory<Tenant, int>
+    {
+
+        private readonly IOptionsMonitor<SystemSetupOptions> _systemSetupOptionsMonitor; // your dependency
+
+        private static Task<TenantIdentifier> _systemSetupTenantId = Task.FromResult(CreateIdentifier(-1));
+
+        public SystemSetupIdentifierFactory(
+            ILogger<MappedHttpContextTenantIdentifierFactory<Tenant, int>> logger,
+            IHttpContextProvider httpContextAccessor,
+            IHttpContextValueSelector valueSelector,
+            IOptionsProvider<TenantMappingOptions<int>> optionsMonitor,
+            ITenantMatcherFactory<int> matcherFactory,
+            IOptionsMonitor<SystemSetupOptions> systemSetupOptionsMonitor) : base(logger, httpContextAccessor, valueSelector, optionsMonitor, matcherFactory)
+        {
+            _systemSetupOptionsMonitor = systemSetupOptionsMonitor;
+        }
+
+        public override Task<TenantIdentifier> IdentifyTenant()
+        {
+            if(_systemSetupOptionsMonitor.CurrentValue.IsSystemSetupComplete)
+            {
+                return base.IdentifyTenant();
+            }
+            else
+            {
+                return _systemSetupTenantId;
+            }
+        }
+
+    }
+```
+
+A different way you could achieve this, is to have a catch all mapping that maps to the system setup experience. Then during your system setup process, it could configure a more specific mapping:
+
+So prior to completing system setup:
+
+```
+
+{
+  "Mappings": [
+    {
+      "Key": -1,
+      "Patterns": [ "**" ]
+    }
+  ]
+}
+
+```
+
+During your system setup experience, you'd update this JSON file to add the url mapping for the now fully configured current tenant:
+
+```
+{
+  "Mappings": [
+    {
+      "Key": 1,
+      "Patterns": [ "www.foo.com" ]
+    },
+    {
+      "Key": -1,
+      "Patterns": [ "**" ]
+    }
+  ]
+}
+
+```
+
+Now any request that comes in for a tenant not set up will be mapped to -1 key, and you can configure the -1 tenant, to present your setup experience.
+
+
+Having trouble updating the Json file? Yes System.Text.Json isn't currently the best - back to Newtonsoft?
+
 ## Notes
 
 ### Serilog

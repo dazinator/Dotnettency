@@ -9,7 +9,7 @@ namespace Dotnettency.Tests
 
         public TestInjectedMappedTenantShellFactory(ILogger<TestInjectedMappedTenantShellFactory> someDependency)
         {
-            if(someDependency == null)
+            if (someDependency == null)
             {
                 throw new ArgumentNullException(nameof(someDependency));
             }
@@ -30,8 +30,6 @@ namespace Dotnettency.Tests
             return Task.FromResult<Tenant>(null); // key does not match a recognised tenant.
         }
     }
-
-
 }
 
 

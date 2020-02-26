@@ -6,5 +6,7 @@
 
         public string Name { get; set; }
 
+        public bool IsSystemSetup { get; set; }
+
     }
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Dotnettency
 {
-
     public class MappedHttpContextTenantIdentifierFactory<TTenant, TKey> : HttpContextTenantIdentifierFactory<TTenant>, IDisposable
       where TTenant : class
     {
@@ -45,6 +44,12 @@ namespace Dotnettency
             _lazyTenantMatchers = new Lazy<IEnumerable<TenantPatternMatcher<TKey>>>(() => _matcherFactory.LoadPaternMatchers(opts));
         }
 
+        protected static TenantIdentifier CreateIdentifier(TKey value)
+        {
+            var ident = new Uri(string.Format(identifierFormatString, value.ToString()));
+            return new TenantIdentifier(ident);
+        }
+
         protected override TenantIdentifier GetTenantIdentifier(HttpContextBase context)
         {
             var matchers = _lazyTenantMatchers.Value;
@@ -57,8 +62,7 @@ namespace Dotnettency
                 {
                     // we've mapped this url to a particular tenant's key.
                     // store the key in the identifiers URI Path.
-                    var ident = new Uri(string.Format(identifierFormatString, tenantMatcher.Key.ToString()));
-                    return new TenantIdentifier(ident);
+                    return CreateIdentifier(tenantMatcher.Key);
                 }
             }
 

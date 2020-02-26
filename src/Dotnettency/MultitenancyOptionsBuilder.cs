@@ -5,19 +5,20 @@ using System.Threading.Tasks;
 
 namespace Dotnettency
 {
+
     public class MultitenancyOptionsBuilder<TTenant>
         where TTenant : class
-    {        
+    {
         public MultitenancyOptionsBuilder(IServiceCollection serviceCollection)
         {
             Services = serviceCollection;
-            AddDefaultServices(Services);           
+            AddDefaultServices(Services);
         }
 
         protected virtual void AddDefaultServices(IServiceCollection serviceCollection)
         {
             // Add default services
-           // Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            // Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             Services.AddScoped<ITenantAccessor<TTenant>, TenantAccessor<TTenant>>();
 
             // Tenant shell cache is special in that it houses the tenant shell for each tenant, and each 
@@ -27,20 +28,22 @@ namespace Dotnettency
             Services.AddSingleton<ITenantShellResolver<TTenant>, TenantShellResolver<TTenant>>();
             Services.AddScoped<TenantIdentifierAccessor<TTenant>>();
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
-            Services.AddScoped<ITenantShellRestarter<TTenant>, TenantShellRestarter<TTenant>>();      
+            Services.AddScoped<ITenantShellRestarter<TTenant>, TenantShellRestarter<TTenant>>();
 
             // By default, we use a URI from the request to identify tenants.
             // Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
 
             // Support injection of TTenant (has side effect that may block during injection)
-            Services.AddScoped(sp => {
+            Services.AddScoped(sp =>
+            {
                 var accessor = sp.GetRequiredService<ITenantAccessor<TTenant>>();
                 return accessor.CurrentTenant.Value.Result;
             });
 
             // Support injection of Task<TTenant> - a convenience that allows non blocking access to tenant when required 
             // minor contention on Lazy<>
-            Services.AddScoped(sp => {
+            Services.AddScoped(sp =>
+            {
                 return sp.GetRequiredService<ITenantAccessor<TTenant>>().CurrentTenant.Value;
             });
 
@@ -55,10 +58,12 @@ namespace Dotnettency
             // aspnet core options system, that can do things like change notifications etc.
             SetGenericOptionsProvider(typeof(BasicOptionsProvider<>));
 
+            // Default startegy just always uses the tenant shell factory registered with di.
+            InitialiseTenantStrategy<DefaultTenantShellFactoryStrategy<TTenant>>();
         }
 
         public Func<IServiceProvider> ServiceProviderFactory { get; set; }
-        public IServiceCollection Services { get; set; }        
+        public IServiceCollection Services { get; set; }
         public IHttpContextProvider HttpContextProvider { get; set; }
 
         public MultitenancyOptionsBuilder<TTenant> SetHttpContextProvider(IHttpContextProvider provider)
@@ -81,8 +86,15 @@ namespace Dotnettency
 
         public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
         {
+            return MapFromHttpContext<TKey, MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>(configureOptions);
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey, TIdentifierFactory>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
+       where TIdentifierFactory : MappedHttpContextTenantIdentifierFactory<TTenant, TKey>
+        {
             var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(this);
             configureOptions?.Invoke(optionsBuilder);
+            IdentifyTenantsWith<TIdentifierFactory>();
             return this;
         }
 
@@ -99,7 +111,6 @@ namespace Dotnettency
             return this;
         }
 
-
         /// <summary>
         /// Identify tenants based on the Request Authority Uri.  
         /// </summary>
@@ -111,12 +122,29 @@ namespace Dotnettency
             return this;
         }
 
-        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantTask(Func<Task<TenantIdentifier>> factory)            
+        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantTask(Func<Task<TenantIdentifier>> factory)
         {
             var delegateFactory = new DelegateTenantIdentifierFactory<TTenant>(factory);
             Services.AddSingleton<ITenantIdentifierFactory<TTenant>>(delegateFactory);
             return this;
         }
+
+        public MultitenancyOptionsBuilder<TTenant> InitialiseTenantStrategy<T>()
+           where T : class, ITenantShellFactoryStrategy<TTenant>
+        {
+            Services.AddScoped<ITenantShellFactoryStrategy<TTenant>, T>();
+            return this;
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> InitialiseTenantStrategy<TDependency>(Func<TDependency, Type> chooseFactoryType)
+        {
+            Services.AddScoped<ITenantShellFactoryStrategy<TTenant>>(sp =>
+            {
+                return new SelectTypeTenantShellFactoryStrategy<TDependency, TTenant>(sp, chooseFactoryType);
+            });
+            return this;
+        }
+
 
         public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>()
             where T : class, ITenantShellFactory<TTenant>

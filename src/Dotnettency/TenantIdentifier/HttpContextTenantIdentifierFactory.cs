@@ -28,6 +28,7 @@ namespace Dotnettency
             return Task.FromResult(identity);
         }
 
+      
         protected abstract TenantIdentifier GetTenantIdentifier(HttpContextBase context);
     }
 }
