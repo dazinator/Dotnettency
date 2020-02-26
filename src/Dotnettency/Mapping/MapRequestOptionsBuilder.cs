@@ -12,6 +12,15 @@ namespace Dotnettency
         public MapRequestOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder)
         {
             _builder = builder;
+            IdentifyWith<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
+        }
+               
+
+        public MapRequestOptionsBuilder<TTenant, TKey> IdentifyWith<TIdentifierFactory>()
+            where TIdentifierFactory: MappedHttpContextTenantIdentifierFactory<TTenant, TKey>
+        {
+            _builder.IdentifyTenantsWith<TIdentifierFactory>();
+            return this;
         }
 
         public MapRequestOptionsBuilder<TTenant, TKey> MapValue(Func<HttpContextBase, string> selectValue)
@@ -43,7 +52,7 @@ namespace Dotnettency
         public IServiceCollection Services { get { return _builder.Services; } }
 
         public MapRequestOptionsBuilder<TTenant, TKey> InitialiseWith<TTenantShellFactory>()
-            where TTenantShellFactory: MappedTenantShellFactory<TTenant, TKey>
+            where TTenantShellFactory : MappedTenantShellFactory<TTenant, TKey>
         {
             _builder.InitialiseTenant<TTenantShellFactory>();
             return this;
@@ -56,12 +65,21 @@ namespace Dotnettency
             return this;
         }
 
-
-        //public MapRequestOptionsBuilder<TTenant, TKey> ConfigureMap()
-        //{
-
-        //    Services
-        //}
+        /// <summary>
+        /// Select a tenant shell factory to use to initialise the tenant's shell, based on the key value, of the key mapped to this request.
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <returns>return null will result in the default <see cref="ITenantShellFactory{TTenant}"/> being used. Return the type of an alternative one to use to override it.</returns>
+        public MapRequestOptionsBuilder<TTenant, TKey> OverrideInitialise(Func<TKey, Type> factory)
+        {
+            Services.AddScoped<ITenantShellFactoryStrategy<TTenant>>(sp =>
+            {
+                var defaultFactory = sp.GetRequiredService<ITenantShellFactory<TTenant>>();
+                return new SelectTenantShellTypeFromKeyFactoryStrategy<TKey, TTenant>(sp, defaultFactory, factory);
+            });           
+            return this;
+        }
+      
 
     }
 }

@@ -15,26 +15,19 @@ namespace Dotnettency
         {
             // This method only gets invoked once when the tenant shell needs to be created as it's not in the cache, so although performance is important, this is not a critical path.
             // this is only example code at this point:
-            var keyString = identifier.Uri.PathAndQuery; // this will be a string representation of TKey.
             TTenant tenant = null;
-            if (NoMappedTenantKey(keyString)) // probably use a null or special string value to indicate no tenant key matched.
-            {               
-                tenant = await GetDefaultTenant(identifier);
+            if (identifier.TryGetMappedTenantKey<TKey>(out TKey value))
+            {
+                tenant = await GetTenant(value);
             }
             else
             {
-                TKey tenantKey = (TKey)Convert.ChangeType(keyString.Substring(1), typeof(TKey));
-                tenant = await GetTenant(tenantKey);
-            }           
+                tenant = await GetDefaultTenant(identifier);
+            }          
 
             var shell = GetTenantShell(identifier, tenant);
             return shell;
-        }
-
-        private bool NoMappedTenantKey(string keyString)
-        {
-            return string.IsNullOrWhiteSpace(keyString) || keyString == "/";
-        }
+        }      
 
         protected abstract Task<TTenant> GetTenant(TKey key);
 
@@ -52,7 +45,7 @@ namespace Dotnettency
                 // and then use that key to return a default TTenant instance.
                 return _defaultNullShell;
             }
-            return new TenantShell<TTenant>(tenant); 
+            return new TenantShell<TTenant>(tenant);
         }
     }
 }

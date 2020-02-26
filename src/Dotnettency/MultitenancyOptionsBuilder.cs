@@ -84,17 +84,11 @@ namespace Dotnettency
             return this;
         }
 
-        public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
-        {
-            return MapFromHttpContext<TKey, MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>(configureOptions);
-        }
-
-        public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey, TIdentifierFactory>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
-       where TIdentifierFactory : MappedHttpContextTenantIdentifierFactory<TTenant, TKey>
+       
+        public MultitenancyOptionsBuilder<TTenant> IdentifyFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
         {
             var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(this);
             configureOptions?.Invoke(optionsBuilder);
-            IdentifyTenantsWith<TIdentifierFactory>();
             return this;
         }
 
@@ -122,6 +116,7 @@ namespace Dotnettency
             return this;
         }
 
+        
         public MultitenancyOptionsBuilder<TTenant> IdentifyTenantTask(Func<Task<TenantIdentifier>> factory)
         {
             var delegateFactory = new DelegateTenantIdentifierFactory<TTenant>(factory);

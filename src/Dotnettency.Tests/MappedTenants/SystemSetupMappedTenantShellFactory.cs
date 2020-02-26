@@ -7,7 +7,7 @@ namespace Dotnettency.Tests
     public class SystemSetupMappedTenantShellFactory : MappedTenantShellFactory<Tenant, int>
     {
 
-        private readonly Task<Tenant> _systemSetupTenant = Task.FromResult(new Tenant() { Id = 0, Name = "System Setup", IsSystemSetup = true });
+        private readonly Task<Tenant> _systemSetupTenant = Task.FromResult(new Tenant() { Id = -1, Name = "System Setup", IsSystemSetup = true });
 
         public SystemSetupMappedTenantShellFactory(ILogger<TestInjectedMappedTenantShellFactory> someDependency)
         {

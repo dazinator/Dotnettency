@@ -10,6 +10,6 @@
     public interface ITenantShellFactoryStrategy<TTenant>
         where TTenant : class
     {
-        ITenantShellFactory<TTenant> GetTenantShellFactory();
+        ITenantShellFactory<TTenant> GetTenantShellFactory(TenantIdentifier identifier);
     }
 }

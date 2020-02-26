@@ -43,7 +43,7 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .MapFromHttpContext<int>((m) =>
+                .IdentifyFromHttpContext<int>((m) =>
                 {
                     m.MapRequestHost()
                      .WithMapping((tenants) =>
@@ -100,7 +100,7 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .MapFromHttpContext<int>((m) =>
+                .IdentifyFromHttpContext<int>((m) =>
                 {
                     m.MapRequestHost()                    
                      .UsingDotNetGlobPatternMatching();

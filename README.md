@@ -277,7 +277,7 @@ So this is the new way to configure dotnettency on startup (the old api's still 
             services.AddMultiTenancy<Tenant>((builder) =>
             {
                 builder.AddAspNetCore()                      
-                       .MapFromHttpContext<int>((m) =>
+                       .IdentifyFromHttpContext<int>((m) =>
                        {
                            m.MapRequestHost() // you can optionally use lambda here to select from any available value in httpcontext
                             .WithMapping((tenants) =>
@@ -311,7 +311,7 @@ You can also configure the Map from IConfiguration, rather than using `.WithMapp
             services.AddMultiTenancy<Tenant>((builder) =>
             {
                 builder.AddAspNetCore()                      
-                       .MapFromHttpContext<int>((m) =>
+                       .IdentifyFromHttpContext<int>((m) =>
                        {
                            m.MapRequestHost()                            
                             .UsingDotNetGlobPatternMatching(); // add the Dotnettency.DotNetGlob package for this extension method.
@@ -333,35 +333,45 @@ You can also configure the Map from IConfiguration, rather than using `.WithMapp
             services.Configure<TenantMappingOptions<int>>(configSection);
 ```
 
-Sometimes, whilst your system is in "Setup Mode" for example, you may want disregard the mapping and always map to an absolute KEY - for example that can then be used to 
-identify a special "system setup" tenant. You can achieve this kind of logic by using the overload to pass your custom derived implemenation:
+Sometimes, whilst your system is in "Setup Mode" for example, you may want override the usual way of initialising the tenant shell for the tenant, and perhaps instead initialise a tenant
+shell with a hardcode "System Setup" tenant, and you want to intialise that in a way that doesn't touch any services yet to be configured during the setup process, such as database connection strings etc.
+Once setup has been complete, you'd then like for your tenant shells to be initialised using all the dependencies now avialable to them.
+You can override the strategy used to the initialise a tenant like so:
+
 
 ```
 
-  .MapFromHttpContext<int, SystemSetupIdentifierFactory>((m) =>
+         .IdentifyFromHttpContext<int>((m) =>
                         {
-                            m.MapRequestHost()
+                            m.IdentifyWith<SystemSetupIdentifierFactory>() //override the default identifier factory with one that can use our SystemSetupOptions to map to a special -1 tenant when in setup mode.
+                             .MapRequestHost()
                              .WithMapping((tenants) =>
                              {
                                  tenants.Add(1, "t1.foo.com", "t1.foo.uk");
                              })
                              .UsingDotNetGlobPatternMatching()
+                             .OverrideInitialise((key) =>
+                             {
+                                 if (key == -1)
+                                 {
+                                     // alternative implementation of MappedTenantShellFactory with no dependencies injected that touch unconfigured services such as database etc.
+                                     // This implemenation, because we are in System Setup mode, will just construct a tenant without querying database etc, and sets special flag.
+                                     return typeof(SystemSetupMappedTenantShellFactory);
+                                 }
+                                 return null; // don't override - default Initialise will be used.
+                             })
                              .Initialise((key) =>
                              {
                                  var tenant = new Tenant() { Id = key, Name = "Test" };
-                                 if (key == -1)
-                                 {
-                                     // our custom SystemSetupIdentifierFactory always overrides the mapped tenant key and sets it to -1 when the system is in setup mode.
-                                     tenant.IsSystemSetup = true;
-                                 }
+                                 Assert.NotEqual(-1, tenant.Id); // shouldn't ever be -1, as we are overriden by above in that case.                                
                                  return Task.FromResult(tenant);
                              });
-                        });
+                        });        
 
 ```
 
-
-.. and you could implement `SystemSetupIdentifierFactory` like this:
+First, we've called `IdentifyWith` so that we can override the default identifier, and use our custom one: `SystemSetupIdentifierFactory` which will return a key of -1 our platform setup options `IsSetupComplete` flag is false.
+We implemented that like this:
 
 ```
      public class SystemSetupIdentifierFactory : MappedHttpContextTenantIdentifierFactory<Tenant, int>
@@ -386,20 +396,45 @@ identify a special "system setup" tenant. You can achieve this kind of logic by 
         {
             if(_systemSetupOptionsMonitor.CurrentValue.IsSystemSetupComplete)
             {
-                return base.IdentifyTenant();
+                return base.IdentifyTenant(); // map tenant key in the normal way.
             }
             else
             {
-                return _systemSetupTenantId;
+                return _systemSetupTenantId; // -1
             }
         }
 
     }
 ```
 
-A different way you could achieve this, is to have a catch all mapping that maps to the system setup experience. Then during your system setup process, it could configure a more specific mapping:
+The, the Initialise and OverrideInitialise() allow us to supply a defaul and optional override respectively, for how to initialise the tenant based on the mapped key. 
+In this case we can provide a defauly way to load tenants with a mapped key, and we can override that with a different way when the key is -1 (representing system setup mode),
+when the OverrideInitialise() method returns different implementation then our Initialise() method will not be called. 
 
-So prior to completing system setup:
+```
+                              // setting a default initialiser to load tenants from the database etc based on the key. This will only fire when not overriden below.
+                             .Initialise((key) =>
+                             {
+                                 var tenant = new Tenant() { Id = key, Name = "Test" };
+                                 Assert.NotEqual(-1, tenant.Id); // shouldn't ever be -1, as we are overriden by above in that case.                                
+                                 return Task.FromResult(tenant);
+                             })
+                             .OverrideInitialise((key) =>
+                             {
+                                 if (key == -1)
+                                 {
+                                     // return the type of an alternative implementation of `MappedTenantShellFactory`. We will use this as it has no depedency on the database etc whilst the system is in setup mode,
+                                     // it will just return a hardcoded default tenant. 
+                                     return typeof(SystemSetupMappedTenantShellFactory);
+                                 }
+                                 return null; // don't override - Initialise() will be called to initialise this tenant.
+                             })
+```
+
+### Catch-all mapping
+
+You might want ensure you catch any url's not specifically mapped to specific tenants, with a catch all mapping that you can map to a specific key to initialise a "default" or "welcome page" tenant.
+You'd just ensure you have this mapping last in your mappings list. If no other mapping above it maps to another key, then this is essentially the fallback key.
 
 ```
 
@@ -414,14 +449,14 @@ So prior to completing system setup:
 
 ```
 
-During your system setup experience, you'd update this JSON file to add the url mapping for the now fully configured current tenant:
+As you on-board new tenants, you'd update these mappings to add the url mapping for each tenant, above that catch-all mapping:
 
 ```
 {
   "Mappings": [
     {
       "Key": 1,
-      "Patterns": [ "www.foo.com" ]
+      "Patterns": [ "*.foo.com" ]
     },
     {
       "Key": -1,
@@ -432,7 +467,7 @@ During your system setup experience, you'd update this JSON file to add the url 
 
 ```
 
-Now any request that comes in for a tenant not set up will be mapped to -1 key, and you can configure the -1 tenant, to present your setup experience.
+Now any request that comes in for a tenant not set up will be mapped to -1 key, and you can configure the -1 tenant, to present your welcome experience.
 
 
 Having trouble updating the Json file? Yes System.Text.Json isn't currently the best - back to Newtonsoft?

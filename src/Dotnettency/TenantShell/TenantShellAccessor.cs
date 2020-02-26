@@ -25,7 +25,7 @@ namespace Dotnettency
                 {
                     return null;
                 }
-                var tenantShellFactory = _tenantFactoryStrategy.GetTenantShellFactory();
+                var tenantShellFactory = _tenantFactoryStrategy.GetTenantShellFactory(identifier); // pass identifier so this can be used to return potentially different shell factories.
                 return await _tenantResolver.ResolveTenantShell(identifier, tenantShellFactory);
             });
         }

@@ -49,7 +49,7 @@ namespace Sample.Pages
                         //.IdentifyTenantsWithRequestAuthorityUri()
                         //.InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
-                        .MapFromHttpContext<int>((m) =>
+                        .IdentifyFromHttpContext<int>((m) =>
                            {
                                m.MapValue(http => http.Request.GetUri().Port.ToString())
                                 .UsingDotNetGlobPatternMatching()

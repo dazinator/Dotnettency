@@ -77,7 +77,7 @@ namespace Dotnettency.Tests
             {
                 builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
                        .SetMockHttpContextProvider(new System.Uri("http://unknown.foo.com"))
-                       .MapFromHttpContext<int>((m) =>
+                       .IdentifyFromHttpContext<int>((m) =>
                        {
                            m.MapRequestHost()
                             .WithMapping((tenants) =>
@@ -166,25 +166,32 @@ namespace Dotnettency.Tests
             {
                 builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
                        .SetMockHttpContextProvider(new System.Uri("http://t1.foo.com"))
-                        .MapFromHttpContext<int, SystemSetupIdentifierFactory>((m) =>
+                        .IdentifyFromHttpContext<int>((m) =>
                         {
-                            m.MapRequestHost()
+                            m.IdentifyWith<SystemSetupIdentifierFactory>() //override the default identifier factory with one that can use our SystemSetupOptions to map to a special -1 tenant when in setup mode.
+                             .MapRequestHost()
                              .WithMapping((tenants) =>
                              {
                                  tenants.Add(1, "t1.foo.com", "t1.foo.uk");
                              })
                              .UsingDotNetGlobPatternMatching()
+                             .OverrideInitialise((key) =>
+                             {
+                                 if (key == -1)
+                                 {
+                                     // alternative implementation of MappedTenantShellFactory with no dependencies injected that touch unconfigured services such as database etc.
+                                     // This implemenation, because we are in System Setup mode, will just construct a tenant without querying database etc, and sets special flag.
+                                     return typeof(SystemSetupMappedTenantShellFactory);
+                                 }
+                                 return null; // don't override - default Initialise will be used.
+                             })
                              .Initialise((key) =>
                              {
                                  var tenant = new Tenant() { Id = key, Name = "Test" };
-                                 if (key == -1)
-                                 {
-                                     // our custom SystemSetupIdentifierFactory only returns -1 when we need to perform system setup.
-                                     tenant.IsSystemSetup = true; // we can check this when configuring per tenant services, middleware etc to present a tailored system setup experience.
-                                 }
+                                 Assert.NotEqual(-1, tenant.Id); // shouldn't ever be -1, as we are overriden by above in that case.                                
                                  return Task.FromResult(tenant);
                              });
-                        });
+                        });                       
 
             });
 
