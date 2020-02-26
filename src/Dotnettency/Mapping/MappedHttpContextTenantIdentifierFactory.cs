@@ -1,4 +1,4 @@
-﻿using Dotnettency.Mapping;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -18,19 +18,23 @@ namespace Dotnettency
 
         private IDisposable _optionsOnChangeToken = null;
         private Lazy<IEnumerable<TenantPatternMatcher<TKey>>> _lazyTenantMatchers;
+        private readonly ILogger<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>> _logger;
 
         public MappedHttpContextTenantIdentifierFactory(
+            ILogger<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>> logger,
             IHttpContextProvider httpContextAccessor,
             IHttpContextValueSelector valueSelector,
-            IOptionsProvider<TenantMappingOptions<TKey>> optionsMonitor,
+            IOptionsProvider<TenantMappingOptions<TKey>> optionsMonitor,           
             ITenantMatcherFactory<TKey> matcherFactory) : base(httpContextAccessor)
         {
+            _logger = logger;
             _valueSelector = valueSelector;
             _optionsMonitor = optionsMonitor;
             _matcherFactory = matcherFactory;
             SetLazy();
             _optionsOnChangeToken = _optionsMonitor.OnChange((a) =>
             {
+                _logger.LogInformation("Change detected for mapping options, reloading.");
                 SetLazy(a);
             });
         }

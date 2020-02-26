@@ -9,6 +9,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using Dotnettency.Mapping;
+using System.Threading.Tasks;
 
 namespace Sample.Pages
 {
@@ -51,7 +52,25 @@ namespace Sample.Pages
                         .MapFromHttpContext<int>((m) =>
                            {
                                m.MapValue(http => http.Request.GetUri().Port.ToString())
-                                .UsingDotNetGlobPatternMatching();
+                                .UsingDotNetGlobPatternMatching()
+                                .Initialise(key =>
+                                {
+                                    Tenant result = null;
+                                    switch (key)
+                                    {
+                                        case 1:
+                                            result = new Tenant(Guid.Parse("049c8cc4-3660-41c7-92f0-85430452be22")) { Name = "Gicrosoft" };
+                                            break;
+                                        case 2:
+                                            result = new Tenant(Guid.Parse("b17fcd22-0db1-47c0-9fef-1aa1cb09605e")) { Name = "Moogle" };
+                                            break;
+                                        case 3:
+                                            result = null;
+                                            break;
+
+                                    }
+                                    return Task.FromResult(result);
+                                });
                            })
                         .ConfigureNamedTenantFileSystems((namedItems) =>
                         {

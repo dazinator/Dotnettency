@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
 
-namespace Dotnettency
+namespace Dotnettency.Options
 {
     public class OptionsMonitorOptionsProvider<TOptions> : IOptionsProvider<TOptions>
     {

@@ -71,6 +71,7 @@ namespace Dotnettency.Tests
 
             ServiceCollection services = new ServiceCollection();
             services.AddOptions();
+            services.AddLogging();
             services.AddMultiTenancy<Tenant>((builder) =>
             {
                 builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))

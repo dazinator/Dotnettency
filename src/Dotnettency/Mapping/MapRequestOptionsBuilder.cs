@@ -12,6 +12,7 @@ namespace Dotnettency
         public MapRequestOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder)
         {
             _builder = builder;
+            _builder.IdentifyTenantsWith<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
         }
 
         public MapRequestOptionsBuilder<TTenant, TKey> MapValue(Func<HttpContextBase, string> selectValue)

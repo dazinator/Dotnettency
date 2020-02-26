@@ -83,7 +83,6 @@ namespace Dotnettency
         {
             var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(this);
             configureOptions?.Invoke(optionsBuilder);
-            IdentifyTenantsWith<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
             return this;
         }
 

@@ -7,7 +7,9 @@ namespace Dotnettency
     public abstract class MappedTenantShellFactory<TTenant, TKey> : ITenantShellFactory<TTenant>
         where TTenant : class
     {
+        private readonly TenantShell<TTenant> _defaultNullShell = default(TenantShell<TTenant>);
         private readonly Task<TTenant> _defaultNullTenant = Task.FromResult(default(TTenant));
+
 
         public async Task<TenantShell<TTenant>> Get(TenantIdentifier identifier)
         {
@@ -16,14 +18,14 @@ namespace Dotnettency
             var keyString = identifier.Uri.PathAndQuery; // this will be a string representation of TKey.
             TTenant tenant = null;
             if (NoMappedTenantKey(keyString)) // probably use a null or special string value to indicate no tenant key matched.
-            {
+            {               
                 tenant = await GetDefaultTenant(identifier);
             }
             else
             {
                 TKey tenantKey = (TKey)Convert.ChangeType(keyString.Substring(1), typeof(TKey));
                 tenant = await GetTenant(tenantKey);
-            }
+            }           
 
             var shell = GetTenantShell(identifier, tenant);
             return shell;
@@ -43,7 +45,14 @@ namespace Dotnettency
 
         protected virtual TenantShell<TTenant> GetTenantShell(TenantIdentifier identifier, TTenant tenant)
         {
-            return new TenantShell<TTenant>(tenant); // could be null tenant, by default we initialise one shell to serve default tenants. That shell could be configured with default middleware like a welcome page etc.
+            if (tenant == null)
+            {
+                // don't return a tenant shell for a null tenant as this could be source of bugs.
+                // if a catch-all shell is needed, developer can map a pattern like ** as the last mapping mapped to a tenant key XYZ,
+                // and then use that key to return a default TTenant instance.
+                return _defaultNullShell;
+            }
+            return new TenantShell<TTenant>(tenant); 
         }
     }
 }

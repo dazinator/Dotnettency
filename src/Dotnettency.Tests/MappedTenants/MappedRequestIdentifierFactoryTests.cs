@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -28,6 +26,7 @@ namespace Dotnettency.Tests
 
             ServiceCollection services = new ServiceCollection();
             services.AddOptions();
+            services.AddLogging();
 
             services.AddMultiTenancy<Tenant>((builder) =>
             {
@@ -83,6 +82,7 @@ namespace Dotnettency.Tests
 
             ServiceCollection services = new ServiceCollection();
             services.AddOptions();
+            services.AddLogging();
             services.Configure<TenantMappingOptions<int>>(config);
 
             services.AddMultiTenancy<Tenant>((builder) =>
