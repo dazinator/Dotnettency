@@ -15,12 +15,11 @@ namespace Dotnettency
         {
             // this service will only work when 
             //  IAppBuilder.UseRequestScopeContext() middleware has been activated.
-
             var provider = new HttpContextProvider();
             builder.HttpContextProvider = provider;
             builder.Services.AddSingleton<IHttpContextProvider>(provider);
             return builder;
-        }       
+        }
 
         public static MultitenancyOptionsBuilder<TTenant> OwinPipeline<TTenant>(this TenantPipelineOptionsBuilder<TTenant> builder, Action<TenantShellItemBuilderContext<TTenant>, IAppBuilder> configuration)
            where TTenant : class

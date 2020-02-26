@@ -1,0 +1,8 @@
+{
+  "Mappings": [
+    {
+      "Key": 1,
+      "Patterns": [ "t1.foo.com", "t1.foo.uk" ]
+    }
+  ]
+}

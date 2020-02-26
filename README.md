@@ -261,6 +261,78 @@ Or during fluent configuration of the tenant, for exmaple whilst configuring the
  var redShellItem = await context.GetShellItemAsync<ExampleShellItem>("red");
 
 ```
+
+## Tenant Mapping (New in v3.0)
+
+There now exists a newer API to help you get up and running more quickly.
+In most cases you just want to map some value during an incoming request (using some value current httpcontext like Request.Hostname etc.) to a unique
+identifier, that can then be used to establish the correct context for the current tenant.
+
+So this is the new way to configure dotnettency on startup (the old api's still exist and work):
+
+```csharp
+            ServiceCollection services = new ServiceCollection();
+            services.AddOptions();
+            services.AddLogging();
+            services.AddMultiTenancy<Tenant>((builder) =>
+            {
+                builder.AddAspNetCore()                      
+                       .MapFromHttpContext<int>((m) =>
+                       {
+                           m.MapRequestHost() // you can optionally use lambda here to select from any available value in httpcontext
+                            .WithMapping((tenants) =>
+                            {
+                                tenants.Add(1, "*.foo.com", "*.foo.uk");
+                                tenants.Add(2, "t2.bar.com", "t1.foo.uk");
+                            })
+                            .UsingDotNetGlobPatternMatching(); // add the Dotnettency.DotNetGlob package for this extension method.
+                            .Initialise((key) =>
+                            {
+                                // e.g return Tenant info that you need for the mapped key.
+                                if (key == 1)
+                                {
+                                    var tenant = new Tenant() { Id = key, Name = "Test Tenant" };
+                                    return Task.FromResult(tenant);
+                                }
+                                return null; // we somehow mapped an invalid key - return null.
+                            });                            
+                      });                       
+            });
+```
+
+There are various options available for these API's. For example if you don't want to provide lamdas, you can use overloads that allow you to register factory classes instead, which have the benefit of DI.
+
+You can also configure the Map from IConfiguration, rather than using `.WithMapping()`:
+
+```
+            ServiceCollection services = new ServiceCollection();
+            services.AddOptions();
+            services.AddLogging();
+            services.AddMultiTenancy<Tenant>((builder) =>
+            {
+                builder.AddAspNetCore()                      
+                       .MapFromHttpContext<int>((m) =>
+                       {
+                           m.MapRequestHost()                            
+                            .UsingDotNetGlobPatternMatching(); // add the Dotnettency.DotNetGlob package for this extension method.
+                            .Initialise((key) =>
+                            {
+                                // e.g load tenant info for mapped key.
+                                if (key == 1)
+                                {
+                                    var tenant = new Tenant() { Id = key, Name = "Test Tenant" };
+                                    return Task.FromResult(tenant);
+                                }
+                                return Task.FromResult<Tenant>(null); // we must have mapped an invalid key.
+                            });                            
+                      });                       
+            });
+
+            // Let's put our mapping in configuration - then it will reload if we make config changes!
+            IConfigurationSection configSection = Configuration.GetSection("Tenants");
+            services.Configure<TenantMappingOptions<int>>(configSection);
+```
+
 ## Notes
 
 ### Serilog

@@ -9,7 +9,7 @@ namespace Dotnettency
         {
         }
 
-        protected override TenantIdentifier GetTenantDistinguisher(HttpContextBase context)
+        protected override TenantIdentifier GetTenantIdentifier(HttpContextBase context)
         {
             var uri = context.Request.GetUri();
             

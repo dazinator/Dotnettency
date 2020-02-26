@@ -23,11 +23,11 @@ namespace Dotnettency
             var context = HttpContextAccessor.GetCurrent();
             if (HttpContextAccessor != null)
             {
-                identity = GetTenantDistinguisher(context);
+                identity = GetTenantIdentifier(context);
             }
             return Task.FromResult(identity);
         }
 
-        protected abstract TenantIdentifier GetTenantDistinguisher(HttpContextBase context);
+        protected abstract TenantIdentifier GetTenantIdentifier(HttpContextBase context);
     }
 }

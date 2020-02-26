@@ -27,9 +27,7 @@ namespace Dotnettency
             Services.AddSingleton<ITenantShellResolver<TTenant>, TenantShellResolver<TTenant>>();
             Services.AddScoped<TenantIdentifierAccessor<TTenant>>();
             Services.AddScoped<ITenantShellAccessor<TTenant>, TenantShellAccessor<TTenant>>();
-            Services.AddScoped<ITenantShellRestarter<TTenant>, TenantShellRestarter<TTenant>>();           
-
-
+            Services.AddScoped<ITenantShellRestarter<TTenant>, TenantShellRestarter<TTenant>>();      
 
             // By default, we use a URI from the request to identify tenants.
             // Services.AddSingleton<ITenantDistinguisherFactory<TTenant>, RequestAuthorityTenantDistinguisherFactory<TTenant>>();
@@ -52,11 +50,41 @@ namespace Dotnettency
             // As OWIN doesn't have a mechanism / concept for RequestServices of its own, unlike ASP.NET Core.
             Services.AddScoped<RequestServicesSwapper<TTenant>>();
 
+            // Default options provider primarily used for tenant mappings.
+            // When using AddAspNetCore this gets overridden with a superior implemenations based on the 
+            // aspnet core options system, that can do things like change notifications etc.
+            SetGenericOptionsProvider(typeof(BasicOptionsProvider<>));
+
         }
 
         public Func<IServiceProvider> ServiceProviderFactory { get; set; }
         public IServiceCollection Services { get; set; }        
         public IHttpContextProvider HttpContextProvider { get; set; }
+
+        public MultitenancyOptionsBuilder<TTenant> SetHttpContextProvider(IHttpContextProvider provider)
+        {
+            HttpContextProvider = provider;
+            Services.AddSingleton<IHttpContextProvider>(provider);
+            return this;
+        }
+
+        /// <summary>
+        /// Call this to set an options provider. Typically this is set up per platform.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public MultitenancyOptionsBuilder<TTenant> SetGenericOptionsProvider(Type optionsProviderOpenGenericType)
+        {
+            Services.AddSingleton(typeof(IOptionsProvider<>), optionsProviderOpenGenericType);
+            return this;
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
+        {
+            var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(this);
+            configureOptions?.Invoke(optionsBuilder);
+            return this;
+        }
 
         /// <summary>
         /// Call this to override the service used to provide a URI for the current request. The URI is used as an identifier
@@ -94,6 +122,13 @@ namespace Dotnettency
             where T : class, ITenantShellFactory<TTenant>
         {
             Services.AddSingleton<ITenantShellFactory<TTenant>, T>();
+            return this;
+        }
+
+        public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>(T factory)
+           where T : class, ITenantShellFactory<TTenant>
+        {
+            Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);
             return this;
         }
 
