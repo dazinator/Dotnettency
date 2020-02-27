@@ -218,6 +218,8 @@ namespace Dotnettency.Tests
             Assert.Equal(-1, tenant.Id);
             Assert.True(tenant.IsSystemSetup);
         }
+
+      
     }
 }
 

@@ -7,7 +7,7 @@ namespace Dotnettency
     public static class MappingBuilderExtensions
     {
       
-        public static MapRequestOptionsBuilder<TTenant, TKey> Map<TTenant, TKey>(this MapRequestOptionsBuilder<TTenant, TKey> builder, Action<TenantMappingOptions<TKey>> configure)
+        public static MapRequestOptionsBuilder<TTenant, TKey> WithMapping<TTenant, TKey>(this MapRequestOptionsBuilder<TTenant, TKey> builder, Action<TenantMappingOptions<TKey>> configure)
             where TTenant : class
         {
             builder.Services.Configure<TenantMappingOptions<TKey>>(configure);
@@ -20,6 +20,6 @@ namespace Dotnettency
         {
             builder.Services.Configure<TenantMappingOptions<TKey>>((a)=>a.Build(configure));
             return builder;
-        }     
+        }       
     }
 }

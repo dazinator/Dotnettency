@@ -23,6 +23,15 @@ namespace Dotnettency.Mapping
             _list.Add(mapping);
         }
 
+        public void Add(TKey key, string[] patterns, string conditionName, bool requiredValue)
+        {
+            var mapping = new TenantMapping<TKey>();
+            mapping.Key = key;
+            mapping.Patterns = patterns;
+            mapping.Condition = new TenantMappingEnabledCondition() { Name = conditionName, RequiredValue = requiredValue };
+            _list.Add(mapping);
+        }
+
         public TenantMapping<TKey>[] Build()
         {
             return _list.ToArray();

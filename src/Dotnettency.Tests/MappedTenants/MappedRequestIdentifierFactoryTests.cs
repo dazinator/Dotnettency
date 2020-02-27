@@ -72,7 +72,7 @@ namespace Dotnettency.Tests
         public async Task Can_Get_Mapped_TenantIdentifier_FromConfig()
         {
             var currentDir = Environment.CurrentDirectory;
-           // var currentLocation = Assembly.GetExecutingAssembly().Location;
+            // var currentLocation = Assembly.GetExecutingAssembly().Location;
             var configBuilder = new ConfigurationBuilder();
             var config = configBuilder.SetBasePath(currentDir)
                          .AddJsonFile("tenant-mappings.json")
@@ -102,7 +102,7 @@ namespace Dotnettency.Tests
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
                 .IdentifyFromHttpContext<int>((m) =>
                 {
-                    m.MapRequestHost()                    
+                    m.MapRequestHost()
                      .UsingDotNetGlobPatternMatching();
                 });
             });
@@ -118,6 +118,76 @@ namespace Dotnettency.Tests
             isFirstRequest = false;
             var nextIdentifier = await sut.IdentifyTenant();
             Assert.Equal(nextIdentifier, identfier);
+
+        }
+
+        [Fact]
+        public async Task Can_Get_ConditionallyMapped_TenantIdentifier_FromConfig()
+        {
+            var currentDir = Environment.CurrentDirectory;
+            // var currentLocation = Assembly.GetExecutingAssembly().Location;
+            var configBuilder = new ConfigurationBuilder();
+            var config = configBuilder.SetBasePath(currentDir)
+                         .AddJsonFile("tenant-mappings-conditions.json")
+                         .Build();
+
+            bool isFirstRequest = true;
+
+            ServiceCollection services = new ServiceCollection();
+            services.AddOptions();
+            services.AddLogging();
+            services.Configure<TenantMappingOptions<int>>(config);
+
+
+            bool setupComplete = false;
+
+            services.AddMultiTenancy<Tenant>((builder) =>
+            {
+                builder.SetMockHttpContextProvider(() =>
+                {
+                    if (isFirstRequest)
+                    {
+                        return new System.Uri("http://t1.foo.com");
+                    }
+                    else
+                    {
+                        return new System.Uri("https://t1.foo.uk?bar=1");
+                    }
+
+                })
+                .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
+                .IdentifyFromHttpContext<int>((m) =>
+                {
+                    m.MapRequestHost()
+                    .WithMapping((a) =>
+                    {
+                        a.Add(-1, new string[] { "**" }, "IsSetupComplete", false);
+                        a.Add(1, new string[] { "*.foo.com", "*.foo.uk" });
+                    })
+                    .RegisterConditions((c) =>
+                    {
+                        c.Add("IsSetupComplete", (sp) =>
+                        {
+                            return setupComplete;
+                        });
+                    })
+                     .UsingDotNetGlobPatternMatching();
+                });
+            });
+
+            var sp = services.BuildServiceProvider();
+            var sut = sp.GetRequiredService<ITenantIdentifierFactory<Tenant>>();
+
+            var identfier = await sut.IdentifyTenant();
+            Assert.NotNull(identfier);
+            Assert.Equal("/-1", identfier.Uri.PathAndQuery);
+
+            // Do another request, this time the condition evaluates to true, disabling the first mapping so we map to a different key now.
+            isFirstRequest = false;
+            setupComplete = true;
+
+            var nextIdentifier = await sut.IdentifyTenant();
+            Assert.Equal("/1", nextIdentifier.Uri.PathAndQuery);
 
         }
 

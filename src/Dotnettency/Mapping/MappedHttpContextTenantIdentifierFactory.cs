@@ -60,6 +60,8 @@ namespace Dotnettency
                 var valueToMap = _valueSelector.SelectValue(context);
                 if (tenantMatcher.IsMatch(valueToMap))
                 {
+                    //todo: check condition
+
                     // we've mapped this url to a particular tenant's key.
                     // store the key in the identifiers URI Path.
                     return CreateIdentifier(tenantMatcher.Key);

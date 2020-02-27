@@ -12,12 +12,13 @@ namespace Dotnettency
         public MapRequestOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder)
         {
             _builder = builder;
+            _builder.Services.AddSingleton<ConditionRegistry>();
             IdentifyWith<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
         }
-               
+
 
         public MapRequestOptionsBuilder<TTenant, TKey> IdentifyWith<TIdentifierFactory>()
-            where TIdentifierFactory: MappedHttpContextTenantIdentifierFactory<TTenant, TKey>
+            where TIdentifierFactory : MappedHttpContextTenantIdentifierFactory<TTenant, TKey>
         {
             _builder.IdentifyTenantsWith<TIdentifierFactory>();
             return this;
@@ -76,10 +77,21 @@ namespace Dotnettency
             {
                 var defaultFactory = sp.GetRequiredService<ITenantShellFactory<TTenant>>();
                 return new SelectTenantShellTypeFromKeyFactoryStrategy<TKey, TTenant>(sp, defaultFactory, factory);
-            });           
+            });
             return this;
         }
-      
+
+        public MapRequestOptionsBuilder<TTenant, TKey> RegisterConditions(Action<ConditionRegistry> registerConditions)
+        {
+            Services.AddSingleton<ConditionRegistry>(sp =>
+            {
+                var registry = new ConditionRegistry(sp);
+                registerConditions(registry);
+                return registry;
+            });
+            return this;
+        }
+
 
     }
 }

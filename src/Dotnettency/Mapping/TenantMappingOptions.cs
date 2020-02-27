@@ -1,6 +1,4 @@
-﻿using Dotnettency.Mapping;
-
-namespace Dotnettency
+﻿namespace Dotnettency
 {
     public class TenantMappingOptions<TKey>
     {

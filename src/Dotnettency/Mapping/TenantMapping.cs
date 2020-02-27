@@ -6,5 +6,7 @@ namespace Dotnettency
     {
         public TKey Key { get; set; }
         public string[] Patterns { get; set; }
+
+        public TenantMappingEnabledCondition Condition { get; set; }
     }
 }
