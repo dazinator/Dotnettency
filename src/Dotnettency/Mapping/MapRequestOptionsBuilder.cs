@@ -8,11 +8,11 @@ namespace Dotnettency
         where TTenant : class
     {
         private readonly MultitenancyOptionsBuilder<TTenant> _builder;
+        private readonly ConditionRegistry _conditions = new ConditionRegistry();
 
         public MapRequestOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder)
         {
             _builder = builder;
-            _builder.Services.AddSingleton<ConditionRegistry>();
             IdentifyWith<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
         }
 
@@ -83,13 +83,17 @@ namespace Dotnettency
 
         public MapRequestOptionsBuilder<TTenant, TKey> RegisterConditions(Action<ConditionRegistry> registerConditions)
         {
-            Services.AddSingleton<ConditionRegistry>(sp =>
-            {
-                var registry = new ConditionRegistry(sp);
-                registerConditions(registry);
-                return registry;
-            });
+            registerConditions(_conditions);           
             return this;
+        }
+
+        public void Build()
+        {
+            _builder.Services.AddSingleton<ConditionRegistry>(sp =>
+            {
+                _conditions.ServiceProvider = sp;
+                return _conditions;
+            });
         }
 
 

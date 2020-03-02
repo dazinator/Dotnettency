@@ -1,5 +1,6 @@
 ﻿using Dotnettency.Container;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -89,6 +90,7 @@ namespace Dotnettency
         {
             var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(this);
             configureOptions?.Invoke(optionsBuilder);
+            optionsBuilder.Build();
             return this;
         }
 
@@ -159,7 +161,7 @@ namespace Dotnettency
         {
             var factory = new DelegateTenantShellFactory<TTenant>(factoryMethod);
             return InitialiseTenant(factory);
-        }
+        }      
 
     }
 }

@@ -5,11 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Dotnettency;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
-using Dotnettency.Mapping;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Sample.Pages
 {
@@ -128,6 +126,19 @@ namespace Sample.Pages
 
                                     // demonstrates registering IHostedService at per tenant level
                                     tenantServices.AddHostedService<TimedTenantHostedService>();
+
+                                    // Example of overriding logging at root level for a tenant
+                                    if (tenantContext.Tenant.Name == "Moogle")
+                                    {
+                                        tenantServices.AddLoggingFactory(b => b.ClearProviders().SetMinimumLevel(LogLevel.Debug)
+                                        .AddDebug());
+                                    }
+                                    else
+                                    
+                                    {
+                                        tenantServices.AddLoggingFactory(b => b.ClearProviders().SetMinimumLevel(LogLevel.Information));
+                                    }
+
                                 }
                             });
                         })
@@ -135,6 +146,8 @@ namespace Sample.Pages
                         {
                             tenantOptions.AspNetCorePipelineTask(async (context, tenantAppBuilder) =>
                             {
+                                
+                                
                                 var tenantConfig = await context.GetConfiguration();
                                 var someTenantConfigSetting = tenantConfig.GetValue<bool>("SomeSetting");
                                 if (someTenantConfigSetting)
@@ -166,6 +179,9 @@ namespace Sample.Pages
 
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {
+                                    var logger = c.RequestServices.GetRequiredService<ILogger<Startup>>();
+                                    
+                                    logger.LogDebug("Debug log in middleware.");
                                     // This is some middleware running in the tenant pipeline.
                                     Console.WriteLine("Running in tenant pipeline: " + context.Tenant?.Name);
                                     await next.Invoke();

@@ -11,5 +11,7 @@ namespace Dotnettency
             builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>));
             return builder;
         }
+
+      
     }
 }

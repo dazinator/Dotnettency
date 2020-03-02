@@ -7,12 +7,14 @@ namespace Dotnettency
     {
 
         private IDictionary<string, Func<bool>> _conditions;
-        private readonly IServiceProvider _sp;
+        //private readonly IServiceProvider _sp;
 
-        public ConditionRegistry(IServiceProvider sp)
+        internal IServiceProvider ServiceProvider { get; set; }
+
+        public ConditionRegistry()
         {
             _conditions = new Dictionary<string, Func<bool>>();
-            _sp = sp;
+            //_sp = sp;
         }
 
         public void Add(string name, bool conditionValue)
@@ -28,7 +30,7 @@ namespace Dotnettency
 
         public void Add(string name, Func<IServiceProvider, bool> getConditionValue)
         {
-            var wrapped = new Func<bool>(() => getConditionValue(_sp));
+            var wrapped = new Func<bool>(() => getConditionValue(ServiceProvider));
             _conditions.Add(name, wrapped);
         }
 
