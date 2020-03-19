@@ -15,7 +15,7 @@ namespace Dotnettency
             _cache = tenantShellCache;
         }
 
-        public async Task<TenantShell<TTenant>> ResolveTenantShell(TenantIdentifier identifier, ITenantShellFactory<TTenant> tenantFactory)
+        public async Task<TenantShell<TTenant>> ResolveTenantShell(TenantIdentifier identifier, Func<ITenantShellFactory<TTenant>> getShellFactory)
         {
             if (_cache.TryGetValue(identifier, out TenantShell<TTenant> result))
             {
@@ -29,11 +29,29 @@ namespace Dotnettency
                 // Double locking - check cache again incase another thread just put it there.
                 if (_cache.TryGetValue(identifier, out result))
                 {
-                    return result;
+                    return result; // what if shell is having initialisation logic carried out?
                 }
 
                 // initialise tenant shell for tenant identifier.
-                var tenantResult = await tenantFactory.Get(identifier);
+
+                //var factoryName = identifier.FactoryName ?? string.Empty;
+                //var factory = getNamedFactory(factoryName);
+
+                //if (factoryName == null)
+                //{
+                //    // todo: log:
+                //    // throw new InvalidOperationException("Resolver named: {resolverName} not registered", resolverName);
+                //    return null;
+                //}
+
+                var factory = getShellFactory();
+                if (factory == null)
+                {
+                    // todo: log:
+                    throw new InvalidOperationException("Unable to obtain Shell Factory");
+                }
+
+                var tenantResult = await factory.Get(identifier);
                 if (tenantResult == null)
                 {
                     // don't cache / associate null tenant shells with tenant identifiers. This means future requests for a tenant who currenlty has a null shell will contiue to flow throw to the factory 
@@ -45,24 +63,15 @@ namespace Dotnettency
                     return null;
                 }
 
-                // We got a new shell, so add it to the cache under its identifier, and any additional identifiers.
-                _cache.AddOrUpdate(identifier, tenantResult, (a, b) => { return tenantResult; });
+                // We initialised a new tenant shell, so add it to the cache under its identifier.  
+                tenantResult.Identifier = identifier;
 
-                bool distinguisherFound = false;
-                foreach (var item in tenantResult.Identifiers)
+                _cache.AddOrUpdate(identifier, tenantResult, (key, oldValue) =>
                 {
-                    if (item.Equals(identifier))
-                    {
-                        distinguisherFound = true;
-                        continue;
-                    }
-                    _cache.AddOrUpdate(item, tenantResult, (a, b) => { return tenantResult; });
-                }
-
-                if (!distinguisherFound)
-                {
-                    tenantResult.Identifiers.Add(identifier);
-                }
+                    // todo: log warning. Disposing old shell shouldn't happen here.. as we should have exclusive access to the cache until semaphore is releases..           
+                    oldValue.Dispose();
+                    return tenantResult;
+                });
 
                 return tenantResult;
             }
@@ -90,27 +99,26 @@ namespace Dotnettency
                 // tenant may have just been restarted on another thread and removed from cache, so check again.
                 //Todo: make this more robust if TryRemove returns false for example..
                 var isRemoved = _cache.TryRemove(identifier, out removed);
-                if (isRemoved)
+                if (!isRemoved)
                 {
-                    foreach (var item in removed.Identifiers)
+                    await Task.Delay(1000);
+                    isRemoved = _cache.TryRemove(identifier, out removed);
+                    if (!isRemoved)
                     {
-                        if (item.Equals(identifier))
-                        {
-                            continue;
-                        }
-                        isRemoved = _cache.TryRemove(item, out TenantShell<TTenant> itemRemoved);
+                        throw new Exception("Unable to remove cached tenant shell.");
                     }
+                    //foreach (var item in removed.Identifiers)
+                    //{
+                    //    if (item.Equals(identifier))
+                    //    {
+                    //        continue;
+                    //    }
+                    //    isRemoved = _cache.TryRemove(item, out TenantShell<TTenant> itemRemoved);
+                    //}
                 }
-
-                // dispose after small delay to allow respoinse to be returned flowing back through the same pipeline.
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 return removed;
-                //Task.Delay(new TimeSpan(0, 0, 2)).ContinueWith((t) =>
-                //{
-                //    removed?.Dispose();
-                //});
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
 
             }
             finally

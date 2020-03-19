@@ -11,6 +11,8 @@ namespace Dotnettency
 
         public Uri Uri { get; set; }
 
+        public string FactoryName { get; set; } = string.Empty;
+
         public static implicit operator TenantIdentifier(Uri key)
         {
             TenantIdentifier value = new TenantIdentifier(key);

@@ -47,11 +47,11 @@ namespace Sample.Pages
                         //.IdentifyTenantsWithRequestAuthorityUri()
                         //.InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
-                        .IdentifyFromHttpContext<int>((m) =>
+                        .MapFromHttpContext<int>((m) =>
                            {
                                m.MapValue(http => http.Request.GetUri().Port.ToString())
                                 .UsingDotNetGlobPatternMatching()
-                                .Initialise(key =>
+                                .Factory(key =>
                                 {
                                     Tenant result = null;
                                     switch (key)

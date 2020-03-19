@@ -26,9 +26,19 @@ namespace Sample.RazorPagesTest
 
             var sp = services.AddMultiTenancy<Tenant>((builder) =>
               {
-                  builder.IdentifyTenantsWithRequestAuthorityUri()
-                         .InitialiseTenant<TenantShellFactory>()
-                         .AddAspNetCore()
+                //  Dotnettency.MappingBuilderExtensions.WithMapping
+                  builder//.IdentifyTenantsWithRequestAuthorityUri()
+                        // .InitialiseTenantShell<TenantShellFactory>()
+                          .AddAspNetCore()
+                          .MapFromHttpContext<int>((m) =>
+                          {
+                              m.MapRequestHost()
+                               .WithMapping((tenants) =>
+                               {
+                                   tenants.Add(1, "t1.foo.com", "t1.foo.uk");
+                               })
+                               .UsingDotNetGlobPatternMatching();
+                          }) 
                          .ConfigureTenantContainers((containerOptions) =>
                          {
                              containerOptions

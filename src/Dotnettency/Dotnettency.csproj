@@ -8,12 +8,13 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/dazinator/Dotnettency</PackageProjectUrl>
     <PackageTags>Multitenancy,tenant</PackageTags>
+    <UserSecretsId>fbd2bc3f-dc44-45e4-88c5-3496accad99f</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>   
+    <PackageReference Include="Dazinator.Extensions.DependencyInjection" Version="1.1.0-alpha.14" />   
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.0.0" />
-  </ItemGroup>
-  
+  </ItemGroup> 
   
 
 </Project>

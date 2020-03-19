@@ -20,5 +20,6 @@ namespace Dotnettency
                 return _factory(identifier);
             });
         }
+        //}
     }
 }

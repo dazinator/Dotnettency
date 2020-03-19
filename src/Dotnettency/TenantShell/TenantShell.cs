@@ -10,20 +10,12 @@ namespace Dotnettency
 
         private CompositeDisposable _disposables = new CompositeDisposable();
 
-        public TenantShell(TTenant tenant, params TenantIdentifier[] distinguishers)
+        public TenantShell(TTenant tenant, TenantIdentifier identifier)
         {
             Id = Guid.NewGuid();
             Tenant = tenant;
             Properties = new ConcurrentDictionary<string, object>();
-            Identifiers = new HashSet<TenantIdentifier>();
-
-            if (distinguishers != null)
-            {
-                foreach (var item in distinguishers)
-                {
-                    Identifiers.Add(item);
-                }
-            }
+            Identifier = identifier;            
         }
 
         protected ConcurrentDictionary<string, object> Properties { get; private set; }
@@ -96,12 +88,7 @@ namespace Dotnettency
 
         public TTenant Tenant { get; set; }
 
-        /// <summary>
-        /// Represents identifiers for this tenant. 
-        /// A tenant can have multiple identifiers associated with it.
-        /// An identifier is returned from <see cref="ITenantIdentifierFactory{TTenant}"/> usally based on information available from HttpContext.
-        /// </summary>
-        internal HashSet<TenantIdentifier> Identifiers { get; set; }
+        internal TenantIdentifier Identifier { get; set; }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

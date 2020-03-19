@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 
 namespace Dotnettency
 {
-    public class DelegateMappedTenantShellFactory<TTenant, TKey> : MappedTenantShellFactory<TTenant, TKey>
+    public class DelegateTenantFactory<TTenant, TKey> : TenantFactory<TTenant, TKey>
         where TTenant : class
     {
         private readonly Func<TKey, Task<TTenant>> _getTenant;
 
-        public DelegateMappedTenantShellFactory(Func<TKey, Task<TTenant>> getTenant)
+        public DelegateTenantFactory(Func<TKey, Task<TTenant>> getTenant)
         {
             if (getTenant == null)
             {
@@ -16,7 +16,7 @@ namespace Dotnettency
             }
             _getTenant = getTenant;
         }
-        protected override Task<TTenant> GetTenant(TKey key)
+        public override Task<TTenant> GetTenant(TKey key)
         {
             return _getTenant(key);
         }

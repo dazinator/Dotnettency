@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore21\Dotnettency.AspNetCore21.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
+    <ProjectReference Include="..\Dotnettency.DotNetGlob\Dotnettency.DotNetGlob.csproj" />
   </ItemGroup>
 
 </Project>

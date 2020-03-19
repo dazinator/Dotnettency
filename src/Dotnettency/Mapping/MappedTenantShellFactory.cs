@@ -1,15 +1,32 @@
-﻿using System;
+﻿using Dazinator.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 namespace Dotnettency
 {
+
+    public abstract class TenantFactory<TTenant, TKey>
+         where TTenant : class
+    {
+        public abstract Task<TTenant> GetTenant(TKey value);
+    }
 
     public abstract class MappedTenantShellFactory<TTenant, TKey> : ITenantShellFactory<TTenant>
         where TTenant : class
     {
         private readonly TenantShell<TTenant> _defaultNullShell = default(TenantShell<TTenant>);
         private readonly Task<TTenant> _defaultNullTenant = Task.FromResult(default(TTenant));
+        private readonly TenantFactory<TTenant, TKey> _defaultFactory;
+        private readonly NamedServiceResolver<TenantFactory<TTenant, TKey>> _namedFactories;
+       // private readonly IServiceProvider _serviceProvider;
 
+        public MappedTenantShellFactory(TenantFactory<TTenant, TKey> defaultFactory, NamedServiceResolver<TenantFactory<TTenant, TKey>> namedFactories)
+        {
+            _defaultFactory = defaultFactory;
+            _namedFactories = namedFactories;
+          //  _serviceProvider = serviceProvider;
+        }
 
         public async Task<TenantShell<TTenant>> Get(TenantIdentifier identifier)
         {
@@ -18,16 +35,31 @@ namespace Dotnettency
             TTenant tenant = null;
             if (identifier.TryGetMappedTenantKey<TKey>(out TKey value))
             {
-                tenant = await GetTenant(value);
+                TenantFactory<TTenant, TKey> factory = _defaultFactory;
+                var factoryName = identifier.FactoryName ?? string.Empty;
+                if(!string.IsNullOrEmpty(factoryName))
+                {
+                    factory = _namedFactories[factoryName] ?? factory;
+                }                
+                if(factory != null)
+                {
+                    tenant = await factory.GetTenant(value);
+                }
+                else
+                {
+                    tenant = await GetDefaultTenant(identifier);
+                    // log warning?
+                }
+                //  tenant = await GetTenant(value);
             }
             else
             {
                 tenant = await GetDefaultTenant(identifier);
-            }          
+            }
 
             var shell = GetTenantShell(identifier, tenant);
             return shell;
-        }      
+        }
 
         protected abstract Task<TTenant> GetTenant(TKey key);
 
@@ -45,7 +77,7 @@ namespace Dotnettency
                 // and then use that key to return a default TTenant instance.
                 return _defaultNullShell;
             }
-            return new TenantShell<TTenant>(tenant);
+            return new TenantShell<TTenant>(tenant, identifier);
         }
     }
 }

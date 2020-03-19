@@ -1,6 +1,5 @@
 ﻿using Dotnettency.Container;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -59,8 +58,8 @@ namespace Dotnettency
             // aspnet core options system, that can do things like change notifications etc.
             SetGenericOptionsProvider(typeof(BasicOptionsProvider<>));
 
-            // Default startegy just always uses the tenant shell factory registered with di.
-            InitialiseTenantStrategy<DefaultTenantShellFactoryStrategy<TTenant>>();
+            //// Default startegy just always uses the tenant shell factory registered with di.
+            //InitialiseTenantStrategy<DefaultTenantShellFactoryStrategy<TTenant>>();
         }
 
         public Func<IServiceProvider> ServiceProviderFactory { get; set; }
@@ -86,7 +85,7 @@ namespace Dotnettency
         }
 
        
-        public MultitenancyOptionsBuilder<TTenant> IdentifyFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
+        public MultitenancyOptionsBuilder<TTenant> MapFromHttpContext<TKey>(Action<MapRequestOptionsBuilder<TTenant, TKey>> configureOptions)
         {
             var optionsBuilder = new MapRequestOptionsBuilder<TTenant, TKey>(this);
             configureOptions?.Invoke(optionsBuilder);
@@ -100,68 +99,63 @@ namespace Dotnettency
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantsWith<T>()
+        public MultitenancyOptionsBuilder<TTenant> Identify<T>()
             where T : class, ITenantIdentifierFactory<TTenant>
         {
             Services.AddSingleton<ITenantIdentifierFactory<TTenant>, T>();
             return this;
-        }
-
-        /// <summary>
-        /// Identify tenants based on the Request Authority Uri.  
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantsWithRequestAuthorityUri()
-        {
-            IdentifyTenantsWith<RequestAuthorityTenantIdentifierFactory<TTenant>>();
-            return this;
-        }
+        }              
 
         
-        public MultitenancyOptionsBuilder<TTenant> IdentifyTenantTask(Func<Task<TenantIdentifier>> factory)
+        public MultitenancyOptionsBuilder<TTenant> Identify(Func<Task<TenantIdentifier>> factory)
         {
             var delegateFactory = new DelegateTenantIdentifierFactory<TTenant>(factory);
             Services.AddSingleton<ITenantIdentifierFactory<TTenant>>(delegateFactory);
             return this;
         }
 
-        public MultitenancyOptionsBuilder<TTenant> InitialiseTenantStrategy<T>()
-           where T : class, ITenantShellFactoryStrategy<TTenant>
+        public MultitenancyOptionsBuilder<TTenant> InitialiseShell(Func<TenantIdentifier, TenantShell<TTenant>> factoryFunc)
         {
-            Services.AddScoped<ITenantShellFactoryStrategy<TTenant>, T>();
+            Services.AddSingleton<ITenantShellFactory<TTenant>>(new DelegateTenantShellFactory<TTenant>(factoryFunc));
             return this;
         }
 
-        public MultitenancyOptionsBuilder<TTenant> InitialiseTenantStrategy<TDependency>(Func<TDependency, Type> chooseFactoryType)
-        {
-            Services.AddScoped<ITenantShellFactoryStrategy<TTenant>>(sp =>
-            {
-                return new SelectTypeTenantShellFactoryStrategy<TDependency, TTenant>(sp, chooseFactoryType);
-            });
-            return this;
-        }
+        //public MultitenancyOptionsBuilder<TTenant> InitialiseTenantStrategy<T>()
+        //   where T : class, ITenantShellFactoryStrategy<TTenant>
+        //{
+        //    Services.AddScoped<ITenantShellFactoryStrategy<TTenant>, T>();
+        //    return this;
+        //}
+
+        //public MultitenancyOptionsBuilder<TTenant> InitialiseTenantStrategy<TDependency>(Func<TDependency, Type> chooseFactoryType)
+        //{
+        //    Services.AddScoped<ITenantShellFactoryStrategy<TTenant>>(sp =>
+        //    {
+        //        return new SelectTypeTenantShellFactoryStrategy<TDependency, TTenant>(sp, chooseFactoryType);
+        //    });
+        //    return this;
+        //}
 
 
-        public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>()
-            where T : class, ITenantShellFactory<TTenant>
-        {
-            Services.AddScoped<ITenantShellFactory<TTenant>, T>();
-            return this;
-        }
+        //public MultitenancyOptionsBuilder<TTenant> InitialiseTenantShell<T>()
+        //    where T : class, ITenantShellFactory<TTenant>
+        //{
+        //    Services.AddScoped<ITenantShellFactory<TTenant>, T>();
+        //    return this;
+        //}
 
-        public MultitenancyOptionsBuilder<TTenant> InitialiseTenant<T>(T factory)
-           where T : class, ITenantShellFactory<TTenant>
-        {
-            Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);
-            return this;
-        }
+        //public MultitenancyOptionsBuilder<TTenant> InitialiseTenantShell<T>(T factory)
+        //   where T : class, ITenantShellFactory<TTenant>
+        //{
+        //    Services.AddSingleton<ITenantShellFactory<TTenant>>(factory);
+        //    return this;
+        //}
 
-        public MultitenancyOptionsBuilder<TTenant> InitialiseTenant(Func<TenantIdentifier, TenantShell<TTenant>> factoryMethod)
-        {
-            var factory = new DelegateTenantShellFactory<TTenant>(factoryMethod);
-            return InitialiseTenant(factory);
-        }      
+        //public MultitenancyOptionsBuilder<TTenant> InitialiseTenantShell(Func<TenantIdentifier, TenantShell<TTenant>> factoryMethod)
+        //{
+        //    var factory = new DelegateTenantShellFactory<TTenant>(factoryMethod);
+        //    return InitialiseTenantShell(factory);
+        //}      
 
     }
 }

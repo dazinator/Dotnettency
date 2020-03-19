@@ -18,10 +18,7 @@ namespace Sample.Pages
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
-                
+                });                
         }
     }
-
 }
-

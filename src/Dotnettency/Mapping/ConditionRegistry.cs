@@ -7,14 +7,11 @@ namespace Dotnettency
     {
 
         private IDictionary<string, Func<bool>> _conditions;
-        //private readonly IServiceProvider _sp;
-
         internal IServiceProvider ServiceProvider { get; set; }
 
         public ConditionRegistry()
         {
             _conditions = new Dictionary<string, Func<bool>>();
-            //_sp = sp;
         }
 
         public void Add(string name, bool conditionValue)

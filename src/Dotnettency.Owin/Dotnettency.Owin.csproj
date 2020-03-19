@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
+    <ProjectReference Include="..\Dotnettency.Configuration.Options\Dotnettency.Configuration.Options.csproj" />
   </ItemGroup>
 
 </Project>

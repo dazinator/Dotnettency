@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 namespace Dotnettency
@@ -6,17 +7,17 @@ namespace Dotnettency
     public class TenantShellAccessor<TTenant> : ITenantShellAccessor<TTenant>
         where TTenant : class
     {
-        private readonly ITenantShellFactoryStrategy<TTenant> _tenantFactoryStrategy;
+        //  private readonly ITenantShellFactoryStrategy<TTenant> _tenantFactoryStrategy;
         private readonly TenantIdentifierAccessor<TTenant> _tenantDistinguisherAccessor;
-        private readonly ITenantShellResolver<TTenant> _tenantResolver;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ITenantShellResolver<TTenant> _tenantShellResolver;
 
-        public TenantShellAccessor(ITenantShellFactoryStrategy<TTenant> tenantFactoryStrategy,
-            TenantIdentifierAccessor<TTenant> tenantDistinguisherAccessor,
-            ITenantShellResolver<TTenant> tenantResolver)
+        public TenantShellAccessor(
+            TenantIdentifierAccessor<TTenant> tenantDistinguisherAccessor, ITenantShellResolver<TTenant> shellResolver, IServiceProvider serviceProvider)
         {
-            _tenantFactoryStrategy = tenantFactoryStrategy;
             _tenantDistinguisherAccessor = tenantDistinguisherAccessor;
-            _tenantResolver = tenantResolver;
+            _serviceProvider = serviceProvider;
+            _tenantShellResolver = shellResolver;
 
             CurrentTenantShell = new Lazy<Task<TenantShell<TTenant>>>(async () =>
             {
@@ -25,8 +26,14 @@ namespace Dotnettency
                 {
                     return null;
                 }
-                var tenantShellFactory = _tenantFactoryStrategy.GetTenantShellFactory(identifier); // pass identifier so this can be used to return potentially different shell factories.
-                return await _tenantResolver.ResolveTenantShell(identifier, tenantShellFactory);
+
+                return await _tenantShellResolver.ResolveTenantShell(identifier, () =>
+                {
+                    // We don't inject this in the construcotr because we only need this dependency if we have to intiialise a new tenant on a cache miss,
+                    // and we have optiised for the typical case - i.e we usually won't have to do this very often.
+                    ITenantShellFactory<TTenant> shellFactory = serviceProvider.GetRequiredService<ITenantShellFactory<TTenant>>();
+                    return shellFactory;
+                });
             });
         }
 

@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
+    <ProjectReference Include="..\Dotnettency.DotNetGlob\Dotnettency.DotNetGlob.csproj" />
     <ProjectReference Include="..\Dotnettency.Owin\Dotnettency.Owin.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>

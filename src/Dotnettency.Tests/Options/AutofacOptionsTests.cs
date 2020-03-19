@@ -104,9 +104,8 @@ namespace Dotnettency.Tests
             IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .IdentifyTenantTask(async () =>
+                    .Identify(async () =>
                     {
-
                         if (isTenantA)
                         {
                             return new TenantIdentifier(new Uri("unittest://tenanta"));
@@ -116,16 +115,16 @@ namespace Dotnettency.Tests
                             return new TenantIdentifier(new Uri("unittest://tenantb"));
                         }
 
-                    })
+                    })                   
                     .AddAspNetCore()
-                    .InitialiseTenant(tenantId =>
+                    .InitialiseShell(tenantId =>
                     {
                         if (tenantId.Uri.Scheme != "unittest")
                         {
                             throw new ArgumentException();
                         }
 
-                        return new TenantShell<Tenant>(new Tenant() { Name = tenantId.Uri.Host });
+                        return new TenantShell<Tenant>(new Tenant() { Name = tenantId.Uri.Host }, tenantId);
                     })
                     .ConfigureTenantConfiguration((t, b) =>
                     {
@@ -133,7 +132,6 @@ namespace Dotnettency.Tests
                         b.SetBasePath(basePath);
                         b.AddJsonFile($"appsettings-{t.Tenant.Name}.json");
                     })
-
                     .ConfigureTenantContainers((containerBuilder) =>
                     {
                         // var defaultServices = services.RemoveOptions();
@@ -247,9 +245,8 @@ namespace Dotnettency.Tests
             IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .IdentifyTenantTask(async () =>
+                    .Identify(async () =>
                     {
-
                         if (isTenantA)
                         {
                             return new TenantIdentifier(new Uri("unittest://tenanta"));
@@ -261,14 +258,14 @@ namespace Dotnettency.Tests
 
                     })
                     .AddAspNetCore()
-                    .InitialiseTenant(tenantId =>
+                    .InitialiseShell(tenantId =>
                     {
                         if (tenantId.Uri.Scheme != "unittest")
                         {
                             throw new ArgumentException();
                         }
 
-                        return new TenantShell<Tenant>(new Tenant() { Name = tenantId.Uri.Host });
+                        return new TenantShell<Tenant>(new Tenant() { Name = tenantId.Uri.Host }, tenantId);
                     })
                     .ConfigureTenantConfiguration((t, b) =>
                     {
@@ -404,7 +401,7 @@ namespace Dotnettency.Tests
             IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
-                    .IdentifyTenantTask(async () =>
+                    .Identify(async () =>
                     {
 
                         if (isTenantA)
@@ -418,14 +415,14 @@ namespace Dotnettency.Tests
 
                     })
                     .AddAspNetCore()
-                    .InitialiseTenant(tenantId =>
+                   .InitialiseShell(tenantId =>
                     {
                         if (tenantId.Uri.Scheme != "unittest")
                         {
                             throw new ArgumentException();
                         }
 
-                        return new TenantShell<Tenant>(new Tenant() { Name = tenantId.Uri.Host });
+                        return new TenantShell<Tenant>(new Tenant() { Name = tenantId.Uri.Host }, tenantId);
                     })
                     .ConfigureTenantConfiguration((t, b) =>
                     {
@@ -571,7 +568,8 @@ namespace Dotnettency.Tests
                 var tConfig = tenantConfig.Result;
 
 
-                registeredoptions.OnChange<MyOptions>((a) => {
+                registeredoptions.OnChange<MyOptions>((a) =>
+                {
                     Console.WriteLine("Options Montior On Change..");
 
                 });

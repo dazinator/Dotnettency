@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dazinator.Extensions.Options.Updatable" Version="2.1.0-alpha.25" />
+    <PackageReference Include="Dazinator.Extensions.Options.Updatable" Version="2.1.0-alpha.27" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />

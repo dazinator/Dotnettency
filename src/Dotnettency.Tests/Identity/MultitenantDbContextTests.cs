@@ -32,22 +32,27 @@ namespace Dotnettency.Tests
             {
                 multitenancyOptions
                 .AddAspNetCore()
-                .IdentifyTenantTask(() =>
+                .MapFromHttpContext<int>((builder) =>
                 {
-                    var t = tenantToReturn;
-                    return Task.FromResult(new TenantIdentifier(new Uri(t)));
-                })
-                .InitialiseTenant((t) =>
-                {
-                    if(t.Uri.Host=="foo.com")
+                    builder.MapRequestHost()
+                    .WithMapping((tenants) =>
                     {
-                        return new TenantShell<Tenant>(new Tenant() { Id = 1 });
-                    }
-                    else
+                        tenants.Add(1, "*.foo.com")
+                               .Add(2, "**");
+                    })
+                    .UsingDotNetGlobPatternMatching()
+                    .Factory(key =>
                     {
-                        return new TenantShell<Tenant>(new Tenant() { Id = 2 });
-                    }
-                });
+                        if (key == 1)
+                        {
+                            return Task.FromResult(new Tenant() { Id = 1 });
+                        }
+                        else
+                        {
+                            return Task.FromResult(new Tenant() { Id = 2 });
+                        }
+                    });
+                });               
             });
 
 
@@ -70,7 +75,7 @@ namespace Dotnettency.Tests
             }
 
             // switch tenant
-            tenantToReturn = "http://bar.com";           
+            tenantToReturn = "http://bar.com";
             using (var scope = sp.CreateScope())
             {
                 // role should not exist for this tenant
@@ -82,7 +87,7 @@ namespace Dotnettency.Tests
                 // Create role with the same name but for this tenant - should succeed.
                 var role = new Role() { Name = "Foo", NormalizedName = "Foo" };
                 var result = await roleManager.CreateAsync(role);
-               
+
                 newRole = await roleManager.Roles.FirstOrDefaultAsync(a => a.Name == "Foo");
                 Assert.NotNull(newRole);
             }

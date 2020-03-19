@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -43,7 +44,7 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .IdentifyFromHttpContext<int>((m) =>
+                .MapFromHttpContext<int>((m) =>
                 {
                     m.MapRequestHost()
                      .WithMapping((tenants) =>
@@ -100,7 +101,7 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .IdentifyFromHttpContext<int>((m) =>
+                .MapFromHttpContext<int>((m) =>
                 {
                     m.MapRequestHost()
                      .UsingDotNetGlobPatternMatching();
@@ -156,13 +157,17 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .IdentifyFromHttpContext<int>((m) =>
+                .MapFromHttpContext<int>((m) =>
                 {
                     m.MapRequestHost()
                     .WithMapping((a) =>
                     {
-                        a.Add(-1, new string[] { "**" }, "IsSetupComplete", false);
-                        a.Add(1, new string[] { "*.foo.com", "*.foo.uk" });
+                        a.Add(key: -1,
+                              patterns: new string[] { "**" },
+                              conditionName: "IsSetupComplete", false);
+
+                        a.Add(key: 1, 
+                              patterns: new string[] { "*.foo.com", "*.foo.uk" });
                     })
                     .RegisterConditions((c) =>
                     {
@@ -170,6 +175,10 @@ namespace Dotnettency.Tests
                         {
                             return setupComplete;
                         });
+                    })
+                    .NamedFactories(a =>
+                    {
+
                     })
                      .UsingDotNetGlobPatternMatching();
                 });

@@ -73,8 +73,15 @@ namespace Sample.Owin.SelfHost
             var sp = services.AddMultiTenancy<Tenant>((builder) =>
              {
                  builder.AddOwin()
-                        .IdentifyTenantsWithRequestAuthorityUri()
-                        .InitialiseTenant<TenantShellFactory>()
+                         .MapFromHttpContext<int>((m) =>
+                         {
+                             m.MapRequestHost()
+                              .WithMapping((tenants) =>
+                              {
+                                  tenants.Add(1, "t1.foo.com", "t1.foo.uk");
+                              })
+                              .UsingDotNetGlobPatternMatching();
+                         })
                         .ConfigureTenantContainers((containerOptions) =>
                         {
                             containerOptions.Autofac((tenantContext, tenantServices) =>
