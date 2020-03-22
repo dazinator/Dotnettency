@@ -9,14 +9,17 @@ namespace Dotnettency
         private readonly Func<bool> _checkIsEnabled;
         private readonly IEnumerable<IPatternMatcher> _patterns;
 
-        public TenantPatternMatcher(TKey key, Func<bool> checkIsEnabled, IEnumerable<IPatternMatcher> patterns)
+        public TenantPatternMatcher(TKey key, Func<bool> checkIsEnabled, IEnumerable<IPatternMatcher> patterns, string factoryName)
         {
             Key = key;
             _checkIsEnabled = checkIsEnabled;
             _patterns = patterns;
+            FactoryName = factoryName;
         }
 
         public TKey Key { get; }
+
+        public string FactoryName { get; }
 
         public bool IsEnabled()
         {

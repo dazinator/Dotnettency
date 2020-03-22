@@ -2,6 +2,11 @@
 {
     public interface IPatternMatcher
     {
-        bool IsMatch(string testValue);
+        bool IsMatch(string testValue);     
+    }
+
+    public interface ITenantPatternMatcher : IPatternMatcher
+    {
+        string FactoryName { get; }
     }
 }

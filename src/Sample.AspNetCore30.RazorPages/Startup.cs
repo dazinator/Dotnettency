@@ -47,29 +47,29 @@ namespace Sample.Pages
                         //.IdentifyTenantsWithRequestAuthorityUri()
                         //.InitialiseTenant<TenantShellFactory>()
                         .AddAspNetCore()
-                        .MapFromHttpContext<int>((m) =>
+                        .Map<int>((m) =>
                            {
-                               m.MapValue(http => http.Request.GetUri().Port.ToString())
-                                .UsingDotNetGlobPatternMatching()
-                                .Factory(key =>
-                                {
-                                    Tenant result = null;
-                                    switch (key)
-                                    {
-                                        case 1:
-                                            result = new Tenant(Guid.Parse("049c8cc4-3660-41c7-92f0-85430452be22")) { Name = "Gicrosoft" };
-                                            break;
-                                        case 2:
-                                            result = new Tenant(Guid.Parse("b17fcd22-0db1-47c0-9fef-1aa1cb09605e")) { Name = "Moogle" };
-                                            break;
-                                        case 3:
-                                            result = null;
-                                            break;
-
-                                    }
-                                    return Task.FromResult(result);
-                                });
+                               m.SelectValue(http => http.Request.GetUri().Port.ToString())
+                                .UsingDotNetGlobPatternMatching();
                            })
+                        .Get(key =>
+                        {
+                            Tenant result = null;
+                            switch (key)
+                            {
+                                case 1:
+                                    result = new Tenant(Guid.Parse("049c8cc4-3660-41c7-92f0-85430452be22")) { Name = "Gicrosoft" };
+                                    break;
+                                case 2:
+                                    result = new Tenant(Guid.Parse("b17fcd22-0db1-47c0-9fef-1aa1cb09605e")) { Name = "Moogle" };
+                                    break;
+                                case 3:
+                                    result = null;
+                                    break;
+
+                            }
+                            return Task.FromResult(result);
+                        })
                         .ConfigureNamedTenantFileSystems((namedItems) =>
                         {
                             var contentFileProvider = Environment.ContentRootFileProvider;
@@ -134,7 +134,7 @@ namespace Sample.Pages
                                         .AddDebug());
                                     }
                                     else
-                                    
+
                                     {
                                         tenantServices.AddLoggingFactory(b => b.ClearProviders().SetMinimumLevel(LogLevel.Information));
                                     }
@@ -146,8 +146,8 @@ namespace Sample.Pages
                         {
                             tenantOptions.AspNetCorePipelineTask(async (context, tenantAppBuilder) =>
                             {
-                                
-                                
+
+
                                 var tenantConfig = await context.GetConfiguration();
                                 var someTenantConfigSetting = tenantConfig.GetValue<bool>("SomeSetting");
                                 if (someTenantConfigSetting)
@@ -180,7 +180,7 @@ namespace Sample.Pages
                                 tenantAppBuilder.Use(async (c, next) =>
                                 {
                                     var logger = c.RequestServices.GetRequiredService<ILogger<Startup>>();
-                                    
+
                                     logger.LogDebug("Debug log in middleware.");
                                     // This is some middleware running in the tenant pipeline.
                                     Console.WriteLine("Running in tenant pipeline: " + context.Tenant?.Name);

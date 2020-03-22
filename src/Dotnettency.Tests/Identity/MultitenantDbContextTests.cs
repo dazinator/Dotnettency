@@ -32,27 +32,21 @@ namespace Dotnettency.Tests
             {
                 multitenancyOptions
                 .AddAspNetCore()
-                .MapFromHttpContext<int>((builder) =>
+                .SetMockHttpContextProvider(()=>new Uri(tenantToReturn))
+                .Map<int>((builder) =>
                 {
-                    builder.MapRequestHost()
+                    builder.SelectRequestHost()
                     .WithMapping((tenants) =>
                     {
-                        tenants.Add(1, "*.foo.com")
-                               .Add(2, "**");
+                        tenants.Add(1, "foo.com")
+                               .Add(2, "bar.com");
                     })
-                    .UsingDotNetGlobPatternMatching()
-                    .Factory(key =>
-                    {
-                        if (key == 1)
-                        {
-                            return Task.FromResult(new Tenant() { Id = 1 });
-                        }
-                        else
-                        {
-                            return Task.FromResult(new Tenant() { Id = 2 });
-                        }
-                    });
-                });               
+                    .UsingDotNetGlobPatternMatching();
+                })
+                 .Get(key =>
+                 {
+                     return Task.FromResult(new Tenant() { Id = key });                     
+                 });
             });
 
 

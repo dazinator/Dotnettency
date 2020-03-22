@@ -1,13 +1,10 @@
 ﻿using DotNet.Globbing;
-using Dotnettency.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Dotnettency
 {
-   
-
     public class DotNetGlobTenantMatcherFactory<TKey> : ITenantMatcherFactory<TKey>
     {
         private readonly ConditionRegistry _conditionRegistry;
@@ -27,13 +24,11 @@ namespace Dotnettency
                 var key = item.Key;             
                 var patterns = item.Patterns.Select(a => (IPatternMatcher)new GlobPattern(a, caseInsensitiveGlobOptions));
                 Func<bool> checkIsEnabled = _conditionRegistry.GetEvaluateCondition(item.Condition?.Name, item.Condition?.RequiredValue ?? false);               
-                var tenantPatterMatcher = new TenantPatternMatcher<TKey>(key, checkIsEnabled, patterns);
+                var tenantPatterMatcher = new TenantPatternMatcher<TKey>(key, checkIsEnabled, patterns, item.FactoryName);
                 matchers.Add(tenantPatterMatcher);
             }
 
             return matchers.AsEnumerable();
         }       
-    }
-
-   
+    }   
 }

@@ -30,9 +30,9 @@ namespace Sample.RazorPagesTest
                   builder//.IdentifyTenantsWithRequestAuthorityUri()
                         // .InitialiseTenantShell<TenantShellFactory>()
                           .AddAspNetCore()
-                          .MapFromHttpContext<int>((m) =>
+                          .Map<int>((m) =>
                           {
-                              m.MapRequestHost()
+                              m.SelectRequestHost()
                                .WithMapping((tenants) =>
                                {
                                    tenants.Add(1, "t1.foo.com", "t1.foo.uk");

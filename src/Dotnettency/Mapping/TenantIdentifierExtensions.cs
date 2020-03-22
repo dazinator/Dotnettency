@@ -21,5 +21,10 @@ namespace Dotnettency
         {
             return string.IsNullOrWhiteSpace(keyString) || keyString == "/";
         }
+
+        public static TenantIdentifier ToTenantIdentifier<TKey>(this TKey key)
+        {
+            return new TenantIdentifier(new System.Uri($"key://{typeof(TKey).Name}/{key}"));
+        }
     }
 }

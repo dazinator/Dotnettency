@@ -44,9 +44,9 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .MapFromHttpContext<int>((m) =>
+                .Map<int>((m) =>
                 {
-                    m.MapRequestHost()
+                    m.SelectRequestHost()
                      .WithMapping((tenants) =>
                      {
                          tenants.Add(1, "t1.foo.com", "t1.foo.uk");
@@ -101,9 +101,9 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .MapFromHttpContext<int>((m) =>
+                .Map<int>((m) =>
                 {
-                    m.MapRequestHost()
+                    m.SelectRequestHost()
                      .UsingDotNetGlobPatternMatching();
                 });
             });
@@ -157,16 +157,16 @@ namespace Dotnettency.Tests
 
                 })
                 .SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>))
-                .MapFromHttpContext<int>((m) =>
+                .Map<int>((m) =>
                 {
-                    m.MapRequestHost()
+                    m.SelectRequestHost()
                     .WithMapping((a) =>
                     {
                         a.Add(key: -1,
                               patterns: new string[] { "**" },
                               conditionName: "IsSetupComplete", false);
 
-                        a.Add(key: 1, 
+                        a.Add(key: 1,
                               patterns: new string[] { "*.foo.com", "*.foo.uk" });
                     })
                     .RegisterConditions((c) =>
@@ -176,15 +176,25 @@ namespace Dotnettency.Tests
                             return setupComplete;
                         });
                     })
-                    .NamedFactories(a =>
-                    {
-
-                    })
                      .UsingDotNetGlobPatternMatching();
-                });
+                })
+                 .Get(async a =>
+                 {
+                     return new Tenant();
+                 });
             });
 
-            var sp = services.BuildServiceProvider();
+            IServiceProvider sp = null;
+            try
+            {
+                sp = services.BuildServiceProvider();
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+
             var sut = sp.GetRequiredService<ITenantIdentifierFactory<Tenant>>();
 
             var identfier = await sut.IdentifyTenant();

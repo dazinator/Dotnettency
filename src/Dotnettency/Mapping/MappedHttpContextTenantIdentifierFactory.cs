@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Dotnettency
 {
@@ -44,10 +45,10 @@ namespace Dotnettency
             _lazyTenantMatchers = new Lazy<IEnumerable<TenantPatternMatcher<TKey>>>(() => _matcherFactory.LoadPaternMatchers(opts));
         }
 
-        protected static TenantIdentifier CreateIdentifier(TKey value)
+        protected static TenantIdentifier CreateIdentifier(TKey value, string factoryName)
         {
             var ident = new Uri(string.Format(identifierFormatString, value.ToString()));
-            return new TenantIdentifier(ident);
+            return new TenantIdentifier(ident) { FactoryName = factoryName };
         }
 
         protected override TenantIdentifier GetTenantIdentifier(HttpContextBase context)
@@ -64,7 +65,7 @@ namespace Dotnettency
 
                     // we've mapped this url to a particular tenant's key.
                     // store the key in the identifiers URI Path.
-                    return CreateIdentifier(tenantMatcher.Key);
+                    return CreateIdentifier(tenantMatcher.Key, tenantMatcher.FactoryName);
                 }
             }
 

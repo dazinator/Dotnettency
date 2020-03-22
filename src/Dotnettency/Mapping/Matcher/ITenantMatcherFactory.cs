@@ -1,5 +1,4 @@
-﻿using Dotnettency.Mapping;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Dotnettency
 {
@@ -7,4 +6,5 @@ namespace Dotnettency
     {
         IEnumerable<TenantPatternMatcher<TKey>> LoadPaternMatchers(TenantMappingOptions<TKey> options);
     }
+
 }

@@ -5,55 +5,41 @@ using System.Threading.Tasks;
 
 namespace Dotnettency
 {
-    //public static class NamedRegistryExtensions
-    //{
-    //    public NamedServiceRegistry<TService> AddDefault<TService>(this NamedServiceRegistry<TService> registry)
-    //    {
-    //        registry.add
-    //    }
-    //}
-
     public class MapRequestOptionsBuilder<TTenant, TKey>
         where TTenant : class
     {
         private readonly MultitenancyOptionsBuilder<TTenant> _builder;
         private readonly ConditionRegistry _conditions = new ConditionRegistry();
-        // private readonly TenantFactoryRegistry<TTenant, TKey> _tenantFactoryTypes = new TenantFactoryRegistry<TTenant, TKey>();
 
         public MapRequestOptionsBuilder(MultitenancyOptionsBuilder<TTenant> builder)
         {
             _builder = builder;
             Identify<MappedHttpContextTenantIdentifierFactory<TTenant, TKey>>();
-            InitialiseShell<MappedTenantShellFactory<TTenant, TKey>>();
+            SetPatternMatcherFactory<DefaultTenantMatcherFactory<TKey>>();
         }
 
-        public MapRequestOptionsBuilder<TTenant, TKey> Identify(Func<Task<TenantIdentifier>> factory)
-        {
-            _builder.Identify(factory);
-            return this;
-        }
-
-
-        public MapRequestOptionsBuilder<TTenant, TKey> Identify<TIdentifierFactory>()
+        private MapRequestOptionsBuilder<TTenant, TKey> Identify<TIdentifierFactory>()
             where TIdentifierFactory : MappedHttpContextTenantIdentifierFactory<TTenant, TKey>
         {
             _builder.Identify<TIdentifierFactory>();
             return this;
         }
 
-        public MapRequestOptionsBuilder<TTenant, TKey> MapValue(Func<HttpContextBase, string> selectValue)
+        public IServiceCollection Services { get { return _builder.Services; } }
+
+        public MapRequestOptionsBuilder<TTenant, TKey> SelectValue(Func<HttpContextBase, string> selectValue)
         {
             var instance = new HttpContextValueSelectorFunc(selectValue);
             _builder.Services.AddSingleton<IHttpContextValueSelector>(instance);
             return this;
         }
 
-        public MapRequestOptionsBuilder<TTenant, TKey> MapRequestHost()
+        public MapRequestOptionsBuilder<TTenant, TKey> SelectRequestHost()
         {
-            return MapValue<HostValueSelector>();
+            return SelectValue<HostValueSelector>();
         }
 
-        public MapRequestOptionsBuilder<TTenant, TKey> MapValue<TValueSelector>()
+        public MapRequestOptionsBuilder<TTenant, TKey> SelectValue<TValueSelector>()
             where TValueSelector : class, IHttpContextValueSelector
         {
             _builder.Services.AddSingleton<IHttpContextValueSelector, TValueSelector>();
@@ -67,52 +53,39 @@ namespace Dotnettency
             return this;
         }
 
-        public IServiceCollection Services { get { return _builder.Services; } }
-
-        public MapRequestOptionsBuilder<TTenant, TKey> InitialiseShell<TTenantShellFactory>()
-            where TTenantShellFactory : MappedTenantShellFactory<TTenant, TKey>
-        {
-            Services.AddScoped<ITenantShellFactory<TTenant>, TTenantShellFactory>();
-            return this;
-        }      
-
-
-        ///// <summary>
-        ///// Select a tenant shell factory to use to initialise the tenant's shell, based on the key value, of the key mapped to this request.
-        ///// </summary>
-        ///// <param name="factory"></param>
-        ///// <returns>return null will result in the default <see cref="ITenantShellFactory{TTenant}"/> being used. Return the type of an alternative one to use to override it.</returns>
-        //public MapRequestOptionsBuilder<TTenant, TKey> OverrideInitialise(Func<TKey, Type> factory)
-        //{
-        //    Services.AddScoped<ITenantShellFactoryStrategy<TTenant>>(sp =>
-        //    {
-        //        var defaultFactory = sp.GetRequiredService<ITenantShellFactory<TTenant>>();
-        //        return new SelectTenantShellTypeFromKeyFactoryStrategy<TKey, TTenant>(sp, defaultFactory, factory);
-        //    });
-        //    return this;
-        //}
-
         public MapRequestOptionsBuilder<TTenant, TKey> RegisterConditions(Action<ConditionRegistry> registerConditions)
         {
             registerConditions(_conditions);
             return this;
         }
+              
+        ///// <summary>
+        ///// Register a default factory Func that will be used to create TTenant instance.
+        ///// </summary>
+        ///// <param name="getTenant"></param>
+        ///// <returns></returns>
+        //public MapRequestOptionsBuilder<TTenant, TKey> TenantFactory<TTenantFactory>(ServiceLifetime lifetime = ServiceLifetime.Scoped, Func<TKey, Task<TTenant>> getTenant = null)
+        //    where TTenantFactory : TenantFactory<TTenant, TKey>
+        //{
+        //    // default named factory (I.e no name) that NamedFactoryTenantShellFactory uses by default to create TTenant instances.
+        //    ServiceDescriptor descriptor = null;
+        //    if (getTenant == null)
+        //    {
+        //        descriptor = new ServiceDescriptor(typeof(TenantFactory<TTenant>), typeof(TTenantFactory), lifetime);
+        //    }
+        //    else
+        //    {
+        //        var fact = new Func<IServiceProvider, TenantFactory<TTenant, TKey>>(sp =>
+        //        {
+        //            var delegateFactory = new DelegateTenantFactory<TTenant, TKey>(getTenant);
+        //            return delegateFactory;
+        //        });
 
-        public MapRequestOptionsBuilder<TTenant, TKey> NamedFactories(Action<NamedServiceRegistry<TenantFactory<TTenant, TKey>>> registerTenantFactories)
-        {
-            _builder.Services.AddNamed<TenantFactory<TTenant, TKey>>(registerTenantFactories);
-            return this;
-        }
-
-        public MapRequestOptionsBuilder<TTenant, TKey> Factory(Func<TKey, Task<TTenant>> getTenant)
-        {
-            Services.AddScoped<TenantFactory<TTenant, TKey>>(sp =>
-            {
-                var delegateFactory = new DelegateTenantFactory<TTenant, TKey>(getTenant);
-                return delegateFactory;
-            });
-            return this;
-        }
+        //        descriptor = new ServiceDescriptor(typeof(TenantFactory<TTenant>), fact, lifetime);
+        //    }
+        //    Services.Add(descriptor);
+        //    return this;
+        //}
 
         public void Build()
         {
@@ -122,7 +95,5 @@ namespace Dotnettency
                 return _conditions;
             });
         }
-
-
     }
 }
