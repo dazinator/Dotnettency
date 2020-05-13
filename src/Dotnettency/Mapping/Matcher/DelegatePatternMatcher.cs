@@ -13,7 +13,7 @@ namespace Dotnettency
         }
 
 
-       // public string FactoryName { get; }
+        public string FactoryName { get; }
 
         public bool IsMatch(string testValue)
         {
