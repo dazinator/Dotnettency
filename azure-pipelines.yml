@@ -22,13 +22,6 @@ steps:
   displayName: gitversion
 
 - task: UseDotNet@2
-  displayName: 'Install .net core sdk 2.1.x'
-  inputs:
-    packageType: sdk    
-    version: 2.1.x
-    installationPath: $(Agent.ToolsDirectory)/dotnet
-
-- task: UseDotNet@2
   displayName: 'Use .NET Core sdk'
   inputs:
     packageType: sdk    
@@ -50,15 +43,16 @@ steps:
   inputs:
     command: build
     projects: '$(solution)'
-    configuration: '$(buildConfiguration)'
-    versioningScheme: byEnvVar
-    versionEnvVar: 'GitVersion.SemVer'
+    arguments: '--configuration $(buildConfiguration) --no-restore -p:ContinuousIntegrationBuild=true -p:InformationalVersion=$(GitVersion.SemVer) -p:PackageVersion=$(GitVersion.SemVer)'
+    versioningScheme: off
 
 - task: DotNetCoreCLI@2
   inputs: 
     command: 'pack'    
     versioningScheme: byEnvVar
     versionEnvVar: 'GitVersion.SemVer'
+    nobuild: true
+    arguments: '--configuration $(buildConfiguration)'
     
 - task: NuGetCommand@2
   inputs:
