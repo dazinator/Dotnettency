@@ -28,8 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dazinator.Extensions.Options.Updatable" Version="2.1.0-alpha.25" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
     
@@ -52,6 +51,10 @@
     <ProjectReference Include="..\Dotnettency.DotNetGlob\Dotnettency.DotNetGlob.csproj" />
     <ProjectReference Include="..\Dotnettency.EFCore.Identity\Dotnettency.EFCore.Identity.csproj" />
     <ProjectReference Include="..\Dotnettency.EFCore\Dotnettency.EFCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

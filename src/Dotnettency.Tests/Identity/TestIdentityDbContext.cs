@@ -87,24 +87,18 @@ namespace Dotnettency.Tests
                 //  b.ToTable("AspNetUserRoles");
             });
 
-
-            //builder.ApplyConfiguration(new UpgradeJournalEntityConfiguration<UpgradeJournal>());
-            //HasTenantIdFilter<UpgradeJournal>(builder, TenantIdPropertyName, (b) => EF.Property<int?>(b, TenantIdPropertyName));
-
-            //This will singularize all table names
-            // ef core 2.2
-            foreach (IMutableEntityType entityType in builder.Model.GetEntityTypes())
-            {
-                entityType.Relational().TableName = entityType.DisplayName();
-            }
-
-            ////  ef core 3.0.0
+            ////This will singularize all table names
+            //// ef core 2.2
             //foreach (IMutableEntityType entityType in builder.Model.GetEntityTypes())
             //{
-            //    entityType.SetTableName(entityType.DisplayName());
+            //    entityType.Relational().TableName = entityType.DisplayName();
             //}
 
-            // SeedAppPermissionsAndRoles(modelBuilder);
+            ////  ef core 3.1.0
+            foreach (IMutableEntityType entityType in builder.Model.GetEntityTypes())
+            {
+                entityType.SetTableName(entityType.DisplayName());
+            }
 
         }
 

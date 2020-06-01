@@ -18,6 +18,7 @@ namespace Dotnettency.Tests
             var services = new ServiceCollection();
             string tenantToReturn = "http://foo.com";
 
+            services.AddLogging();
             services.AddDbContext<TestIdentityDbContext>((options) =>
             {
                 options.UseInMemoryDatabase(nameof(MultitenantDbContextTests));
