@@ -146,9 +146,8 @@ namespace Sample.Pages
                         {
                             tenantOptions.AspNetCorePipelineTask(async (context, tenantAppBuilder) =>
                             {
-                                
-                                
-                                var tenantConfig = await context.GetConfiguration();
+
+                                var tenantConfig = await context.GetConfigurationAsync();                              
                                 var someTenantConfigSetting = tenantConfig.GetValue<bool>("SomeSetting");
                                 if (someTenantConfigSetting)
                                 {

@@ -153,7 +153,7 @@ namespace Dotnettency.Tests
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
                         .AutofacAsync(async (tenant, tenantServices) =>
                         {
-                            var tenantConfig = await tenant.GetConfiguration();
+                            var tenantConfig = await tenant.GetConfigurationAsync();
                             var section = tenantConfig.GetSection("thing");
                             tenantServices.Configure<MyOptions>(section);
 
@@ -317,7 +317,7 @@ namespace Dotnettency.Tests
                             tenantServices.AddOptions();
                             tenantServices.AddOptionsManagerBackedByMonitorCache();
 
-                            var tenantConfig = await tenant.GetConfiguration();
+                            var tenantConfig = await tenant.GetConfigurationAsync();
                             var section = tenantConfig.GetSection("thing");
                             tenantServices.Configure<MyOptions>(section);
                             //var name = Microsoft.Extensions.Options.Options.DefaultName;
@@ -461,7 +461,7 @@ namespace Dotnettency.Tests
                             tenantServices.AddOptions();
                             tenantServices.AddOptionsManagerBackedByMonitorCache();
 
-                            var tenantConfig = await tenant.GetConfiguration();
+                            var tenantConfig = await tenant.GetConfigurationAsync();
                             var section = tenantConfig.GetSection(sectionPath);
                             tenantServices.Configure<MyOptions>(section);
                             //,

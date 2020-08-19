@@ -17,7 +17,8 @@ namespace Dotnettency
              where TTenant : class
         {
 
-            optionsBuilder.ConfigureTenantShellItem<TTenant, IConfiguration>(configureItem);
+            optionsBuilder.ConfigureTenantShellItem<TTenant, Task<IConfiguration>>((a) => Task.FromResult(configureItem(a)));
+           // optionsBuilder.ConfigureTenantShellItem<TTenant, Task<IConfiguration>>(configureItem);
             return optionsBuilder;
         }
 
@@ -40,7 +41,7 @@ namespace Dotnettency
                 return builder.Build();
             };
 
-            optionsBuilder.ConfigureTenantShellItem<TTenant, IConfiguration>(factory);
+            optionsBuilder.ConfigureTenantShellItem<TTenant, Task<IConfiguration>>((a) => Task.FromResult(factory(a)));
             return optionsBuilder;
         }
 
