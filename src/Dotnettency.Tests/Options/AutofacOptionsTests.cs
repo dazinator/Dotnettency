@@ -1,17 +1,14 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Dazinator.Extensions.Options.Updatable;
-using Dotnettency.AspNetCore.Container;
 using Dotnettency.Container;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
