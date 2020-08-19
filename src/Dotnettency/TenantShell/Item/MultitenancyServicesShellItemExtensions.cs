@@ -13,7 +13,8 @@ namespace Dotnettency
         /// <param name="optionsBuilder"></param>
         /// <param name="configureItem"></param>
         /// <returns></returns>
-        public static MultitenancyOptionsBuilder<TTenant> ConfigureTenantShellItem<TTenant, TTItem>(this MultitenancyOptionsBuilder<TTenant> optionsBuilder, Func<TenantShellItemBuilderContext<TTenant>, TTItem> configureItem)
+        public static MultitenancyOptionsBuilder<TTenant> ConfigureTenantShellItem<TTenant, TTItem>(this MultitenancyOptionsBuilder<TTenant> optionsBuilder,
+            Func<TenantShellItemBuilderContext<TTenant>, TTItem> configureItem)
              where TTenant : class
         {
             optionsBuilder.Services.ConfigureTenantShellItem(configureItem);

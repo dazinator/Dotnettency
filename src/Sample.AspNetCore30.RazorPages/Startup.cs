@@ -158,19 +158,21 @@ namespace Sample.Pages
                                 // Check out the ConfigureTenantShellItem<> below.
                                 // You can also inject Task<ExampleShellItem> into controllers etc.
                                 // ExampleShellItem will be lazily constructed only per tenant, or once after a tenant restart.
-                                var exampleShellItem = await context.GetShellItemAsync<ExampleShellItem>();
+                                var exampleShellItemTask = await context.GetShellItemAsync<Task<ExampleShellItem>>();
+                                var exampleShellItem = await exampleShellItemTask;
+
                                 if (exampleShellItem.Colour != "indigo")
                                 {
                                     throw new Exception("wrong named item was retrieved..");
                                 }
 
-                                var redShellItem = await context.GetShellItemAsync<ExampleShellItem>("red");
+                                var redShellItem = await context.GetShellItemAsync<ExampleShellItem>("red");                               
                                 if (redShellItem.Colour != "red")
                                 {
                                     throw new Exception("wrong named item was retrieved..");
                                 }
 
-                                var blueShellItem = await context.GetShellItemAsync<ExampleShellItem>("blue");
+                                var blueShellItem = await context.GetShellItemAsync<ExampleShellItem>("blue");                              
                                 if (blueShellItem.Colour != "blue")
                                 {
                                     throw new Exception("wrong named item was retrieved..");
@@ -218,11 +220,13 @@ namespace Sample.Pages
                                 }
                             });
                         })
-                        .ConfigureTenantShellItem((b) =>
+                        .ConfigureTenantShellItem(async (b) =>
                         {
                             // Example - you can configure your own arbitrary shell items
                             // This item will be lazily constructed once per tenant, and stored in tenant shell, and 
                             // optionally disposed of if tenant is restarted (if implements IDisposable).
+                            var exampleItem1 = await b.GetConfigurationAsync();
+
                             return new ExampleShellItem(b.Tenant?.Name ?? "NULL TENANT") { Colour = "indigo" };
 
 
@@ -288,4 +292,16 @@ namespace Sample.Pages
             });
         }
     }
+
+    public class ExampleShellItem2
+    {
+
+    }
+
+    public class ExampleShellItem3
+    {
+
+    }
+
+   
 }

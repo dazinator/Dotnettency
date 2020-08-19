@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Dotnettency
@@ -34,6 +35,7 @@ namespace Dotnettency
         public static Lazy<Task<TItem>> GetOrAddItem<TTenant, TItem>(this TenantShell<TTenant> tenantShell, Func<Lazy<Task<TItem>>> createLazyAsyncFactory, string name = "")
            where TTenant : class
         {
+
             string key = GetKey<TItem>(name);
             return tenantShell.GetOrAddProperty<Lazy<Task<TItem>>>(key, (s) => createLazyAsyncFactory(), true);
         }
@@ -47,8 +49,17 @@ namespace Dotnettency
 
         private static string GetKey<TItem>(string name = "")
         {
+
             var key = $"{nameof(TenantShellItemExtensions)}-{typeof(TItem).Name}:{name}";
-            return key;
+
+            var type = typeof(TItem);
+            if (type.IsConstructedGenericType)
+            {
+                var genericArgs = type.GenericTypeArguments;
+                var typesKey = string.Join(",", genericArgs.Select(a => a.Name));
+                key = $"{key}-{typesKey}";
+            }
+            return key;       
         }
 
     }
