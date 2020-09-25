@@ -22,7 +22,7 @@ namespace Dotnettency
                 var containerEventsPublisher = container.TryGetInstance<ITenantContainerEventsPublisher<TTenant>>();
                 // add ITenantContainerBuilder<TTenant> service to the host container
                 // This service can be used to build a child container (adaptor) for a particular tenant, when required.
-                var defaultServices = options.DefaultServices;
+                var defaultServices = options.ParentServices;
                 container.Configure(_ =>
                     _.For<ITenantContainerBuilder<TTenant>>()
                         .Use(new DelegateActionTenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher))

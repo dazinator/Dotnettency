@@ -7,17 +7,17 @@ namespace Dotnettency.Container
     public class DelegateTaskTenantContainerBuilder<TTenant> : ITenantContainerBuilder<TTenant>
     where TTenant : class
     {
-        private readonly IServiceCollection _defaultServices;
+        private readonly IServiceCollection _parentServices;
         private readonly ITenantContainerAdaptor _parentContainer;
         private readonly Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> _configureTenant;
         private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
-        public DelegateTaskTenantContainerBuilder(IServiceCollection defaultServices,
+        public DelegateTaskTenantContainerBuilder(IServiceCollection parentServices,
             ITenantContainerAdaptor parentContainer,
             Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> configureTenant,
             ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
         {
-            _defaultServices = defaultServices;
+            _parentServices = parentServices;
             _parentContainer = parentContainer;
             _configureTenant = configureTenant;
             _containerEventsPublisher = containerEventsPublisher;
@@ -26,17 +26,18 @@ namespace Dotnettency.Container
         public async Task<ITenantContainerAdaptor> BuildAsync(TenantShellItemBuilderContext<TTenant> tenantContext)
         {
             var tenantContainer = await _parentContainer.CreateChildContainerAndConfigureAsync("Tenant: " + (tenantContext?.Tenant?.ToString() ?? "NULL").ToString(),
+                _parentServices,
                 async config =>
             {
                 // add default services to tenant container.
                 // see https://github.com/aspnet/AspNetCore/issues/10469 and issues linked with that.
-                if (_defaultServices != null)
-                {
-                    foreach (var item in _defaultServices)
-                    {
-                        config.Add(item);
-                    }
-                }
+                //if (_defaultServices != null)
+                //{
+                //    foreach (var item in _defaultServices)
+                //    {
+                //        config.Add(item);
+                //    }
+                //}
 
                 // As tenantContext.Services is provided from current scope, we prefer that.
                 // otherwise fallback to parent scope (i.e this could mean falling back to application services from current scoped services etc).

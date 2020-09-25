@@ -9,10 +9,10 @@ namespace Dotnettency.Container
         ITenantContainerAdaptor CreateNestedContainer(string Name);
         ITenantContainerAdaptor CreateChildContainer(string Name);
 
-        ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, Action<IServiceCollection> configure);
-        Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, Func<IServiceCollection, Task> configure);
+        ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, IServiceCollection parentServices, Action<IServiceCollection> configure);
+        Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, IServiceCollection parentServices, Func<IServiceCollection, Task> configure);
 
-        ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure);
+        ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name);
 
         /// <summary>
         /// Adding services to an already running / configured container is bad. Safer to treat a created container as immutable.

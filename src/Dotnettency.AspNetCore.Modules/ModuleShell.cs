@@ -36,7 +36,7 @@ namespace Dotnettency.AspNetCore.Modules
 
             if (Options.OnConfigureModuleServices != null)
             {
-                container = container.CreateChildContainerAndConfigure($"Module:{Module?.GetType().Name}", (services) =>
+                container = container.CreateChildContainerAndConfigure($"Module:{Module?.GetType().Name}", sharedServices, (services) =>
                 {
                     services.AddRouting(); //it's assumed routing is required for a routed module!
                     Options.OnConfigureModuleServices(services);

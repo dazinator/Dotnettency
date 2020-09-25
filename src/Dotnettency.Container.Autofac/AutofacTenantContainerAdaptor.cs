@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Dazinator.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -62,7 +63,7 @@ namespace Dotnettency.Container
             configure(services);
 
             ContainerBuilder builder = new ContainerBuilder();
-            builder.Populate(services);            
+            builder.Populate(services);
             builder.Update(_container.ComponentRegistry);
 
             _logger.LogDebug("Configured container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
@@ -71,9 +72,9 @@ namespace Dotnettency.Container
         public ITenantContainerAdaptor CreateNestedContainer(string Name)
         {
 
-           // return new AutofacServiceScope(this._lifetimeScope.BeginLifetimeScope());
-            return CreateNestedContainerAndConfigure(Name, null);
-           // throw new NotImplementedException();
+            // return new AutofacServiceScope(this._lifetimeScope.BeginLifetimeScope());
+            return CreateNestedContainerAndConfigure(Name);
+            // throw new NotImplementedException();
             //_logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, ContainerName, _container.Role);
             //ILifetimeScope perRequestScope = _container.BeginLifetimeScope()
 
@@ -91,27 +92,30 @@ namespace Dotnettency.Container
         public new void Dispose()
         {
             _logger.LogDebug("Disposing of container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
-           // _container.Dispose();
+            // _container.Dispose();
             base.Dispose();
         }
 
-        public ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, Action<IServiceCollection> configure)
+        public ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, IServiceCollection parentServices, Action<IServiceCollection> configure)
         {
             var scope = _container.BeginLifetimeScope(TenantLifetimeScopeTag, (builder) =>
             {
-                ServiceCollection services = new ServiceCollection();
+                var services = parentServices.CreateChildServiceCollection(ParentSingletonOpenGenericRegistrationsBehaviour.ThrowIfNotSupportedByContainer);
+                //todo check difference between these two behaviours..
+                // ServiceCollection services = new ServiceCollection();
                 configure(services);
-                builder.Populate(services);
+                builder.Populate(services.ChildDescriptors);
             });
 
-             _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
-             return new AutofacTenantContainerAdaptor(_logger, scope, ContainerRole.Child, Name);
+            _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
+            return new AutofacTenantContainerAdaptor(_logger, scope, ContainerRole.Child, Name);
         }
 
-        public async Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, Func<IServiceCollection, Task> configure)
+        public async Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, IServiceCollection parentServices, Func<IServiceCollection, Task> configure)
         {
+            var services = parentServices.CreateChildServiceCollection(ParentSingletonOpenGenericRegistrationsBehaviour.ThrowIfNotSupportedByContainer);
 
-            ServiceCollection services = new ServiceCollection();
+            //  ServiceCollection services = new ServiceCollection();
             await configure(services);
 
             var scope = _container.BeginLifetimeScope(TenantLifetimeScopeTag, (builder) =>
@@ -123,13 +127,14 @@ namespace Dotnettency.Container
             return new AutofacTenantContainerAdaptor(_logger, scope, ContainerRole.Child, Name);
         }
 
-        public ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name, Action<IServiceCollection> configure)
-        {            
+        public ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name)
+        {
             var scope = _container.BeginLifetimeScope((builder) =>
             {
-                ServiceCollection services = new ServiceCollection();
-                configure?.Invoke(services);
-                builder.Populate(services);
+                //ServiceCollection services = new ServiceCollection();
+                //configure?.Invoke(services);
+                //builder.Populate(services);
+
             });
 
             _logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);

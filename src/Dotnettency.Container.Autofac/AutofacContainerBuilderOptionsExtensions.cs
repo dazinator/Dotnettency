@@ -34,7 +34,7 @@ namespace Dotnettency
 
                 // Update the root container with a service that can be used to build per tenant container!
                 ContainerBuilder updateBuilder = new ContainerBuilder();
-                var defaultServices = options.DefaultServices;
+                var defaultServices = options.ParentServices;
                 updateBuilder.RegisterInstance(new DelegateActionTenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher)).As<ITenantContainerBuilder<TTenant>>();
                 updateBuilder.Update(container);
 
@@ -71,7 +71,7 @@ namespace Dotnettency
 
                 // Update the root container with a service that can be used to build per tenant container!
                 ContainerBuilder updateBuilder = new ContainerBuilder();
-                var defaultServices = options.DefaultServices;
+                var defaultServices = options.ParentServices;
                 updateBuilder.RegisterInstance(new DelegateTaskTenantContainerBuilder<TTenant>(defaultServices, adaptedContainer, configureTenant, containerEventsPublisher)).As<ITenantContainerBuilder<TTenant>>();
                 updateBuilder.Update(container);
 

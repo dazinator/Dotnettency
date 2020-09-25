@@ -22,7 +22,7 @@ namespace Sample.RazorPagesTest
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var defaultServices = services.Clone();
+           // var defaultServices = services.Clone();
 
             var sp = services.AddMultiTenancy<Tenant>((builder) =>
               {
@@ -32,7 +32,7 @@ namespace Sample.RazorPagesTest
                          .ConfigureTenantContainers((containerOptions) =>
                          {
                              containerOptions
-                             .SetDefaultServices(defaultServices)
+                            // .SetDefaultServices(defaultServices)
                              .Autofac((tenantContext, tenantServices) =>
                              {
                                  if (tenantContext.Tenant != null)

@@ -84,9 +84,9 @@ namespace Dotnettency.Tests
         {
             ILogger<AutofacOptionsTests> logger = _loggerFactory.CreateLogger<AutofacOptionsTests>();
 
+            //NOTE add logging and options were added to default services..
             IServiceCollection services = new ServiceCollection() as IServiceCollection;
             services.AddLogging();
-
             services.AddOptions();
 
             //var configBuilder = new ConfigurationBuilder();
@@ -135,7 +135,7 @@ namespace Dotnettency.Tests
                     {
                         // var defaultServices = services.RemoveOptions();
                         //  var defaultServices = services.RemoveOptions();
-                        containerBuilder.SetDefaultServices(services);
+                       // containerBuilder.SetDefaultServices(services);
                         containerBuilder.Events((events) =>
                         {
                             // callback invoked after tenant container is created.
@@ -289,7 +289,7 @@ namespace Dotnettency.Tests
                     {
                         // var defaultServices = services.RemoveOptions();
                         //  var defaultServices = services.RemoveOptions();
-                        containerBuilder.SetDefaultServices(services);
+                        //containerBuilder.SetDefaultServices(services);
                         //containerBuilder.Events((events) =>
                         //{
                         //    // callback invoked after tenant container is created.
@@ -446,7 +446,7 @@ namespace Dotnettency.Tests
                     {
                         // var defaultServices = services.RemoveOptions();
                         //  var defaultServices = services.RemoveOptions();
-                        containerBuilder.SetDefaultServices(services);
+                      //  containerBuilder.SetDefaultServices(services);
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
                         containerBuilder.AutofacAsync(async (tenant, tenantServices) =>

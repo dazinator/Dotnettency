@@ -33,7 +33,7 @@ namespace Dotnettency.Owin
             var scheme = (string)environment["owin.RequestScheme"];
 
             // PERF: Calculate string length to allocate correct buffer size for StringBuilder.
-            var length = scheme + SchemeDelimiter.Length + host.Length
+            var length = scheme.Length + SchemeDelimiter.Length + host.Length
                 + pathBase.Length + path.Length + queryString.Length;
 
             return new Uri(new StringBuilder(length)

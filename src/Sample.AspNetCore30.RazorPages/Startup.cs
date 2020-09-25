@@ -28,7 +28,7 @@ namespace Sample.Pages
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var defaultServices = services.Clone();
+           // var defaultServices = services.Clone();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -99,7 +99,7 @@ namespace Sample.Pages
                         .ConfigureTenantContainers((containerOptions) =>
                         {
                             containerOptions
-                            .SetDefaultServices(defaultServices)
+                           // .SetDefaultServices(defaultServices)
                             .UseTenantHostedServices((m) =>
                             {
                                 // If you have registered IHostedService's at application level

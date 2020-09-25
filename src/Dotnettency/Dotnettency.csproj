@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>   
+    <PackageReference Include="Dazinator.Extensions.DependencyInjection.ChildContainers" Version="1.1.0-alpha.48" />   
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.0.0" />
   </ItemGroup>
   
