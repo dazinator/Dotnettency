@@ -1,3 +1,7 @@
+# THE END IS NIGH
+
+## 28/09/2021: I have taken the decision to archive this repository and discontinue development. I have learned a lot with this project. I beleive that although this project does solve some problems, there are nicer ways that will yield cleaner code, and a cleaner solution architecture. I have begun work on a side project which will eventually replace this.
+
 c# Dotnettency
 Dotnettency is a library that provides features to enable Multi-Tenant applications using either:
   - ASP.NET Core
