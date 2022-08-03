@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="3.1.8" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.3" />
     <PackageReference Include="Nancy" Version="2.0.0-clinteastwood" />
   </ItemGroup>
