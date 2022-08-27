@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />    
-    <PackageReference Include="Microsoft.Owin" Version="4.0.1" />    
+    <PackageReference Include="Microsoft.Owin" Version="4.1.1" />    
     <PackageReference Include="Microsoft.Owin.SelfHost" Version="4.0.1" />
 
   </ItemGroup>
