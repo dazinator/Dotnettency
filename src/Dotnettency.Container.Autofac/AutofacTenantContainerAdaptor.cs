@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using ServiceCollection = Microsoft.Extensions.DependencyInjection.ServiceCollection;
 
 namespace Dotnettency.Container
 {
@@ -100,7 +101,7 @@ namespace Dotnettency.Container
         {
             var scope = _container.BeginLifetimeScope(TenantLifetimeScopeTag, (builder) =>
             {
-                var services = parentServices.CreateChildServiceCollection(ParentSingletonOpenGenericRegistrationsBehaviour.ThrowIfNotSupportedByContainer);
+                var services = parentServices.CreateChildServiceCollection();
                 //todo check difference between these two behaviours..
                 // ServiceCollection services = new ServiceCollection();
                 configure(services);
@@ -113,7 +114,7 @@ namespace Dotnettency.Container
 
         public async Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, IServiceCollection parentServices, Func<IServiceCollection, Task> configure)
         {
-            var services = parentServices.CreateChildServiceCollection(ParentSingletonOpenGenericRegistrationsBehaviour.ThrowIfNotSupportedByContainer);
+            var services = parentServices.CreateChildServiceCollection();
 
             //  ServiceCollection services = new ServiceCollection();
             await configure(services);

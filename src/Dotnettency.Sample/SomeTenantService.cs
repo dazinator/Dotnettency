@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Sample
 {
     public class SomeTenantService
     {
-        private readonly IHostingEnvironment _hostingEnv;
+        private readonly IWebHostEnvironment _hostingEnv;
 
         public SomeTenantService(Tenant tenant,
-            IHostingEnvironment hostingEnv)
+            IWebHostEnvironment hostingEnv)
         {
             Id = Guid.NewGuid();
             TenantName = tenant?.Name;

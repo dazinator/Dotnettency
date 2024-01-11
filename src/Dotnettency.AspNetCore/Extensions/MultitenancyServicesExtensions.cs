@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using Dotnettency.Options;
 
 namespace Dotnettency
 {
@@ -21,5 +22,15 @@ namespace Dotnettency
             builder.SetHttpContextProvider(provider);
             return builder;
         }
+        
+        public static MultitenancyOptionsBuilder<TTenant> AddAspNetCore<TTenant>(this MultitenancyOptionsBuilder<TTenant> builder)
+            where TTenant : class
+        {
+            builder.AddCoreAspNetCore<TTenant>();
+            builder.SetGenericOptionsProvider(typeof(OptionsMonitorOptionsProvider<>));
+            return builder;
+        }
     }
+    
+    
 }

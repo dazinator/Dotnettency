@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,28 +12,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot/Page.html" />
+    <Content Include="wwwroot\**\"/>
+<!--    <Content Include=".tenants\049c8cc4-3660-41c7-92f0-85430452be22\Info.txt" />-->
+<!--    <Content Include="wwwroot\.tenants\00000000-0000-0000-0000-000000000000\DefaultTenant.html" />-->
+<!--    <Content Include="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\**" />-->
+<!--    <Content Include="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\Index.html" />-->
+<!--    <Content Include="wwwroot\Index.html" />-->
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include=".tenants\049c8cc4-3660-41c7-92f0-85430452be22\Info.txt" />
-    <Content Include="wwwroot\.tenants\00000000-0000-0000-0000-000000000000\DefaultTenant.html" />
-    <Content Include="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\BarTenant.html" />
-    <Content Include="wwwroot\.tenants\049c8cc4-3660-41c7-92f0-85430452be22\Index.html" />
-    <Content Include="wwwroot\Index.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.3" />
+<!--    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />-->
+<!--    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="1.1.2" />-->
+<!--    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.3" />-->
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Nancy" Version="2.0.0-clinteastwood" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dotnettency.AspNetCore.HostingEnvironment\Dotnettency.AspNetCore.HostingEnvironment.csproj" />
     <ProjectReference Include="..\Dotnettency.AspNetCore.Modules\Dotnettency.AspNetCore.Modules.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
+    <ProjectReference Include="..\Dotnettency.VirtualFileSystem.Hosting\Dotnettency.VirtualFileSystem.Hosting.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />
   </ItemGroup>
 

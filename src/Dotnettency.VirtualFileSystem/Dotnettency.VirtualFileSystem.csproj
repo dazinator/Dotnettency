@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNet.Cabinets" Version="1.0.2" />
+    <PackageReference Include="DotNet.Cabinets" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

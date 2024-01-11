@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,11 +11,7 @@
     <Compile Remove="IModuleShellFactory.cs" />
     <Compile Remove="ModuleContainerBuilderOptionsExtensions.cs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="1.0.0" />    
-  </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
     <ProjectReference Include="..\Dotnettency\Dotnettency.csproj" />

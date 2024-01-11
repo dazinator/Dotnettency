@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard1.3</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<!--Nuspec Metadata-->
 		<Description>Autofac container support, for the dotnettency Mutlitenancy library for dotnet standard compatible applications.</Description>
 		<Authors>Darrell Tunnell</Authors>
@@ -13,7 +13,7 @@
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="4.9.2" />
 		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <!--Nuspec Metadata-->
     <Description>Mutlitenancy library for dotnet standard compatible applications.</Description>
     <Authors>Darrell Tunnell</Authors>
@@ -10,9 +10,14 @@
     <PackageTags>Multitenancy,tenant</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>   
-    <PackageReference Include="Dazinator.Extensions.DependencyInjection.ChildContainers" Version="1.1.0-alpha.48" />   
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.0.0" />
+  <ItemGroup>    
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Dazinator.Extensions.DependencyInjection.ChildContainers" Version="1.1.0-alpha.81" />   
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Container\Native\" />
   </ItemGroup>
   
   

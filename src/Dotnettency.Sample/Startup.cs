@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
@@ -27,10 +28,10 @@ namespace Sample
 
     public class Startup
     {
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly ILoggerFactory _loggerFactory;
 
-        public Startup(IHostingEnvironment environment, ILoggerFactory loggerFactory)
+        public Startup(IWebHostEnvironment environment, ILoggerFactory loggerFactory)
         {
             _environment = environment;
             _loggerFactory = loggerFactory;
@@ -42,8 +43,8 @@ namespace Sample
         {
             var platformServices = services.Clone();
             services.AddRouting();
-
-            _loggerFactory.AddConsole();
+            
+           //_loggerFactory.AddConsole();
             ILogger<Startup> logger = _loggerFactory.CreateLogger<Startup>();
 
             IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
@@ -53,54 +54,54 @@ namespace Sample
                     .IdentifyTenantsWithRequestAuthorityUri()
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantContainers((containerBuilder) =>
-                   {
-                       containerBuilder.SetDefaultServices(platformServices);
-                       containerBuilder.Events((events) =>
-                       {
-                           // callback invoked after tenant container is created.
-                           events.OnTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
-                           {
-                               Tenant tenant = await tenantResolver;
+                    {
+                       // containerBuilder.SetDefaultServices(platformServices);
+                        containerBuilder.Events((events) =>
+                            {
+                                // callback invoked after tenant container is created.
+                                events.OnTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
+                                    {
+                                        Tenant tenant = await tenantResolver;
 
-                           })
-                           // callback invoked after a nested container is created for a tenant. i.e typically during a request.
-                           .OnNestedTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
-                           {
-                               Tenant tenant = await tenantResolver;
+                                    })
+                                    // callback invoked after a nested container is created for a tenant. i.e typically during a request.
+                                    .OnNestedTenantContainerCreated(async (tenantResolver, tenantServiceProvider) =>
+                                    {
+                                        Tenant tenant = await tenantResolver;
 
-                           });
-                       })
-                       // Extension methods available here for supported containers. We are using structuremap..
-                       // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                       .Autofac((tenant, tenantServices) =>
-                       {
-                           tenantServices.AddOptions();
-                           tenantServices.Configure<MyOptions>((a) => { a.Foo = true; });
+                                    });
+                            })
+                            // Extension methods available here for supported containers. We are using structuremap..
+                            // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
+                            .Autofac((tenantContext, tenantServices) =>
+                            {
+                                tenantServices.AddOptions();
+                                tenantServices.Configure<MyOptions>((a) => { a.Foo = true; });
 
-                           tenantServices.AddSingleton<SomeTenantService>((sp) =>
-                           {
-                               //var logger = sp.GetRequiredService<ILogger<SomeTenantService>>();
-                               logger.LogDebug("Resolving SomeTenantService");
-                               var hostingEnv = sp.GetRequiredService<IHostingEnvironment>();
-                               return new SomeTenantService(tenant, hostingEnv);
-                           });
+                                tenantServices.AddSingleton<SomeTenantService>((sp) =>
+                                {
+                                    //var logger = sp.GetRequiredService<ILogger<SomeTenantService>>();
+                                    logger.LogDebug("Resolving SomeTenantService");
+                                    var hostingEnv = sp.GetRequiredService<IWebHostEnvironment>();
+                                    return new SomeTenantService(tenantContext.Tenant, hostingEnv);
+                                });
 
-                           tenantServices.AddModules<ModuleBase>((modules) =>
-                           {
-                               // Only load these two modules for tenant Bar.
-                               if (tenant?.Name == "Bar")
-                               {
-                                   modules.AddModule<SampleRoutedModule>()
-                                          .AddModule<SampleSharedModule>();
-                               }
+                                tenantServices.AddModules<ModuleBase>((modules) =>
+                                {
+                                    // Only load these two modules for tenant Bar.
+                                    if (tenantContext.Tenant?.Name == "Bar")
+                                    {
+                                        modules.AddModule<SampleRoutedModule>()
+                                            .AddModule<SampleSharedModule>();
+                                    }
 
-                               modules.ConfigureModules();
+                                    modules.ConfigureModules();
 
 
-                           });
-                       });
-                       // .WithModuleContainers(); // Creates a child container per IModule.
-                   })
+                                });
+                            });
+                        // .WithModuleContainers(); // Creates a child container per IModule.
+                    })
                     .ConfigureTenantMiddleware((tenantBuilder) =>
                     {
                         tenantBuilder.AspNetCorePipeline((tenantContext, tenantAppBuilder) =>
@@ -116,38 +117,44 @@ namespace Sample
                             {
                                 tenantAppBuilder.UseWelcomePage("/welcome");
                             }
+
                             // display info.
                             tenantAppBuilder.Run(DisplayInfo);
                         });
 
                     })
-                // configure per tenant hosting environment.
-                .ConfigurePerTenantHostingEnvironment(_environment, (tenantHostingEnvironmentOptions) =>
-                {
-                    tenantHostingEnvironmentOptions.OnInitialiseTenantContentRoot((contentRootOptions) =>
+
+                    // configure per tenant hosting environment.
+                    .ConfigureNamedTenantFileSystems((namedItems) =>
                     {
-                        // WE use a tenant's guid id to partition one tenants files from another on disk.
-                        // NOTE: We use an empty guid for NULL tenants, so that all NULL tenants share the same location.
-                        Guid tenantGuid = (contentRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
-                        contentRootOptions.TenantPartitionId(tenantGuid)
-                                           .AllowAccessTo(_environment.ContentRootFileProvider); // We allow the tenant content root file provider to access to the environments content root.
+                        var contentFileProvider = _environment.ContentRootFileProvider;
+                        var webFileProvider = _environment.WebRootFileProvider;
+
+                        namedItems.AddWebFileSystem(_environment.WebRootPath, (ctx, fs) =>
+                            {
+                                Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
+                                fs.SetPartitionId(tenantGuid)
+                                    .SetSubDirectory(".tenants\\")
+                                    .AllowAccessTo(webFileProvider);
+                            })
+                            .UseAsEnvironmentWebRootFileProvider(_environment)
+                            .AddContentFileSystem(_environment.ContentRootPath, (ctx, fs) =>
+                            {
+                                Guid tenantGuid = (ctx.Tenant?.TenantGuid).GetValueOrDefault();
+                                fs.SetPartitionId(tenantGuid)
+                                    .SetSubDirectory(".tenants\\")
+                                    .AllowAccessTo(contentFileProvider);
+                            })
+                            .UseAsEnvironmentContentRootFileProvider(_environment);
                     });
 
-                    tenantHostingEnvironmentOptions.OnInitialiseTenantWebRoot((webRootOptions) =>
-                    {
-                        // WE use the tenant's guid id to partition one tenants files from another on disk.
-                        Guid tenantGuid = (webRootOptions.Tenant?.TenantGuid).GetValueOrDefault();
-                        webRootOptions.TenantPartitionId(tenantGuid)
-                                           .AllowAccessTo(_environment.WebRootFileProvider); // We allow the tenant web root file provider to access the environments web root files.
-                    });
-                });
             });
 
             // When using tenant containers, must return IServiceProvider.
             return serviceProvider;
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             //  loggerFactory.AddConsole();
 

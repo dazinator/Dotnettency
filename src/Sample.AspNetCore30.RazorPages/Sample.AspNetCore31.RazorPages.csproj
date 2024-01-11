@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
@@ -15,17 +15,18 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 
   </ItemGroup>
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Dotnettency.AspNetCore31\Dotnettency.AspNetCore31.csproj" />
+    <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
     <ProjectReference Include="..\Dotnettency.Configuration\Dotnettency.Configuration.csproj" />
     <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
     <ProjectReference Include="..\Dotnettency.DotNetGlob\Dotnettency.DotNetGlob.csproj" />
+    <ProjectReference Include="..\Dotnettency.Hosting\Dotnettency.Hosting.csproj" />
     <ProjectReference Include="..\Dotnettency.VirtualFileSystem.Hosting\Dotnettency.VirtualFileSystem.Hosting.csproj" />
     <ProjectReference Include="..\Dotnettency.VirtualFileSystem\Dotnettency.VirtualFileSystem.csproj" />
   </ItemGroup>
