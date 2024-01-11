@@ -70,6 +70,13 @@ namespace Dotnettency.Container
             _logger.LogDebug("Configured container: {id}, {containerNAme}, {role}", _id, ContainerName, Role);
         }
 
+        /// <summary>
+        /// A nested container is similar to Microsoft DI ServiceScope. It is a child container that inherits all registrations from its parent, but any services registered as "scoped" will have an instance per nested container.
+        /// Disposing of that nested container will ensure any scoped services that are owned by it, are disposed of.
+        /// It is recommended to create / use a nested container per HTTP request or service bus message handling session or logical transaction etc to deal with disposing transient objects once that logical transaction is accomplihed.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
         public ITenantContainerAdaptor CreateNestedContainer(string Name)
         {
 
