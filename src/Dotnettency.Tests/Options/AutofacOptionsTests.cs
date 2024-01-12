@@ -10,6 +10,7 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -230,7 +231,7 @@ namespace Dotnettency.Tests
             services.AddLogging();
 
             services.AddOptions();
-            services.AddOptionsManagerBackedByMonitorCache();
+          //  services.AddOptionsManagerBackedByMonitorCache();
 
             //var configBuilder = new ConfigurationBuilder();
             //configBuilder.SetBasePath(Environment.CurrentDirectory);
@@ -315,7 +316,7 @@ namespace Dotnettency.Tests
                             //tenantServices.RemoveAll(typeof(IOptionsSnapshot<>));
 
                             tenantServices.AddOptions();
-                            tenantServices.AddOptionsManagerBackedByMonitorCache();
+                            //tenantServices.AddOptionsManagerBackedByMonitorCache();
 
                             var tenantConfig = await tenant.GetConfigurationAsync();
                             var section = tenantConfig.GetSection("thing");
@@ -384,7 +385,7 @@ namespace Dotnettency.Tests
             services.AddLogging();
 
             services.AddOptions();
-            services.AddOptionsManagerBackedByMonitorCache();
+           // services.AddOptionsManagerBackedByMonitorCache();
 
             //var configBuilder = new ConfigurationBuilder();
             //configBuilder.SetBasePath(Environment.CurrentDirectory);
@@ -459,9 +460,10 @@ namespace Dotnettency.Tests
                             //tenantServices.RemoveAll(typeof(IOptionsSnapshot<>));
 
                             tenantServices.AddOptions();
-                            tenantServices.AddOptionsManagerBackedByMonitorCache();
+                            //tenantServices.AddOptionsManagerBackedByMonitorCache();
 
                             var tenantConfig = await tenant.GetConfigurationAsync();
+                            tenantServices.AddSingleton<IConfiguration>(tenantConfig);
                             var section = tenantConfig.GetSection(sectionPath);
                             tenantServices.Configure<MyOptions>(section);
                             //,
@@ -564,8 +566,11 @@ namespace Dotnettency.Tests
                 var currentTenantName = tenantAccessor.CurrentTenant.Value.Result.Name;
                 var settingsFileName = $"updatable-settings-{currentTenantName}.json";
 
-                var tenantConfig = scopeTenantBNextRequestAfterUpdate.ServiceProvider.GetRequiredService<Task<IConfiguration>>();
-                var tConfig = tenantConfig.Result;
+                var tenantContainer = await tenantRequestContainerAccessor.TenantRequestContainer.Value;
+
+                //var sp = tenantContainer.
+                var tConfig = tenantContainer.GetRequiredService<IConfiguration>();
+              //  var tConfig = tenantConfig.Result;
 
 
                 registeredoptions.OnChange<MyOptions>((a) => {
