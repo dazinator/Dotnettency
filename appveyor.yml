@@ -26,6 +26,6 @@ deploy:
   provider: NuGet
   server:
   api_key:
-    secure: u8JpW5kkti8pMi+ra2QcXTJPhkHCA8pkKSiiZOJbcS/vFVHNvF3W8qw1Fy2If6a7
+    secure: 3NzIBS3N4NkTfoOFkjvAtz3e1pS2q7V5mQYNWzt/TKrAAsdowgjS20eGzRjWl1x1
   skip_symbols: false
   symbol_server:
