@@ -3,9 +3,9 @@ environment:
   path_to_sln: src/src.sln 
 skip_tags: true
 install:
-  - choco install gitversion.portable -pre -y
+  - choco install gitversion.portable --version 5.12.0 -y
   - cinst gitlink -version 2.4.1 -y
-#  - cinst dotnetcore-sdk --version 6.0.418
+  - cinst dotnet-6.0-sdk --version 6.0.418 -y
 image: Visual Studio 2022
 assembly_info:
   patch: false
