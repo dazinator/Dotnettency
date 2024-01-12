@@ -5,7 +5,7 @@ skip_tags: true
 install:
   - choco install gitversion.portable -pre -y
   - cinst gitlink -version 2.4.1 -y
-  - cinst dotnetcore-sdk --version 6.0.418
+#  - cinst dotnetcore-sdk --version 6.0.418
 image: Visual Studio 2022
 assembly_info:
   patch: false
