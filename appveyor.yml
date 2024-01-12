@@ -5,10 +5,8 @@ skip_tags: true
 install:
   - choco install gitversion.portable -pre -y
   - cinst gitlink -version 2.4.1 -y
-  - cinst dotnetcore-sdk --version 2.1.804
-  - cinst dotnetcore-sdk --version 3.1.101
-  - dotnet new -i Microsoft.AspNetCore.Blazor.Templates
-image: Visual Studio 2019 Preview
+  - cinst dotnetcore-sdk --version 6.0.418
+image: Visual Studio 2022
 assembly_info:
   patch: false
 before_build:
