@@ -351,6 +351,7 @@ namespace Dotnettency.Tests
 
         }
 
+        // I Suspect this test is failing because child container implementation is set to duplicate parent singletons to child container.
         [Fact]
         public async Task CanGetReloadedOptionsAfterConfigChanged()
         {

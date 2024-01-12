@@ -99,7 +99,7 @@ namespace Dotnettency.Container.Native
                     return adaptor;
                 });
               
-            }, s => s.BuildServiceProvider(), ParentSingletonOpenGenericRegistrationsBehaviour.Delegate);
+            }, s => s.BuildServiceProvider(), ParentSingletonOpenGenericRegistrationsBehaviour.DuplicateSingletons); // BUG: DuplicateSingletons causes test failures.
           
 
             return childServiceProvider.GetRequiredService<ITenantContainerAdaptor>();
@@ -132,7 +132,7 @@ namespace Dotnettency.Container.Native
                 {
                     await configureChild(childServices);
                 }
-            }, sp => sp.BuildServiceProvider(), ParentSingletonOpenGenericRegistrationsBehaviour.Delegate);
+            }, sp => sp.BuildServiceProvider(), ParentSingletonOpenGenericRegistrationsBehaviour.DuplicateSingletons);
 
             return childServiceProvider.GetRequiredService<ITenantContainerAdaptor>();
         }
