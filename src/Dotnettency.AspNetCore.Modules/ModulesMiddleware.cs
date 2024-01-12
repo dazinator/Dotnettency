@@ -60,7 +60,7 @@ namespace Dotnettency.AspNetCore.Modules
             _logger.LogDebug("Request matched module {0}", moduleName);
 
             // Replace request services with a nested version of the routed modules container.
-            using (var scope = routedModule.Container.CreateNestedContainer($"ModulesMiddleware:{moduleName}"))
+            using (var scope = routedModule.Container.CreateScope($"ModulesMiddleware:{moduleName}"))
             {
                 _logger.LogDebug("Setting Request: {containerId} - {containerName}", scope.ContainerId, scope.ContainerName);
                 var oldRequestServices = context.RequestServices;

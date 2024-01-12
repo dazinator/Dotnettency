@@ -15,7 +15,7 @@ namespace Dotnettency.Container
 
         public IServiceScope CreateScope()
         {
-            return new TenantContainerServiceScope(_container.CreateNestedContainer(_container.ContainerName + " - Scoped()"));
+            return new TenantContainerServiceScope(_container.CreateScope(_container.ContainerName + " - Scoped()"));
         }
 
         private class TenantContainerServiceScope : IServiceScope

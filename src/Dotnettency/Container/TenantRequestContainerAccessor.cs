@@ -26,7 +26,7 @@ namespace Dotnettency.Container
                     return null;
                 }
 
-                var requestContainer = tenantContainer.CreateNestedContainer($"{tenantContainer.ContainerName}");
+                var requestContainer = tenantContainer.CreateScope($"{tenantContainer.ContainerName}");
                 logger.LogDebug("Creating container name: {ContainerName}", tenantContainer.ContainerName);
 
                 _containerEventsPublisher?.PublishNestedTenantContainerCreated(requestContainer);

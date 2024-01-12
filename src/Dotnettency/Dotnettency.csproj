@@ -15,10 +15,6 @@
     <PackageReference Include="Dazinator.Extensions.DependencyInjection.ChildContainers" Version="1.1.0-alpha.81" />   
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Container\Native\" />
-  </ItemGroup>
   
   
 

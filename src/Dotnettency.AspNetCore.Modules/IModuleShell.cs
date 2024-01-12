@@ -15,6 +15,6 @@ namespace Dotnettency.AspNetCore.Modules
         TModule Module { get; }
         IRouter Router { get; }
         ModuleShellOptions<TModule> Options { get; }
-        Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, IServiceCollection sharedServices);
+        Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder);
     }
 }

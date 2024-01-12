@@ -7,17 +7,15 @@ namespace Dotnettency.Container
     public class DelegateTaskTenantContainerBuilder<TTenant> : ITenantContainerBuilder<TTenant>
     where TTenant : class
     {
-        private readonly IServiceCollection _parentServices;
         private readonly ITenantContainerAdaptor _parentContainer;
         private readonly Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> _configureTenant;
         private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
-        public DelegateTaskTenantContainerBuilder(IServiceCollection parentServices,
+        public DelegateTaskTenantContainerBuilder(
             ITenantContainerAdaptor parentContainer,
             Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> configureTenant,
             ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
         {
-            _parentServices = parentServices;
             _parentContainer = parentContainer;
             _configureTenant = configureTenant;
             _containerEventsPublisher = containerEventsPublisher;
@@ -25,9 +23,7 @@ namespace Dotnettency.Container
 
         public async Task<ITenantContainerAdaptor> BuildAsync(TenantShellItemBuilderContext<TTenant> tenantContext)
         {
-            var tenantContainer = await _parentContainer.CreateChildContainerAndConfigureAsync("Tenant: " + (tenantContext?.Tenant?.ToString() ?? "NULL").ToString(),
-                _parentServices,
-                async config =>
+            var tenantContainer = await _parentContainer.CreateChildAsync("Tenant: " + (tenantContext?.Tenant?.ToString() ?? "NULL").ToString(), async config =>
             {
                 // add default services to tenant container.
                 // see https://github.com/aspnet/AspNetCore/issues/10469 and issues linked with that.

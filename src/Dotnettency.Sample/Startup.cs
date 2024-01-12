@@ -41,13 +41,13 @@ namespace Sample
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var platformServices = services.Clone();
+          //  var platformServices = services.Clone();
             services.AddRouting();
             
            //_loggerFactory.AddConsole();
             ILogger<Startup> logger = _loggerFactory.CreateLogger<Startup>();
 
-            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
+            services = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
                     .AddAspNetCore()
@@ -73,7 +73,7 @@ namespace Sample
                             })
                             // Extension methods available here for supported containers. We are using structuremap..
                             // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                            .Autofac((tenantContext, tenantServices) =>
+                            .Native((tenantContext, tenantServices) =>
                             {
                                 tenantServices.AddOptions();
                                 tenantServices.Configure<MyOptions>((a) => { a.Foo = true; });
@@ -150,7 +150,10 @@ namespace Sample
 
             });
 
+            services.AddChildContainers(); // required if not using IHost IServiceProviderFactory
+
             // When using tenant containers, must return IServiceProvider.
+            var serviceProvider = services.BuildServiceProvider();
             return serviceProvider;
         }
 

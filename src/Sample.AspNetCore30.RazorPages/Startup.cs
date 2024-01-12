@@ -107,7 +107,7 @@ namespace Sample.Pages
                                 // avoid each tenant from also running them you can exclude them here.
                                 //m.Remove<MyGlobalHostedService>().Remove<MyOtherGlobalHostedService>();
                             }) // Can now regiser IHostedService in tenant level.
-                            .AutofacAsync(async (tenantContext, tenantServices) =>
+                            .NativeAsync(async (tenantContext, tenantServices) =>
                             {
                                 // Can now use tenant level configuration to decide how to bootstrap the tenants services here..
                                 var currentTenantConfig = await tenantContext.GetConfigurationAsync();

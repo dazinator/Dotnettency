@@ -11,14 +11,14 @@ namespace Dotnettency
             return services;
         }
 
-        public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
+        public IServiceProvider CreateServiceProvider(IServiceCollection serviceCollection)
         {
             var factory = TenantServiceProviderFactory<TTenant>.Factory;
             if (factory == null)
             {
-                return containerBuilder.BuildServiceProvider();
+                return serviceCollection.BuildServiceProvider();
             }
-            return factory();
+            return factory(serviceCollection);
         }
 
     }

@@ -6,11 +6,11 @@ namespace Dotnettency.Container
     public class TenantContainerAccessor<TTenant> : ITenantContainerAccessor<TTenant>
         where TTenant : class
     {
-        private readonly IServiceProvider _currentScopeServiceProvider;
+        private readonly ITenantContainerAdaptor _currentScopeServiceProvider;
         private readonly ITenantShellAccessor<TTenant> _tenantShellAccessor;
         private readonly ITenantContainerFactory<TTenant> _containerFactory;
 
-        public TenantContainerAccessor(IServiceProvider currentScopeServiceProvider, ITenantShellAccessor<TTenant> tenantShellAccessor, ITenantContainerFactory<TTenant> factory)
+        public TenantContainerAccessor(ITenantContainerAdaptor currentScopeServiceProvider, ITenantShellAccessor<TTenant> tenantShellAccessor, ITenantContainerFactory<TTenant> factory)
         {
             _currentScopeServiceProvider = currentScopeServiceProvider;
             _tenantShellAccessor = tenantShellAccessor;

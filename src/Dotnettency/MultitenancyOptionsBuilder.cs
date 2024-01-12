@@ -63,7 +63,7 @@ namespace Dotnettency
             InitialiseTenantStrategy<DefaultTenantShellFactoryStrategy<TTenant>>();
         }
 
-        public Func<IServiceProvider> ServiceProviderFactory { get; set; }
+        public Func<IServiceCollection, IServiceProvider> ServiceProviderFactory { get; set; }
         public IServiceCollection Services { get; set; }
         public IHttpContextProvider HttpContextProvider { get; set; }
 

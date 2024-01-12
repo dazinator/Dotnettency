@@ -4,28 +4,31 @@ using System.Threading.Tasks;
 
 namespace Dotnettency.Container
 {
-    public interface ITenantContainerAdaptor : IServiceProvider, IDisposable
+    public interface ITenantContainerAdaptor : IServiceProvider, IDisposable, IServiceScopeFactory, IServiceScope
     {
-        ITenantContainerAdaptor CreateNestedContainer(string Name);
-        ITenantContainerAdaptor CreateChildContainer(string Name);
-
-        ITenantContainerAdaptor CreateChildContainerAndConfigure(string Name, IServiceCollection parentServices, Action<IServiceCollection> configure);
-        Task<ITenantContainerAdaptor> CreateChildContainerAndConfigureAsync(string Name, IServiceCollection parentServices, Func<IServiceCollection, Task> configure);
-
-        ITenantContainerAdaptor CreateNestedContainerAndConfigure(string Name);
-
         /// <summary>
-        /// Adding services to an already running / configured container is bad. Safer to treat a created container as immutable.
-        /// Need to re-design modules system to solve this.
+        /// You can create a new scoped container from an existing container. This is useful for creating a temporary lifetime context to perform some isolated work, where you want everything disposed at the end. Only services registered as "scoped" will have instances
+        /// tied to the new container scope when requested in that new scope.
         /// </summary>
-        /// <param name="configure"></param>
-        void AddServices(Action<IServiceCollection> configure);
-
+        /// <param name="name"></param>
+        /// <returns></returns>
+        ITenantContainerAdaptor CreateScope(string name);
         /// <summary>
-        /// Used to add services to a container AFTER its initialised.
+        /// A child container is a new container that is created from an existing container. It will inherit all the services from the parent container, but can override them with its own registrations. This container is not meant to be used
+        /// for servicing isolated units of work that repeat over and over (use a scope instead). It is meant to be used for creating a new container that can be customised for some sub-area of the system. It is probably held onto for the lifetime of the application, and scopes can be created from it as needed.
         /// </summary>
+        /// <param name="name"></param>
+        /// <param name="configureChild"></param>
+        /// <returns></returns>
+        ITenantContainerAdaptor CreateChild(string name, Action<IServiceCollection> configureChild);
+        /// <summary>
+        /// A child container is a new container that is created from an existing container. It will inherit all the services from the parent container, but can override them with its own registrations. This container is not meant to be used
+        /// for servicing isolated units of work that repeat over and over (use a scope instead). It is meant to be used for creating a new container that can be customised for some sub-area of the system. It is probably held onto for the lifetime of the application, and scopes can be created from it as needed.
+        /// </summary>
+        /// <param name="name"></param>
         /// <param name="configure"></param>
-     //   void Configure(Action<IServiceCollection> configure);
+        /// <returns></returns>
+        Task<ITenantContainerAdaptor> CreateChildAsync(string name, Func<IServiceCollection, Task> configure);
 
         string ContainerName { get; }
         Guid ContainerId { get; }

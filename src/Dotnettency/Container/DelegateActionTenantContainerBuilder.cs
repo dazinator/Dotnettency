@@ -8,19 +8,19 @@ namespace Dotnettency.Container
         where TTenant : class
     {
        // private readonly IServiceCollection _defaultServices;
-        private readonly IServiceCollection _parentServices;
+       // private readonly IServiceCollection _parentServices;
 
         private readonly ITenantContainerAdaptor _parentContainer;
         private readonly Action<TenantShellItemBuilderContext<TTenant>, IServiceCollection> _configureTenant;
         private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
         public DelegateActionTenantContainerBuilder(
-            IServiceCollection parentServices,
+           // IServiceCollection parentServices,
             ITenantContainerAdaptor parentContainer,
             Action<TenantShellItemBuilderContext<TTenant>, IServiceCollection> configureTenant,
             ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
         {
-            _parentServices = parentServices;
+          //  _parentServices = parentServices;
             _parentContainer = parentContainer;
             _configureTenant = configureTenant;
             _containerEventsPublisher = containerEventsPublisher;
@@ -29,7 +29,7 @@ namespace Dotnettency.Container
         public Task<ITenantContainerAdaptor> BuildAsync(TenantShellItemBuilderContext<TTenant> tenantContext)
         {
             var name = tenantContext.Tenant?.ToString();
-            var tenantContainer = _parentContainer.CreateChildContainerAndConfigure("Tenant: " + (name ?? "NULL"), _parentServices, config =>
+            var tenantContainer = _parentContainer.CreateChild("Tenant: " + (name ?? "NULL"), config =>
              {
                  // add default services to tenant container.
                  // see https://github.com/aspnet/AspNetCore/issues/10469 and issues linked with that.
@@ -50,6 +50,7 @@ namespace Dotnettency.Container
                  }
 
                  _configureTenant(tenantContext, config);
+                
              });
 
             _containerEventsPublisher?.PublishTenantContainerCreated(tenantContainer);

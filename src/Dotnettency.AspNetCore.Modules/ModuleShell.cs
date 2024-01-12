@@ -22,7 +22,7 @@ namespace Dotnettency.AspNetCore.Modules
             Module = module;
         }
 
-        public async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder, IServiceCollection sharedServices)
+        public async Task EnsureStarted(Func<Task<ITenantContainerAdaptor>> containerFactory, IApplicationBuilder rootAppBuilder)
         {
             if (IsStarted)
             {
@@ -32,11 +32,11 @@ namespace Dotnettency.AspNetCore.Modules
             var container = await containerFactory();
 
             // Configure container.           
-            Options.OnConfigureSharedServices?.Invoke(sharedServices);
+            //Options.OnConfigureSharedServices?.Invoke();
 
             if (Options.OnConfigureModuleServices != null)
             {
-                container = container.CreateChildContainerAndConfigure($"Module:{Module?.GetType().Name}", sharedServices, (services) =>
+                container = container.CreateChild($"Module:{Module?.GetType().Name}", (services) =>
                 {
                     services.AddRouting(); //it's assumed routing is required for a routed module!
                     Options.OnConfigureModuleServices(services);

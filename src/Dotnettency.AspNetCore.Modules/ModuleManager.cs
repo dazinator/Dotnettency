@@ -22,7 +22,7 @@ namespace Dotnettency.AspNetCore.Modules
             _modules = new List<IModuleShell<TModule>>();
             ModulesRouter = modulesRouter;
         }
-        
+
         public void AddModule(IModuleShell<TModule> module)
         {
             _modules.Add(module);
@@ -48,12 +48,10 @@ namespace Dotnettency.AspNetCore.Modules
 
                 var container = await containerFactory();
 
-                container.AddServices(sharedServices =>
-                {
-                    allModules.Select(m => m.EnsureStarted(containerFactory, rootAppBuilder, sharedServices));
-                   // await Task.WhenAll();
-                });
 
+               // start all modules, this builds there containers, and sets up their middleware.
+                allModules.Select(m => m.EnsureStarted(containerFactory, rootAppBuilder));
+              
                 // Collate routers
                 foreach (var module in allModules.Where(m => m.Router != null))
                 {

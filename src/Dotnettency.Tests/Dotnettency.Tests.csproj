@@ -46,10 +46,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Dotnettency.AspNetCore\Dotnettency.AspNetCore.csproj" />
     <ProjectReference Include="..\Dotnettency.Configuration\Dotnettency.Configuration.csproj" />
-    <ProjectReference Include="..\Dotnettency.Container.Autofac\Dotnettency.Container.Autofac.csproj" />
     <ProjectReference Include="..\Dotnettency.DotNetGlob\Dotnettency.DotNetGlob.csproj" />
     <ProjectReference Include="..\Dotnettency.EFCore.Identity\Dotnettency.EFCore.Identity.csproj" />
     <ProjectReference Include="..\Dotnettency.EFCore\Dotnettency.EFCore.csproj" />
+    <ProjectReference Include="..\Dotnettency.Hosting\Dotnettency.Hosting.csproj" />
   </ItemGroup>
 
   <ItemGroup>

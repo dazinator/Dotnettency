@@ -77,7 +77,7 @@ namespace Dotnettency.Container
         /// </summary>
         /// <param name="Name"></param>
         /// <returns></returns>
-        public ITenantContainerAdaptor CreateNestedContainer(string Name)
+        public ITenantContainerAdaptor CreateScope(string Name)
         {
 
             // return new AutofacServiceScope(this._lifetimeScope.BeginLifetimeScope());

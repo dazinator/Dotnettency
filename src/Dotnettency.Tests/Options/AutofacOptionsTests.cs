@@ -1,6 +1,4 @@
-﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Dazinator.Extensions.Options.Updatable;
+﻿using Dazinator.Extensions.Options.Updatable;
 using Dotnettency.Container;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,19 +8,18 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Dotnettency.Tests
 {
 
-    public class AutofacOptionsTests : XunitContextBase
+    public class NativeOptionsTests : XunitContextBase
     {
 
         private readonly ILoggerFactory _loggerFactory;
 
-        public AutofacOptionsTests(ITestOutputHelper output) : base(output)
+        public NativeOptionsTests(ITestOutputHelper output) : base(output)
         {
             _loggerFactory = new LoggerFactory();
 
@@ -32,48 +29,39 @@ namespace Dotnettency.Tests
         public void CanResolveTOptionsFromChildContainer()
         {
 
-            ServiceCollection services = new ServiceCollection();
-
-            ContainerBuilder builder = new ContainerBuilder();
-            builder.Populate(services);
-
-            var rootContainer = builder.Build();
-            var childContainer = rootContainer.BeginLifetimeScope((a) =>
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddChildContainers();
+            var rootContainer = services.BuildServiceProvider();
+            var adapted = rootContainer.GetRequiredService<ITenantContainerAdaptor>();
+           
+            
+            var childContainer = adapted.CreateChild("a",(a) =>
             {
-
-                var childServices = new ServiceCollection();
-                childServices.AddOptions();
-                childServices.Configure<MyOptions>((b) =>
+                a.AddOptions();
+                a.Configure<MyOptions>((b) =>
                 {
                     b.Foo = true;
                 });
-                a.Populate(childServices);
             });
-
-            var childSp = new AutofacServiceProvider(childContainer);
-            IOptions<MyOptions> options = childSp.GetRequiredService<IOptions<MyOptions>>();
+          
+            IOptions<MyOptions> options = childContainer.GetRequiredService<IOptions<MyOptions>>();
             Assert.True(options.Value?.Foo);
-
         }
 
         [Fact]
         public void CanResolveTOptionsFromRootContainer()
         {
 
-            ServiceCollection services = new ServiceCollection();
-
-            ContainerBuilder builder = new ContainerBuilder();
+            var services = new ServiceCollection();
+     
             services.AddOptions();
             services.Configure<MyOptions>((b) =>
             {
                 b.Foo = true;
             });
-
-            builder.Populate(services);
-
-            var rootContainer = builder.Build();
-
-            var rootSp = new AutofacServiceProvider(rootContainer);
+            
+            var rootSp = services.BuildServiceProvider();
             IOptions<MyOptions> options = rootSp.GetRequiredService<IOptions<MyOptions>>();
             Assert.True(options.Value?.Foo);
 
@@ -83,7 +71,7 @@ namespace Dotnettency.Tests
         [Fact]
         public async Task CanResolveTOptionsFromTenantRequestContainer()
         {
-            ILogger<AutofacOptionsTests> logger = _loggerFactory.CreateLogger<AutofacOptionsTests>();
+            ILogger<NativeOptionsTests> logger = _loggerFactory.CreateLogger<NativeOptionsTests>();
 
             //NOTE add logging and options were added to default services..
             IServiceCollection services = new ServiceCollection() as IServiceCollection;
@@ -99,7 +87,7 @@ namespace Dotnettency.Tests
             //services.Configure<MyOptions>(config);
 
             bool isTenantA = true;
-            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
+            services = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
                     .IdentifyTenantTask(async () =>
@@ -152,32 +140,17 @@ namespace Dotnettency.Tests
                         })
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        .AutofacAsync(async (tenant, tenantServices) =>
+                        .NativeAsync(async (tenant, tenantServices) =>
                         {
                             var tenantConfig = await tenant.GetConfigurationAsync();
                             var section = tenantConfig.GetSection("thing");
                             tenantServices.Configure<MyOptions>(section);
+                            //return Task.CompletedTask;
 
-                            //  tenantServices.AddOptions();
-                            //// override singleton options already registered, so we can have singleton at tenant level.
-                            //  services.RemoveAll(typeof(IOptions<>));
-                            //  services.Add(ServiceDescriptor.Singleton(typeof(IOptions<>), typeof(OptionsManager<>)));
 
-                            //services.TryAdd(ServiceDescriptor.Scoped(typeof(IOptionsSnapshot<>), typeof(OptionsManager<>)));
 
-                            //  services.RemoveAll(typeof(IOptionsMonitor<>));
-                            //  services.Add(ServiceDescriptor.Singleton(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>)));
-                            //services.TryAdd(ServiceDescriptor.Transient(typeof(IOptionsFactory<>), typeof(OptionsFactory<>)));
-
-                            //services.RemoveAll(typeof(IOptionsMonitorCache<>));
-                            //services.Add(ServiceDescriptor.Singleton(typeof(IOptionsMonitorCache<>), typeof(Dotnettency.Tests.Options.OptionsCache<>)));
-                            // return services;
-
-                            // tenantServices.AddOptions();
-                            // both tenants should have tenant name options set.
-
-                            var sp = tenantServices.BuildServiceProvider();
-                            var options = sp.GetRequiredService<IOptions<MyOptions>>();
+                            // var sp = tenantServices.BuildServiceProvider();
+                            //  var options = sp.GetRequiredService<IOptions<MyOptions>>();
 
                             //// but.. Tenant A and tenant B have different Foo settings.
                             //if (tenant.Tenant.Name == "tenanta")
@@ -193,6 +166,7 @@ namespace Dotnettency.Tests
                     });
             });
 
+            var serviceProvider = services.BuildServiceProvider();
             IServiceScopeFactory scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             using (var scopeTenantA = scopeFactory.CreateScope())
@@ -225,9 +199,9 @@ namespace Dotnettency.Tests
         [Fact]
         public async Task CanUpdateOptions()
         {
-            ILogger<AutofacOptionsTests> logger = _loggerFactory.CreateLogger<AutofacOptionsTests>();
+            ILogger<NativeOptionsTests> logger = _loggerFactory.CreateLogger<NativeOptionsTests>();
 
-            IServiceCollection services = new ServiceCollection() as IServiceCollection;
+            var services = new ServiceCollection() as IServiceCollection;
             services.AddLogging();
 
             services.AddOptions();
@@ -242,7 +216,7 @@ namespace Dotnettency.Tests
             //services.Configure<MyOptions>(config);
 
             bool isTenantA = true;
-            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
+            services = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
                     .IdentifyTenantTask(async () =>
@@ -306,7 +280,7 @@ namespace Dotnettency.Tests
                         //})
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        containerBuilder.AutofacAsync(async (tenant, tenantServices) =>
+                        containerBuilder.NativeAsync(async (tenant, tenantServices) =>
                         {
 
                             //tenantServices.RemoveAll(typeof(IOptionsMonitor<>));
@@ -333,6 +307,7 @@ namespace Dotnettency.Tests
                     });
             });
 
+            var serviceProvider = services.BuildServiceProvider();
             IServiceScopeFactory scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             using (var scopeTenantA = scopeFactory.CreateScope())
@@ -379,11 +354,10 @@ namespace Dotnettency.Tests
         [Fact]
         public async Task CanGetReloadedOptionsAfterConfigChanged()
         {
-            ILogger<AutofacOptionsTests> logger = _loggerFactory.CreateLogger<AutofacOptionsTests>();
+            ILogger<NativeOptionsTests> logger = _loggerFactory.CreateLogger<NativeOptionsTests>();
 
-            IServiceCollection services = new ServiceCollection() as IServiceCollection;
+            var services = new ServiceCollection() as IServiceCollection;
             services.AddLogging();
-
             services.AddOptions();
            // services.AddOptionsManagerBackedByMonitorCache();
 
@@ -399,7 +373,7 @@ namespace Dotnettency.Tests
             string tenantBSettingsFileName = "";
 
             bool isTenantA = true;
-            IServiceProvider serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
+            services = services.AddMultiTenancy<Tenant>((options) =>
             {
                 options
                     .IdentifyTenantTask(async () =>
@@ -450,7 +424,7 @@ namespace Dotnettency.Tests
                       //  containerBuilder.SetDefaultServices(services);
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        containerBuilder.AutofacAsync(async (tenant, tenantServices) =>
+                        containerBuilder.NativeAsync(async (tenant, tenantServices) =>
                         {
 
                             //tenantServices.RemoveAll(typeof(IOptionsMonitor<>));
@@ -490,6 +464,10 @@ namespace Dotnettency.Tests
                     });
             });
 
+            var serviceProvider = new DotnettencyServiceProviderFactory<Tenant>().CreateServiceProvider(services);
+
+           // var serviceProvider = spFactory.CreateServiceProvider();
+            
             IServiceScopeFactory scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             using (var scopeTenantA = scopeFactory.CreateScope())
