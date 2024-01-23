@@ -8,6 +8,7 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Dotnettency.Container.Native;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -31,22 +32,31 @@ namespace Dotnettency.Tests
 
             var services = new ServiceCollection();
             services.AddLogging();
-            services.AddChildContainers();
-            var rootContainer = services.BuildServiceProvider();
-            var adapted = rootContainer.GetRequiredService<ITenantContainerAdaptor>();
-           
+            var rootSp = services.BuildServiceProvider();
+            
+            //services.AddChildContainers();
+            var logger = rootSp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>();
+            var rootContainerAdaptor = new NativeTenantContainerAdaptor(logger, rootSp, services, ContainerRole.Root, "Root");
+               
+            var adapted = rootContainerAdaptor.GetRequiredService<ITenantContainerAdaptor>();
             
             var childContainer = adapted.CreateChild("a",(a) =>
             {
                 a.AddOptions();
-                a.Configure<MyOptions>((b) =>
+                a.AutoDuplicateSingletons((child) =>
                 {
-                    b.Foo = true;
+                    child.Configure<MyOptions>((b) =>
+                    {
+                        b.Foo = true;
+                    });
                 });
             });
           
             IOptions<MyOptions> options = childContainer.GetRequiredService<IOptions<MyOptions>>();
             Assert.True(options.Value?.Foo);
+            
+            var rootOptions = rootContainerAdaptor.GetRequiredService<IOptions<MyOptions>>();
+            Assert.False(rootOptions.Value?.Foo);
         }
 
         [Fact]
@@ -143,8 +153,15 @@ namespace Dotnettency.Tests
                         .NativeAsync(async (tenant, tenantServices) =>
                         {
                             var tenantConfig = await tenant.GetConfigurationAsync();
-                            var section = tenantConfig.GetSection("thing");
-                            tenantServices.Configure<MyOptions>(section);
+                           
+
+                            tenantServices.AutoDuplicateSingletons(c =>
+                            {
+                                c.AddSingleton<IConfiguration>(tenantConfig);
+                                var section = tenantConfig.GetSection("thing");
+                                c.Configure<MyOptions>(section);
+                            });
+                           
                             //return Task.CompletedTask;
 
 
@@ -166,7 +183,7 @@ namespace Dotnettency.Tests
                     });
             });
 
-            var serviceProvider = services.BuildServiceProvider();
+            var serviceProvider = new DotnettencyServiceProviderFactory<Tenant>().CreateServiceProvider(services);
             IServiceScopeFactory scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             using (var scopeTenantA = scopeFactory.CreateScope())
@@ -307,7 +324,7 @@ namespace Dotnettency.Tests
                     });
             });
 
-            var serviceProvider = services.BuildServiceProvider();
+            var serviceProvider = new DotnettencyServiceProviderFactory<Tenant>().CreateServiceProvider(services);
             IServiceScopeFactory scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             using (var scopeTenantA = scopeFactory.CreateScope())
@@ -459,17 +476,22 @@ namespace Dotnettency.Tests
                             var fileName = $"updatable-settings-{tenant.Tenant.Name}.json";
 
                             var jsonProvider = new FileJsonStreamProvider<MyOptions>(basePath, fileName);
-                            services.AddJsonUpdatableOptions<MyOptions>(section.Path, jsonProvider);
+                            tenantServices.AddJsonUpdatableOptions<MyOptions>(section.Path, jsonProvider);
 
                         });
                     });
             });
 
-            var serviceProvider = new DotnettencyServiceProviderFactory<Tenant>().CreateServiceProvider(services);
+            var rootSp = services.BuildServiceProvider();
+            //services.AddChildContainers();
+            var rootContainerAdaptorLogger = rootSp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>();
+            var rootContainerAdaptor = new NativeTenantContainerAdaptor(rootContainerAdaptorLogger, rootSp, services, ContainerRole.Root, "Root");
+            
+            //var serviceProvider = new DotnettencyServiceProviderFactory<Tenant>().CreateServiceProvider(services);
 
            // var serviceProvider = spFactory.CreateServiceProvider();
             
-            IServiceScopeFactory scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+            IServiceScopeFactory scopeFactory = rootContainerAdaptor.GetRequiredService<IServiceScopeFactory>();
 
             using (var scopeTenantA = scopeFactory.CreateScope())
             {

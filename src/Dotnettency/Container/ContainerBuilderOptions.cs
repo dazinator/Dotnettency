@@ -38,7 +38,7 @@ namespace Dotnettency.Container
                 return sp.GetRequiredService<ITenantContainerEventsPublisher<TTenant>>();
             });
             
-            builder.Services.AddChildContainers();
+            //builder.Services.AddChildContainers();
             
         }
 

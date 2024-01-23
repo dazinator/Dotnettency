@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Dazinator.Extensions.DependencyInjection.ChildContainers;
 
 namespace Dotnettency.Container
 {
@@ -20,7 +21,7 @@ namespace Dotnettency.Container
         /// <param name="name"></param>
         /// <param name="configureChild"></param>
         /// <returns></returns>
-        ITenantContainerAdaptor CreateChild(string name, Action<IServiceCollection> configureChild);
+        ITenantContainerAdaptor CreateChild(string name, Action<IChildServiceCollection> configureChild);
         /// <summary>
         /// A child container is a new container that is created from an existing container. It will inherit all the services from the parent container, but can override them with its own registrations. This container is not meant to be used
         /// for servicing isolated units of work that repeat over and over (use a scope instead). It is meant to be used for creating a new container that can be customised for some sub-area of the system. It is probably held onto for the lifetime of the application, and scopes can be created from it as needed.
@@ -28,7 +29,7 @@ namespace Dotnettency.Container
         /// <param name="name"></param>
         /// <param name="configure"></param>
         /// <returns></returns>
-        Task<ITenantContainerAdaptor> CreateChildAsync(string name, Func<IServiceCollection, Task> configure);
+        Task<ITenantContainerAdaptor> CreateChildAsync(string name, Func<IChildServiceCollection, Task> configure);
 
         string ContainerName { get; }
         Guid ContainerId { get; }

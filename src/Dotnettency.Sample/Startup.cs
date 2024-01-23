@@ -150,7 +150,7 @@ namespace Sample
 
             });
 
-            services.AddChildContainers(); // required if not using IHost IServiceProviderFactory
+            //services.AddChildContainers(); // required if not using IHost IServiceProviderFactory
 
             // When using tenant containers, must return IServiceProvider.
             var serviceProvider = services.BuildServiceProvider();

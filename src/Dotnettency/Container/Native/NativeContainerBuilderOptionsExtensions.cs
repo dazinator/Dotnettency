@@ -2,6 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Dazinator.Extensions.DependencyInjection.ChildContainers;
+using Dotnettency.Container.Native;
+using Microsoft.Extensions.Logging;
 
 namespace Dotnettency
 {
@@ -23,15 +26,17 @@ namespace Dotnettency
                 // This lets consumers use this adapted interface to create child containers etc.
               
                 var sp = s.BuildServiceProvider();
-                var wrapper = sp.GetRequiredService<ITenantContainerAdaptor>();
-                return wrapper;
+                
+                var logger = sp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>();
+                var rootContainerAdaptor = new NativeTenantContainerAdaptor(logger, sp, s, ContainerRole.Root, "Root");
+                return rootContainerAdaptor;
             });
             
             // Register a builder service, that can be used build child containers.
             var applicationServices = options.Builder.Services;
             applicationServices.AddSingleton<ITenantContainerBuilder<TTenant>>(sp =>
             {
-                var adaptedContainer = sp.GetRequiredService<ITenantContainerAdaptor>(); // this service must be registered by the container adaptor. It is registered when the function below is called,
+                var adaptedContainer = sp.GetRequiredService<ITenantContainerAdaptor>(); // this service must be resolvable by the inner sp. It is registered when the function below is called,
                 // which is done when the IHost is configured to use our custom IServiceProviderFactory
                 // We depend on this to build child containers.
                 var containerEventsPublisher = sp.GetRequiredService<ITenantContainerEventsPublisher<TTenant>>();
@@ -46,16 +51,16 @@ namespace Dotnettency
 
         public static AdaptedContainerBuilderOptions<TTenant> NativeAsync<TTenant>(
           this ContainerBuilderOptions<TTenant> options,
-          Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> configureTenant)
+          Func<TenantShellItemBuilderContext<TTenant>, IChildServiceCollection, Task> configureTenant)
           where TTenant : class
         {
             // We create a function that will be eventually called at startup, by IServiceProviderFactory set on HostBuilder. 
             Func<IServiceCollection, ITenantContainerAdaptor> adaptorFactory = new Func<IServiceCollection, ITenantContainerAdaptor>((s) =>
             {
-                // Build the root container and return the adapted interface.
                 var sp = s.BuildServiceProvider();
-                var wrapper = sp.GetRequiredService<ITenantContainerAdaptor>();
-                return wrapper;
+                var logger = sp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>();
+                var rootContainerAdaptor = new NativeTenantContainerAdaptor(logger, sp, s, ContainerRole.Root, "Root");
+                return rootContainerAdaptor;
             });
             
             // Register a builder service, that can be used build child containers.

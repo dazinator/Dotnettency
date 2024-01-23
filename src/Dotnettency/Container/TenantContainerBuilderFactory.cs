@@ -7,9 +7,9 @@ namespace Dotnettency.Container
     public class TenantContainerBuilderFactory<TTenant> : TenantContainerFactory<TTenant>
         where TTenant : class
     {
-        private readonly ITenantContainerAdaptor _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        public TenantContainerBuilderFactory(ITenantContainerAdaptor serviceProvider) : base()
+        public TenantContainerBuilderFactory(IServiceProvider serviceProvider) : base()
         {
             _serviceProvider = serviceProvider;
         }

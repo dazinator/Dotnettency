@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Dazinator.Extensions.DependencyInjection;
+using Dazinator.Extensions.DependencyInjection.ChildContainers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ServiceCollection = Dazinator.Extensions.DependencyInjection.ServiceCollection;
@@ -70,45 +71,7 @@ namespace Dotnettency.Container.Native
             return new NativeTenantContainerAdaptor(_logger, scope, ContainerRole.Scoped, name);
         }
 
-        public ITenantContainerAdaptor CreateChild(string name, Action<IServiceCollection> configureChild)
-        {
-            if (Role == ContainerRole.Scoped)
-            {
-                throw new InvalidOperationException("Creating a child container from a scoped container is not allowed.");
-            }
-
-            _logger.LogDebug("Creating child container from container: {id}, {containerName}, {role}", _id, ContainerName, Role);
-           // IServiceProvider childSp = null;
-            var childServiceProvider = this.CreateChildServiceProvider(_serviceCollection, (childServices) =>
-            {
-                configureChild?.Invoke(childServices);
-                
-                // support resolving the container adaptor from inside the child container.
-                // This lets consumers use this adapted interface to create child containers etc.
-                childServices.AddSingleton<ITenantContainerAdaptor>(sp=>
-                {
-                    //sp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>();
-                    IServiceCollection allServices = new ServiceCollection();
-                    var allChildServices = childServices.ToArray();
-                    foreach (var cs in allChildServices)
-                    {
-                        allServices.Add(cs);
-                    }
-                 
-                    var adaptor = new NativeTenantContainerAdaptor(_logger, sp, allServices, ContainerRole.Child, name);
-                    return adaptor;
-                });
-              
-            }, s => s.BuildServiceProvider(), ParentSingletonOpenGenericRegistrationsBehaviour.DuplicateSingletons); // BUG: DuplicateSingletons causes test failures.
-          
-
-            return childServiceProvider.GetRequiredService<ITenantContainerAdaptor>();
-
-
-            //  return new NativeTenantContainerAdaptor(_logger, childServiceProvider, finalChildServices, ContainerRole.Child, name);
-        }
-
-        public async Task<ITenantContainerAdaptor> CreateChildAsync(string name, Func<IServiceCollection, Task> configureChild)
+        public ITenantContainerAdaptor CreateChild(string name, Action<IChildServiceCollection> configureChild)
         {
             if (Role == ContainerRole.Scoped)
             {
@@ -117,25 +80,78 @@ namespace Dotnettency.Container.Native
 
             _logger.LogDebug("Creating child container from container: {id}, {containerName}, {role}", _id, ContainerName, Role);
             IServiceCollection finalChildServices = null;
-            var childServiceProvider = await _serviceCollection.CreateChildServiceProviderAsync(_innerServiceProvider, async (childServices) =>
+           // IServiceProvider childSp = null;
+            var childServiceProvider = this.CreateChildServiceProvider(_serviceCollection, (childServices) =>
+            {
+                configureChild?.Invoke(childServices);
+                
+                finalChildServices = childServices;
+                // support resolving the container adaptor from inside the child container.
+                // This lets consumers use this adapted interface to create child containers etc.
+                // childServices.AddSingleton<ITenantContainerAdaptor>(sp=>
+                // {
+                //     //sp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>();
+                //     IServiceCollection allServices = new ServiceCollection();
+                //     var allChildServices = childServices.ToArray();
+                //     foreach (var cs in allChildServices)
+                //     {
+                //         allServices.Add(cs);
+                //     }
+                //  
+                //     var adaptor = new NativeTenantContainerAdaptor(_logger, sp, allServices, ContainerRole.Child, name);
+                //     return adaptor;
+                // });
+              
+            }, s => s.BuildServiceProvider(), ParentSingletonBehaviour.Delegate); // BUG: DuplicateSingletons causes test failures.
+          
+            return new NativeTenantContainerAdaptor(_logger,childServiceProvider, finalChildServices, ContainerRole.Child, name);
+           // return childServiceProvider.GetRequiredService<ITenantContainerAdaptor>();
+
+
+            //  return new NativeTenantContainerAdaptor(_logger, childServiceProvider, finalChildServices, ContainerRole.Child, name);
+        }
+
+        public async Task<ITenantContainerAdaptor> CreateChildAsync(string name, Func<IChildServiceCollection, Task> configureChild)
+        {
+            if (Role == ContainerRole.Scoped)
+            {
+                throw new InvalidOperationException("Creating a child container from a scoped container is not allowed.");
+            }
+
+            _logger.LogDebug("Creating child container from container: {id}, {containerName}, {role}", _id, ContainerName, Role);
+            IServiceCollection finalChildServices = null;
+            
+            var childServiceProvider = await _serviceCollection.CreateChildServiceProviderAsync(this, async (childServices) =>
             {
                 // support resolving the container adaptor from inside the child container.
                 // This lets consumers use this adapted interface to create child containers etc.
-                childServices.AddSingleton<ITenantContainerAdaptor>(sp =>
-                {
-                    var logger = _logger;
-                   // var logger = sp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>(); // we can't resolve this because "sp" here is a native di container scope.. is this a problem?
-                    var adaptor = new NativeTenantContainerAdaptor(logger, sp, childServices, ContainerRole.Child, name);
-                    return adaptor;
-                });
+
+              //  childServices.AutoDuplicateSingletons((child) => AddChildServices(child, name));
+                    
                 if (configureChild != null)
                 {
                     await configureChild(childServices);
                 }
-            }, sp => sp.BuildServiceProvider(), ParentSingletonOpenGenericRegistrationsBehaviour.DuplicateSingletons);
 
-            return childServiceProvider.GetRequiredService<ITenantContainerAdaptor>();
+                finalChildServices = childServices;
+            }, sp => sp.BuildServiceProvider(), ParentSingletonBehaviour.Delegate);
+
+            var reRoutingProvider = new ReRoutingServiceProvider(this);
+            reRoutingProvider.ReRoute(this, typeof(ITenantContainerAdaptor), typeof(IServiceProvider));
+            return new NativeTenantContainerAdaptor(_logger,reRoutingProvider, finalChildServices, ContainerRole.Child, name);
+           /// return childServiceProvider.GetRequiredService<ITenantContainerAdaptor>();
         }
+
+        // private void AddChildServices(IChildServiceCollection childServices, string name)
+        // {
+        //     childServices.AddSingleton<ITenantContainerAdaptor>(sp =>
+        //     {
+        //         var logger = _logger;
+        //         // var logger = sp.GetRequiredService<ILogger<NativeTenantContainerAdaptor>>(); // we can't resolve this because "sp" here is a native di container scope.. is this a problem?
+        //         var adaptor = new NativeTenantContainerAdaptor(logger, sp, childServices, ContainerRole.Child, name);
+        //         return adaptor;
+        //     });
+        // }
 
         public void Dispose()
         {
@@ -146,7 +162,29 @@ namespace Dotnettency.Container.Native
 
         public object GetService(Type serviceType)
         {
-            return _innerServiceProvider.GetService(serviceType);
+            try
+            {
+
+                if (serviceType == typeof(ITenantContainerAdaptor))
+                {
+                    return this;
+                }
+                if (serviceType == typeof(IServiceProvider))
+                {
+                    return this;
+                }
+                if (serviceType == typeof(IServiceScopeFactory))
+                {
+                    return this;
+                }
+                
+                return _innerServiceProvider.GetService(serviceType);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new InvalidOperationException(ContainerName, e);
+            }
+           
         }
 
         public IServiceScope CreateScope()

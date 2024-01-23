@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Dazinator.Extensions.DependencyInjection.ChildContainers;
 
 namespace Dotnettency.Container
 {
@@ -8,12 +9,12 @@ namespace Dotnettency.Container
     where TTenant : class
     {
         private readonly ITenantContainerAdaptor _parentContainer;
-        private readonly Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> _configureTenant;
+        private readonly Func<TenantShellItemBuilderContext<TTenant>, IChildServiceCollection, Task> _configureTenant;
         private readonly ITenantContainerEventsPublisher<TTenant> _containerEventsPublisher;
 
         public DelegateTaskTenantContainerBuilder(
             ITenantContainerAdaptor parentContainer,
-            Func<TenantShellItemBuilderContext<TTenant>, IServiceCollection, Task> configureTenant,
+            Func<TenantShellItemBuilderContext<TTenant>, IChildServiceCollection, Task> configureTenant,
             ITenantContainerEventsPublisher<TTenant> containerEventsPublisher)
         {
             _parentContainer = parentContainer;
